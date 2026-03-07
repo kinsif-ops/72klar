@@ -1,0 +1,34 @@
+{
+  "name": "72klar! – Egenberedskap",
+  "short_name": "72klar!",
+  "description": "Bli klar til å klare deg selv i 72 timer ved krise. Gratis norsk beredskapsapp.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A0A0F",
+  "theme_color": "#D62828",
+  "lang": "no",
+  "categories": ["health", "lifestyle", "utilities"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23D62828'/><text y='.9em' font-size='75' x='12'>🛡️</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Sjekkliste",
+      "short_name": "Sjekkliste",
+      "description": "Åpne sjekklisten direkte",
+      "url": "./index.html#sjekkliste"
+    },
+    {
+      "name": "Nødkontakter",
+      "short_name": "Kontakter",
+      "description": "Åpne nødkontakter direkte",
+      "url": "./index.html#kontakter"
+    }
+  ]
+}

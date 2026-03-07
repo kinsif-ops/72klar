@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>72klar!</title>
+<meta name="theme-color" content="#D62828">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="72klar!">
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #D62828; --orange: #F77F00; --dark: #0A0A0F; --dark2: #14141C;
+    --card: #1C1C28; --border: #2A2A3A; --text: #E8E8F0; --muted: #6B6B88;
+    --green: #2ECC71; --blue: #3B82F6; --gold: #F59E0B;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--dark); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; max-width: 480px; margin: 0 auto; padding-bottom: 80px; }
+
+  /* ONBOARDING */
+  #onboarding { min-height: 100vh; display: flex; flex-direction: column; }
+  .ob-hero { background: linear-gradient(135deg, var(--red) 0%, #8B0000 100%); padding: 48px 28px 36px; position: relative; overflow: hidden; text-align: center; }
+  .ob-hero::before { content: '🛡️'; position: absolute; right: -20px; top: -20px; font-size: 140px; opacity: 0.1; transform: rotate(15deg); }
+  .ob-hero h1 { font-family: 'Syne', sans-serif; font-size: 42px; font-weight: 800; letter-spacing: -1px; }
+  .ob-hero p { font-size: 15px; opacity: 0.85; margin-top: 8px; line-height: 1.5; }
+  .ob-steps { flex: 1; padding: 28px 20px; }
+  .ob-step { display: none; } .ob-step.active { display: block; }
+  .ob-step-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+  .ob-step-sub { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
+  .ob-step-indicator { display: flex; gap: 6px; margin-bottom: 28px; }
+  .ob-dot { height: 4px; border-radius: 99px; background: var(--border); flex: 1; transition: background 0.3s; }
+  .ob-dot.done { background: var(--orange); }
+  .person-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 24px; }
+  .person-option { background: var(--card); border: 2px solid var(--border); border-radius: 14px; padding: 16px 8px; cursor: pointer; text-align: center; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
+  .person-option.selected { border-color: var(--orange); background: rgba(247,127,0,0.1); }
+  .person-option .po-emoji { font-size: 28px; margin-bottom: 6px; }
+  .person-option .po-label { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; }
+  .person-option .po-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .custom-number { background: var(--card); border: 2px solid var(--border); border-radius: 14px; padding: 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .custom-number.selected { border-color: var(--orange); background: rgba(247,127,0,0.07); }
+  .custom-number label { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; }
+  .num-controls { display: flex; align-items: center; gap: 12px; }
+  .num-btn { width: 32px; height: 32px; border-radius: 8px; background: var(--border); border: none; color: var(--text); font-size: 18px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .num-val { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; min-width: 24px; text-align: center; color: var(--orange); }
+  .needs-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .needs-option { background: var(--card); border: 2px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: all 0.2s; }
+  .needs-option.selected { border-color: var(--orange); background: rgba(247,127,0,0.07); }
+  .needs-icon { font-size: 22px; } .needs-text { flex: 1; }
+  .needs-text strong { display: block; font-size: 14px; font-weight: 600; }
+  .needs-text span { font-size: 12px; color: var(--muted); }
+  .needs-check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+  .needs-option.selected .needs-check { background: var(--orange); border-color: var(--orange); }
+  .name-input-wrap { background: var(--card); border: 2px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 16px; transition: border-color 0.2s; }
+  .name-input-wrap:focus-within { border-color: var(--orange); }
+  .name-input-wrap label { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; font-weight: 600; }
+  .name-input-wrap input { width: 100%; background: none; border: none; color: var(--text); font-size: 18px; font-family: 'Syne', sans-serif; font-weight: 700; outline: none; }
+  .name-input-wrap input::placeholder { color: var(--border); }
+  .ob-btn { width: 100%; padding: 16px; border-radius: 12px; border: none; background: linear-gradient(135deg, var(--red), var(--orange)); color: white; font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; }
+  .ob-btn-secondary { width: 100%; padding: 13px; border-radius: 12px; border: 1px solid var(--border); background: none; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; margin-top: 10px; }
+
+  /* MAIN APP */
+  #app { display: none; }
+  header { background: linear-gradient(135deg, var(--red) 0%, #8B0000 100%); padding: 20px 24px 18px; position: relative; overflow: hidden; }
+  header::before { content: '🛡️'; position: absolute; right: -10px; top: -10px; font-size: 100px; opacity: 0.12; transform: rotate(15deg); }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  header h1 { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+  header p { font-size: 12px; opacity: 0.8; margin-top: 3px; }
+  .household-badge { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 6px 10px; font-size: 12px; font-family: 'Syne', sans-serif; font-weight: 700; cursor: pointer; white-space: nowrap; }
+  .status-bar { background: var(--dark2); padding: 10px 24px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .status-bar span { font-size: 13px; color: var(--muted); }
+  nav { display: flex; background: var(--dark2); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
+  nav button { flex: 1; padding: 12px 4px; background: none; border: none; color: var(--muted); font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; }
+  nav button.active { color: var(--orange); border-bottom-color: var(--orange); }
+  .tab { display: none; padding: 20px 16px; } .tab.active { display: block; }
+
+  /* MOTIVASJON */
+  .mot-hero { background: linear-gradient(135deg, #1a1a2e, #16213e); border: 1px solid var(--border); border-radius: 16px; padding: 22px; margin-bottom: 16px; text-align: center; position: relative; overflow: hidden; }
+  .mot-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 70% 30%, rgba(247,127,0,0.08) 0%, transparent 60%); }
+  .mot-readiness-ring { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 110px; margin-bottom: 14px; }
+  .ring-svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: var(--border); stroke-width: 8; }
+  .ring-fill { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.6s ease; }
+  .ring-text { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; }
+  .ring-sub { font-size: 11px; color: var(--muted); }
+  .mot-status-label { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .mot-status-msg { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .daily-tip { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 18px 18px 22px; margin-bottom: 14px; position: relative; overflow: hidden; }
+  .daily-tip::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(180deg, var(--orange), var(--red)); border-radius: 4px 0 0 4px; }
+  .tip-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--orange); margin-bottom: 6px; }
+  .tip-text { font-size: 14px; line-height: 1.6; }
+  .tip-source { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .weekly-reminder { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.25); border-radius: 14px; padding: 16px; margin-bottom: 14px; display: flex; gap: 12px; align-items: flex-start; }
+  .wr-icon { font-size: 24px; flex-shrink: 0; }
+  .wr-body { flex: 1; }
+  .wr-body strong { display: block; font-size: 14px; font-weight: 700; color: var(--blue); margin-bottom: 3px; }
+  .wr-body span { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .wr-done-btn { margin-top: 10px; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); color: var(--blue); border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .badges-section-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  .badges-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
+  .badge-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 10px; text-align: center; transition: all 0.3s; }
+  .badge-card.earned { border-color: var(--gold); background: rgba(245,158,11,0.08); }
+  .badge-emoji { font-size: 28px; margin-bottom: 6px; filter: grayscale(1) opacity(0.3); transition: filter 0.3s; }
+  .badge-card.earned .badge-emoji { filter: none; }
+  .badge-name { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; line-height: 1.3; }
+  .badge-card.earned .badge-name { color: var(--gold); }
+  .badge-desc { font-size: 10px; color: var(--muted); margin-top: 3px; line-height: 1.3; }
+
+  /* BADGE MODAL */
+  .badge-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:300; align-items:center; justify-content:center; padding:20px; }
+  .badge-modal-overlay.open { display:flex; animation:fadeIn 0.2s ease; }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  .badge-modal { background:var(--card); border:2px solid var(--gold); border-radius:24px; padding:32px 24px 28px; width:100%; max-width:340px; text-align:center; position:relative; animation:popIn 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes popIn { from{opacity:0;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
+  .badge-modal-close { position:absolute; top:14px; right:16px; background:var(--border); border:none; color:var(--muted); width:32px; height:32px; border-radius:50%; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; }
+  .badge-modal-close:hover { background:var(--red); color:white; }
+  .badge-modal-emoji { font-size:72px; margin-bottom:12px; animation:badgePop 0.5s 0.2s cubic-bezier(0.34,1.56,0.64,1) both; }
+  @keyframes badgePop { from{transform:scale(0) rotate(-20deg)} to{transform:scale(1) rotate(0deg)} }
+  .badge-modal-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--gold); margin-bottom:6px; }
+  .badge-modal-title { font-family:'Syne',sans-serif; font-size:26px; font-weight:800; color:var(--gold); margin-bottom:8px; }
+  .badge-modal-desc { font-size:14px; color:var(--muted); line-height:1.5; margin-bottom:22px; }
+  .badge-modal-btn { width:100%; padding:14px; border-radius:12px; border:none; background:linear-gradient(135deg,var(--red),var(--orange)); color:white; font-family:'Syne',sans-serif; font-size:15px; font-weight:800; cursor:pointer; }
+
+  /* CONFETTI CANVAS */
+  #confettiCanvas { position:fixed; inset:0; pointer-events:none; z-index:299; }
+
+  /* 7-DAY CHALLENGE CARD (in-page) */
+  .challenge-card { background:linear-gradient(135deg,rgba(247,127,0,0.12),rgba(214,40,40,0.08)); border:1px solid rgba(247,127,0,0.5); border-radius:16px; padding:20px; margin-bottom:14px; display:none; cursor:pointer; transition:all 0.2s; }
+  .challenge-card:active { transform:scale(0.98); }
+  .challenge-card-top { display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+  .challenge-card-emoji { font-size:32px; flex-shrink:0; }
+  .challenge-card-title { font-family:'Syne',sans-serif; font-size:15px; font-weight:800; color:var(--orange); }
+  .challenge-card-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+  .challenge-card-btn { display:inline-block; margin-top:10px; background:linear-gradient(135deg,var(--orange),var(--red)); color:white; border:none; border-radius:8px; padding:9px 18px; font-family:'Syne',sans-serif; font-size:13px; font-weight:700; cursor:pointer; }
+
+  /* 7-DAY CHALLENGE MODAL */
+  .challenge-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.82); z-index:400; align-items:center; justify-content:center; padding:20px; }
+  .challenge-modal-overlay.open { display:flex; animation:fadeIn 0.25s ease; }
+  .challenge-modal { background:linear-gradient(135deg,#1a1a2e,#16213e); border:2px solid var(--orange); border-radius:24px; padding:32px 24px 28px; width:100%; max-width:360px; text-align:center; position:relative; animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+  .challenge-modal-close { position:absolute; top:14px; right:16px; background:rgba(255,255,255,0.1); border:none; color:var(--muted); width:32px; height:32px; border-radius:50%; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .challenge-hero-emoji { font-size:64px; margin-bottom:10px; }
+  .challenge-modal h2 { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:white; margin-bottom:8px; }
+  .challenge-modal p { font-size:13px; color:var(--muted); line-height:1.6; margin-bottom:20px; }
+  .challenge-items { text-align:left; margin-bottom:22px; display:flex; flex-direction:column; gap:10px; }
+  .ch-item { background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:12px; }
+  .ch-item-icon { font-size:22px; flex-shrink:0; }
+  .ch-item-text strong { display:block; font-size:13px; font-weight:700; color:var(--text); }
+  .ch-item-text span { font-size:11px; color:var(--muted); }
+  .challenge-yes-btn { width:100%; padding:15px; border-radius:12px; border:none; background:linear-gradient(135deg,var(--orange),var(--red)); color:white; font-family:'Syne',sans-serif; font-size:16px; font-weight:800; cursor:pointer; margin-bottom:10px; }
+  .challenge-no-btn { width:100%; padding:11px; border-radius:12px; border:1px solid var(--border); background:none; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; }
+
+  /* CHECKLIST */
+  .progress-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+  .progress-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .progress-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .progress-pct { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--orange); }
+  .progress-bar { background: var(--border); border-radius: 99px; height: 10px; overflow: hidden; margin-bottom: 8px; }
+  .progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--red), var(--orange)); transition: width 0.4s ease; }
+  .progress-label { font-size: 13px; color: var(--muted); }
+  .progress-label span { color: var(--orange); font-weight: 600; }
+  .household-summary { background: rgba(247,127,0,0.08); border: 1px solid rgba(247,127,0,0.25); border-radius: 10px; padding: 10px 14px; margin-top: 12px; font-size: 13px; color: var(--orange); }
+  .category { margin-bottom: 20px; }
+  .category-title { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 10px; padding-left: 4px; }
+  .checklist-item { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
+  .checklist-item:active { transform: scale(0.98); }
+  .checklist-item.checked { border-color: var(--green); background: rgba(46,204,113,0.07); }
+  .checkbox { width: 24px; height: 24px; border-radius: 6px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; font-size: 13px; }
+  .checklist-item.checked .checkbox { background: var(--green); border-color: var(--green); }
+  .item-info { flex: 1; }
+  .item-name { font-size: 15px; font-weight: 500; transition: color 0.2s; }
+  .checklist-item.checked .item-name { color: var(--muted); text-decoration: line-through; }
+  .item-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .item-qty { font-size: 11px; background: rgba(247,127,0,0.15); color: var(--orange); border-radius: 6px; padding: 2px 7px; font-weight: 600; white-space: nowrap; margin-top: 4px; display: inline-block; }
+  .item-emoji { font-size: 20px; }
+
+  /* CONTACTS */
+  .contacts-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .contacts-header h2 { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+  .add-btn { background: var(--red); color: white; border: none; border-radius: 8px; padding: 8px 14px; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; }
+  .preset-label { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin: 16px 0 8px; }
+  .contact-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; }
+  .contact-avatar { width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, var(--red), var(--orange)); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .contact-avatar.preset { background: linear-gradient(135deg, #1a3a6b, #2255a4); }
+  .contact-info { flex: 1; }
+  .contact-name { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; }
+  .contact-role { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .contact-number { font-size: 14px; color: var(--orange); margin-top: 4px; font-weight: 500; }
+  .contact-actions { display: flex; flex-direction: column; gap: 6px; }
+  .call-btn { background: var(--green); color: var(--dark); border: none; border-radius: 8px; padding: 7px 12px; font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: none; display: block; text-align: center; font-family: 'Syne', sans-serif; }
+  .del-btn { background: rgba(214,40,40,0.15); color: var(--red); border: 1px solid rgba(214,40,40,0.3); border-radius: 8px; padding: 5px 12px; font-size: 12px; cursor: pointer; }
+
+  /* INFO */
+  .info-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 12px; }
+  .info-card h3 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+  .info-card p, .info-card li { font-size: 14px; color: var(--muted); line-height: 1.6; }
+  .info-card ul { padding-left: 18px; margin-top: 6px; }
+  .info-card li { margin-bottom: 4px; }
+  .alert-box { background: rgba(214,40,40,0.12); border: 1px solid rgba(214,40,40,0.35); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; }
+  .alert-box span { font-size: 14px; color: #ff8080; line-height: 1.5; }
+
+  /* CREDITS */
+  .credits-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 22px; margin-bottom: 12px; }
+  .credits-top { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .credits-avatar { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, var(--red), var(--orange)); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+  .credits-name { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; }
+  .credits-role { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+  .credits-desc { font-size: 13px; color: var(--muted); line-height: 1.6; border-top: 1px solid var(--border); padding-top: 12px; }
+  .sponsor-box { background: var(--card); border: 2px dashed var(--border); border-radius: 14px; padding: 22px; margin-bottom: 12px; text-align: center; }
+  .sp-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .sp-empty { font-size: 28px; margin-bottom: 8px; }
+  .sp-cta { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .sp-cta strong { color: var(--orange); }
+  .app-version { text-align: center; font-size: 11px; color: var(--border); padding: 16px 0 4px; }
+  /* FIRSTAID */
+  .fh-card { background:var(--card); border:1px solid var(--border); border-radius:14px; margin-bottom:10px; overflow:hidden; cursor:pointer; }
+  .fh-header { display:flex; align-items:center; gap:12px; padding:14px 16px; }
+  .fh-emoji { font-size:28px; flex-shrink:0; }
+  .fh-title { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; }
+  .fh-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+  .fh-arrow { margin-left:auto; color:var(--muted); font-size:16px; transition:transform 0.2s; flex-shrink:0; }
+  .fh-card.open .fh-arrow { transform:rotate(180deg); }
+  .fh-body { display:none; padding:0 16px 16px; border-top:1px solid var(--border); padding-top:14px; }
+  .fh-card.open .fh-body { display:block; }
+  .fh-step { display:flex; gap:10px; align-items:flex-start; margin-bottom:10px; font-size:13px; line-height:1.6; }
+  .fh-num { background:var(--red); color:white; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-size:11px; font-weight:800; flex-shrink:0; margin-top:2px; }
+  .fh-tip { background:rgba(247,127,0,0.08); border:1px solid rgba(247,127,0,0.2); border-radius:8px; padding:8px 12px; font-size:12px; color:var(--orange); margin-top:8px; line-height:1.5; }
+  /* LIGHT THEME */
+  body.light { --dark:#F5F5F5; --dark2:#EBEBEB; --card:#FFFFFF; --border:#D0D0D8; --text:#1A1A2E; --muted:#6B6B88; }
+  body.light .fh-card { box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  body.light .item-name { color: #1A1A2E; }
+  body.light .item-desc { color: #6B6B88; }
+  body.light .checklist-item { color: #1A1A2E; }
+  body.light .checklist-item.checked .item-name { color: #aaa; }
+  body.light .category-title { color: #6B6B88; }
+  body.light .progress-title { color: #1A1A2E; }
+  body.light .progress-pct { color: var(--orange); }
+  body.light .progress-label { color: #6B6B88; }
+  body.light .contact-name { color: #1A1A2E; }
+  body.light .contact-role { color: #6B6B88; }
+  body.light .contact-number { color: #6B6B88; }
+  body.light .preset-label { color: #6B6B88; }
+  body.light header { background: linear-gradient(135deg, var(--red) 0%, #8B0000 100%); }
+  body.light header h1, body.light header p { color: white; }
+  body.light .household-badge { color: white; }
+  body.light nav button { color: #6B6B88; }
+  body.light nav button.active { color: var(--orange); }
+  body.light .mot-status-label { color: #1A1A2E; }
+  body.light .mot-status-msg { color: #6B6B88; }
+  body.light .ring-text { color: #1A1A2E; }
+  body.light .tip-text { color: #1A1A2E; }
+  body.light .tip-label { color: var(--orange); }
+  body.light .tip-source { color: #6B6B88; }
+  body.light .badge-name { color: #1A1A2E; }
+  body.light .badge-desc { color: #6B6B88; }
+  body.light .info-card h3 { color: #1A1A2E; }
+  body.light .info-card p, body.light .info-card li { color: #1A1A2E; }
+  body.light .credits-name { color: #1A1A2E; }
+  body.light .credits-desc { color: #6B6B88; }
+  body.light .fh-title { color: #1A1A2E; }
+  body.light .fh-sub { color: #6B6B88; }
+  body.light .fh-step { color: #1A1A2E; }
+  body.light .status-bar { background: #EBEBEB; border-color: #D0D0D8; }
+  body.light #statusText { color: #6B6B88; }
+  /* FEEDBACK STAR */
+  .fb-star { background:none; border:none; font-size:28px; cursor:pointer; padding:2px 4px; opacity:0.4; transition:opacity 0.15s,transform 0.15s; }
+  .fb-star.active { opacity:1; transform:scale(1.15); }
+  .lang-en .no-text { display:none; }
+  .lang-en .en-text { display:block !important; }
+  .no-text { display:block; }
+  .en-text { display:none; }
+  .reset-section { margin-top: 8px; padding: 20px 0 8px; border-top: 1px solid var(--border); }
+  .reset-btn { width:100%; padding:14px; border-radius:12px; border:1px solid rgba(214,40,40,0.4); background:rgba(214,40,40,0.08); color:var(--red); font-family:'Syne',sans-serif; font-size:14px; font-weight:700; cursor:pointer; margin-bottom:10px; transition:all 0.2s; }
+  .reset-btn:active { background:rgba(214,40,40,0.2); }
+  .reset-btn-soft { width:100%; padding:12px; border-radius:12px; border:1px solid var(--border); background:none; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; transition:all 0.2s; }
+  .reset-btn-soft:active { background:var(--border); }
+
+  /* SHARE MODAL */
+  .share-card { background: linear-gradient(135deg, rgba(247,127,0,0.1), rgba(214,40,40,0.08)); border: 1px solid rgba(247,127,0,0.4); border-radius: 16px; padding: 20px; margin-bottom: 12px; }
+  .share-card-title { font-family:'Syne',sans-serif; font-size:15px; font-weight:800; margin-bottom:4px; color:var(--orange); }
+  .share-card-sub { font-size:13px; color:var(--muted); margin-bottom:16px; line-height:1.5; }
+  .share-btns { display:flex; flex-direction:column; gap:10px; }
+  .share-btn { width:100%; padding:13px 16px; border-radius:12px; border:none; font-family:'Syne',sans-serif; font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.2s; }
+  .share-btn:active { transform:scale(0.97); }
+  .share-btn-qr { background: linear-gradient(135deg, var(--red), var(--orange)); color:white; }
+  .share-btn-copy { background: var(--card); border: 1px solid var(--border); color: var(--text); }
+  .share-btn-native { background: var(--card); border: 1px solid rgba(59,130,246,0.4); color: var(--blue); }
+
+  .qr-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.82); z-index:500; align-items:center; justify-content:center; padding:20px; }
+  .qr-modal-overlay.open { display:flex; animation:fadeIn 0.2s ease; }
+  .qr-modal { background:var(--card); border:1px solid var(--border); border-radius:24px; padding:28px 24px; width:100%; max-width:320px; text-align:center; position:relative; animation:popIn 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+  .qr-modal-close { position:absolute; top:14px; right:16px; background:var(--border); border:none; color:var(--muted); width:32px; height:32px; border-radius:50%; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .qr-modal h3 { font-family:'Syne',sans-serif; font-size:18px; font-weight:800; margin-bottom:6px; }
+  .qr-modal p { font-size:13px; color:var(--muted); margin-bottom:18px; line-height:1.5; }
+  #qrCanvas { border-radius:12px; background:white; padding:12px; margin-bottom:16px; }
+  .qr-url { font-size:11px; color:var(--muted); word-break:break-all; margin-bottom:16px; padding:8px 12px; background:var(--dark2); border-radius:8px; }
+  .qr-copy-btn { width:100%; padding:12px; border-radius:10px; border:none; background:linear-gradient(135deg,var(--red),var(--orange)); color:white; font-family:'Syne',sans-serif; font-size:14px; font-weight:700; cursor:pointer; }
+
+  .copy-toast { position:fixed; bottom:100px; left:50%; transform:translateX(-50%) translateY(10px); background:var(--green); color:var(--dark); border-radius:10px; padding:10px 20px; font-family:'Syne',sans-serif; font-size:13px; font-weight:700; z-index:600; opacity:0; transition:all 0.3s; pointer-events:none; white-space:nowrap; }
+  .copy-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: flex-end; padding: 20px 16px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; width: 100%; max-width: 480px; margin: 0 auto; }
+  .modal h3 { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 16px; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-group input, .form-group select { width: 100%; background: var(--dark2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-size: 15px; font-family: 'DM Sans', sans-serif; outline: none; }
+  .form-group input:focus, .form-group select:focus { border-color: var(--orange); }
+  .form-group select option { background: var(--dark2); }
+  .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
+  .modal-btns button { flex: 1; padding: 13px; border-radius: 10px; border: none; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .btn-save { background: var(--red); color: white; } .btn-cancel { background: var(--border); color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- ONBOARDING -->
+<div id="onboarding">
+  <div class="ob-hero"><h1>72klar!</h1><p>Klar til å klare deg selv<br>– i 72 timer</p></div>
+  <div class="ob-steps">
+    <div class="ob-step-indicator">
+      <div class="ob-dot done" id="dot0"></div><div class="ob-dot" id="dot1"></div><div class="ob-dot" id="dot2"></div>
+    </div>
+    <div class="ob-step active" id="step0">
+      <div class="ob-step-title">Hva heter du?</div>
+      <div class="ob-step-sub">Vi personaliserer appen for deg og husstanden din.</div>
+      <div class="name-input-wrap"><label>Ditt navn</label><input type="text" id="inputName" placeholder="Skriv navn her..." autocomplete="given-name"></div>
+      <button class="ob-btn" onclick="goStep(1)">Fortsett →</button>
+    </div>
+    <div class="ob-step" id="step1">
+      <div class="ob-step-title">Hvem forbereder du deg for?</div>
+      <div class="ob-step-sub">Alle mengder tilpasses automatisk.</div>
+      <div class="person-grid">
+        <div class="person-option selected" onclick="selectPersonPreset(1,this)"><div class="po-emoji">🧍</div><div class="po-label">Bare meg</div><div class="po-sub">1 person</div></div>
+        <div class="person-option" onclick="selectPersonPreset(2,this)"><div class="po-emoji">👫</div><div class="po-label">Par</div><div class="po-sub">2 personer</div></div>
+        <div class="person-option" onclick="selectPersonPreset(3,this)"><div class="po-emoji">👨‍👩‍👦</div><div class="po-label">Liten familie</div><div class="po-sub">3 personer</div></div>
+        <div class="person-option" onclick="selectPersonPreset(4,this)"><div class="po-emoji">👨‍👩‍👧‍👦</div><div class="po-label">Familie</div><div class="po-sub">4 personer</div></div>
+        <div class="person-option" onclick="selectPersonPreset(5,this)"><div class="po-emoji">🏘️</div><div class="po-label">Stor familie</div><div class="po-sub">5 personer</div></div>
+        <div class="person-option" id="customOption" onclick="selectCustom()"><div class="po-emoji">✏️</div><div class="po-label">Egendefinert</div><div class="po-sub">Velg antall</div></div>
+      </div>
+      <div class="custom-number" id="customNumberRow" style="display:none">
+        <label>Antall personer</label>
+        <div class="num-controls"><button class="num-btn" onclick="changeNum(-1)">−</button><div class="num-val" id="numVal">6</div><button class="num-btn" onclick="changeNum(1)">+</button></div>
+      </div>
+      <button class="ob-btn" onclick="goStep(2)">Fortsett →</button>
+    </div>
+    <div class="ob-step" id="step2">
+      <div class="ob-step-title">Spesielle hensyn?</div>
+      <div class="ob-step-sub">Vi legger til ekstra punkter i sjekklisten.</div>
+      <div class="needs-grid">
+        <div class="needs-option" onclick="toggleNeed('baby',this)"><div class="needs-icon">👶</div><div class="needs-text"><strong>Baby / småbarn</strong><span>Under 3 år – bleier, barnemat</span></div><div class="needs-check" id="need-baby"></div></div>
+        <div class="needs-option" onclick="toggleNeed('eldre',this)"><div class="needs-icon">🧓</div><div class="needs-text"><strong>Eldre i husstanden</strong><span>Over 70 – ekstra varme</span></div><div class="needs-check" id="need-eldre"></div></div>
+        <div class="needs-option" onclick="toggleNeed('hund',this)"><div class="needs-icon">🐕</div><div class="needs-text"><strong>Hund eller katt</strong><span>Mat og vann til kjæledyr</span></div><div class="needs-check" id="need-hund"></div></div>
+        <div class="needs-option" onclick="toggleNeed('medisin',this)"><div class="needs-icon">💉</div><div class="needs-text"><strong>Faste medisiner</strong><span>Noen er avhengig av medisiner</span></div><div class="needs-check" id="need-medisin"></div></div>
+      </div>
+      <div id="obInstallBtn" style="display:none;background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);border-radius:12px;padding:14px 16px;margin-bottom:12px;display:none;align-items:center;gap:12px;">
+        <span style="font-size:28px;">📲</span>
+        <div style="flex:1;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:#2ECC71;">Lagre som app på telefonen</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">Raskere tilgang – fungerer offline!</div>
+        </div>
+        <button onclick="installPWA()" style="background:linear-gradient(135deg,#2ECC71,#27AE60);border:none;color:white;border-radius:8px;padding:8px 14px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">+ Legg til</button>
+      </div>
+      <button class="ob-btn" onclick="finishOnboarding()">🛡️ Start 72klar!!</button>
+      <button class="ob-btn-secondary" onclick="finishOnboarding()">Hopp over</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <header>
+    <div class="header-top">
+      <div><h1>🛡️ 72klar!</h1><p id="headerSub">Klar til å klare deg selv – i 72 timer</p></div>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <div class="household-badge" id="langToggle" onclick="toggleLang()" style="padding:6px 10px;">🌐 EN</div>
+        <div class="household-badge" onclick="resetOnboarding()" id="householdBadge">⚙️ Husstand</div>
+      </div>
+    </div>
+  </header>
+  <div class="status-bar"><div class="status-dot" id="statusDot"></div><span id="statusText">Status: Normal beredskap</span><span id="offlineBadge" style="display:none;margin-left:auto;background:rgba(46,204,113,0.15);color:var(--green);border:1px solid rgba(46,204,113,0.3);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;">✓ Fungerer offline</span></div>
+  <!-- PWA INSTALL BANNER -->
+  <div id="pwaBanner" style="display:none;background:linear-gradient(135deg,rgba(214,40,40,0.15),rgba(247,127,0,0.15));border-bottom:1px solid rgba(247,127,0,0.3);padding:10px 16px;display:none;align-items:center;gap:10px;">
+    <span style="font-size:22px;">📲</span>
+    <div style="flex:1;font-size:13px;line-height:1.4;"><strong>Legg til på hjemskjermen</strong><br><span style="color:var(--muted);font-size:12px;">Bruk som ekte app – offline!</span></div>
+    <button onclick="installPWA()" style="background:linear-gradient(135deg,var(--red),var(--orange));border:none;color:white;border-radius:8px;padding:7px 12px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">Installer</button>
+    <button onclick="dismissPWA()" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 4px;">×</button>
+  </div>
+
+  <nav>
+    <button class="active" onclick="switchTab('motivasjon',event)">🏅 Fremgang</button>
+    <button onclick="switchTab('sjekkliste',event)">✅ Sjekkliste</button>
+    <button onclick="switchTab('kontakter',event)">📞 Kontakter</button>
+    <button onclick="switchTab('info',event)">ℹ️ Info</button>
+    <button onclick="switchTab('forstehjel',event)">🚑 1.hjelp</button>
+  </nav>
+
+  <!-- MOTIVASJON -->
+  <div id="motivasjon" class="tab active">
+    <div class="mot-hero">
+      <div class="mot-readiness-ring">
+        <svg class="ring-svg" width="110" height="110" viewBox="0 0 110 110">
+          <circle class="ring-bg" cx="55" cy="55" r="46"/>
+          <circle class="ring-fill" id="ringFill" cx="55" cy="55" r="46" stroke-dasharray="289" stroke-dashoffset="289" stroke="url(#rgrad)"/>
+          <defs><linearGradient id="rgrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#D62828"/><stop offset="100%" style="stop-color:#F77F00"/></linearGradient></defs>
+        </svg>
+        <div style="text-align:center"><div class="ring-text" id="ringPct">0%</div><div class="ring-sub">klar</div></div>
+      </div>
+      <div class="mot-status-label" id="motStatusLabel">Kom i gang! 🚀</div>
+      <div class="mot-status-msg" id="motStatusMsg">Du har ikke startet ennå. Første steg er det viktigste!</div>
+    </div>
+
+    <!-- SOCIAL SHARE SCORE -->
+    <div id="socialShareCard" style="display:none;background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:14px;text-align:center;">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:8px;">Del din beredskapsstatus</div>
+      <div id="socialShareText" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:12px;line-height:1.4;"></div>
+      <div style="display:flex;gap:8px;justify-content:center;">
+        <button onclick="shareScore()" style="background:linear-gradient(135deg,var(--red),var(--orange));border:none;color:white;border-radius:8px;padding:8px 16px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">↗️ Del fremgangen din</button>
+      </div>
+    </div>
+
+    <div class="daily-tip">
+      <div class="tip-label">💡 Dagens beredskapstips</div>
+      <div class="tip-text" id="dailyTipText"></div>
+      <div class="tip-source" id="dailyTipSource"></div>
+    </div>
+
+    <div class="challenge-card" id="challengeCard" onclick="openChallengeModal()">
+      <div class="challenge-card-top">
+        <div class="challenge-card-emoji">🗓️</div>
+        <div>
+          <div class="challenge-card-title">7-dagersutfordringen venter!</div>
+          <div class="challenge-card-sub">Du er 100% klar for 72 timer. Klar for neste nivå?</div>
+        </div>
+      </div>
+      <button class="challenge-card-btn">Se utfordringen →</button>
+    </div>
+
+    <div class="weekly-reminder" id="weeklyReminderBox"></div>
+
+    <div class="badges-section-title">🏅 Dine merker</div>
+    <div class="badges-grid" id="badgesGrid"></div>
+  </div>
+
+  <!-- SJEKKLISTE -->
+  <div id="sjekkliste" class="tab">
+    <div class="progress-card">
+      <div class="progress-top"><div class="progress-title">Beredskapsstatus</div><div class="progress-pct" id="progressPct">0%</div></div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="progress-label"><span id="progressText">0 av 0</span> gjenstander klargjort</div>
+      <div class="household-summary" id="householdSummary"></div>
+      <div id="checklistLastUpdated" style="font-size:11px;color:var(--muted);margin-top:6px;text-align:right;"></div>
+    </div>
+    <div id="checklistContainer"></div>
+    <button onclick="printChecklist()" style="width:100%;margin-top:12px;padding:13px;border-radius:12px;border:1px solid var(--border);background:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">🖨️ Skriv ut sjekkliste</button>
+  </div>
+
+  <!-- KONTAKTER -->
+  <div id="kontakter" class="tab">
+    <div class="contacts-header"><h2>Nødkontakter</h2><button class="add-btn" onclick="openModal()">+ Legg til</button></div>
+    <div class="preset-label">🚨 Nødnumre</div>
+    <div class="contact-card"><div class="contact-avatar preset">🚒</div><div class="contact-info"><div class="contact-name">Brannvesen</div><div class="contact-role">Brann, redning</div><div class="contact-number">110</div></div><div class="contact-actions"><a href="tel:110" class="call-btn">Ring</a></div></div>
+    <div class="contact-card"><div class="contact-avatar preset">🚑</div><div class="contact-info"><div class="contact-name">Ambulanse</div><div class="contact-role">Medisinsk nød</div><div class="contact-number">113</div></div><div class="contact-actions"><a href="tel:113" class="call-btn">Ring</a></div></div>
+    <div class="contact-card"><div class="contact-avatar preset">👮</div><div class="contact-info"><div class="contact-name">Politi</div><div class="contact-role">Kriminalitet, orden</div><div class="contact-number">112</div></div><div class="contact-actions"><a href="tel:112" class="call-btn">Ring</a></div></div>
+    <div class="contact-card"><div class="contact-avatar preset">☢️</div><div class="contact-info"><div class="contact-name">Sivilforsvaret</div><div class="contact-role">Katastrofer, evakuering</div><div class="contact-number">02800</div></div><div class="contact-actions"><a href="tel:02800" class="call-btn">Ring</a></div></div>
+    <div class="preset-label" id="privateLabel" style="display:none">👤 Mine kontakter</div>
+    <div id="privateContacts"></div>
+  </div>
+
+  <!-- FØRSTEHJELP -->
+  <div id="forstehjel" class="tab">
+    <div style="background:rgba(214,40,40,0.1);border:1px solid rgba(214,40,40,0.3);border-radius:14px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:var(--muted);line-height:1.6;">
+      ⚠️ <strong style="color:var(--text);">Viktig:</strong> Ring 113 ved livstruende situasjoner. Disse stegene er kun veiledning til hjelp ankommer.
+    </div>
+
+    <div class="fh-card" onclick="toggleFH(this)">
+      <div class="fh-header"><span class="fh-emoji">❤️</span><div><div class="fh-title">Hjertestans (HLR)</div><div class="fh-sub">Bevisstløs og puster ikke normalt</div></div><span class="fh-arrow">▾</span></div>
+      <div class="fh-body">
+        <div class="fh-step"><div class="fh-num">1</div><div>Ring 113 umiddelbart – sett telefonen på høyttaler</div></div>
+        <div class="fh-step"><div class="fh-num">2</div><div>Legg personen flatt på ryggen på hardt underlag</div></div>
+        <div class="fh-step"><div class="fh-num">3</div><div><strong>30 brystkompresjoner:</strong> Legg hendene midt på brystet, press ned 5–6 cm med strake armer, 100–120 per minutt</div></div>
+        <div class="fh-step"><div class="fh-num">4</div><div><strong>2 innblåsinger:</strong> Vipp hodet bakover, løft haken, blås langsomt i ca. 1 sek til brystet hever seg</div></div>
+        <div class="fh-step"><div class="fh-num">5</div><div>Gjenta 30:2 til ambulanse ankommer eller personen puster normalt</div></div>
+        <div class="fh-tip">💡 Hjertestarterens stemme veileder deg trinn for trinn – bruk den!</div>
+      </div>
+    </div>
+
+    <div class="fh-card" onclick="toggleFH(this)">
+      <div class="fh-header"><span class="fh-emoji">😮</span><div><div class="fh-title">Kvelning / fremmedlegeme</div><div class="fh-sub">Personen kan ikke puste, snakke eller hoste</div></div><span class="fh-arrow">▾</span></div>
+      <div class="fh-body">
+        <div class="fh-step"><div class="fh-num">1</div><div>Oppfordre til kraftig hosting hvis mulig</div></div>
+        <div class="fh-step"><div class="fh-num">2</div><div><strong>5 ryggslagere:</strong> Bøy personen fremover, slå 5 ganger kraftig mellom skulderbladene med flat hånd</div></div>
+        <div class="fh-step"><div class="fh-num">3</div><div><strong>5 abdominaltrykk (Heimlich):</strong> Stå bak, fatt rundt livet, press kraftig innover og oppover under ribbene</div></div>
+        <div class="fh-step"><div class="fh-num">4</div><div>Veksle mellom 5 ryggslagere og 5 Heimlich-trykk til legemet løsner</div></div>
+        <div class="fh-step"><div class="fh-num">5</div><div>Mister personen bevisstheten: start HLR og ring 113</div></div>
+        <div class="fh-tip">💡 Ved spedbarn: legg barnet ansiktet ned over underarmen din – aldri Heimlich!</div>
+      </div>
+    </div>
+
+    <div class="fh-card" onclick="toggleFH(this)">
+      <div class="fh-header"><span class="fh-emoji">🩸</span><div><div class="fh-title">Kraftig blødning</div><div class="fh-sub">Store sår med mye blødning</div></div><span class="fh-arrow">▾</span></div>
+      <div class="fh-body">
+        <div class="fh-step"><div class="fh-num">1</div><div>Ring 113 ved livstruende blødning</div></div>
+        <div class="fh-step"><div class="fh-num">2</div><div><strong>Press hardt:</strong> Bruk rent tøy eller bandasje – press direkte på såret med begge hender</div></div>
+        <div class="fh-step"><div class="fh-num">3</div><div>Hold trykket kontinuerlig – ikke løft opp for å sjekke</div></div>
+        <div class="fh-step"><div class="fh-num">4</div><div>Hev kroppsdelen over hjertehøyde om mulig</div></div>
+        <div class="fh-step"><div class="fh-num">5</div><div>Ved ekstremitetsblødning som ikke stopper: legg tourniquet 5–7 cm over såret og noter klokkeslettet</div></div>
+        <div class="fh-tip">💡 Bruk hansker om tilgjengelig – beskytt deg selv</div>
+      </div>
+    </div>
+
+    <div class="fh-card" onclick="toggleFH(this)">
+      <div class="fh-header"><span class="fh-emoji">🔥</span><div><div class="fh-title">Brannskade</div><div class="fh-sub">Forbrenning fra varme, kjemikalier eller strøm</div></div><span class="fh-arrow">▾</span></div>
+      <div class="fh-body">
+        <div class="fh-step"><div class="fh-num">1</div><div>Fjern kilden og sikre stedet</div></div>
+        <div class="fh-step"><div class="fh-num">2</div><div><strong>Kjøl ned:</strong> Hold under rennende, lunkent vann (15–20°C) i minimum 20 minutter</div></div>
+        <div class="fh-step"><div class="fh-num">3</div><div>Ikke bruk is, smør, tannkrem eller annen salve</div></div>
+        <div class="fh-step"><div class="fh-num">4</div><div>Dekk løst med rent, fuktig tøy eller brannsårbandasje</div></div>
+        <div class="fh-step"><div class="fh-num">5</div><div>Ring 113 ved: store brannskader, ansikt/hender/lysken berørt, kjemikalier/strøm involvert</div></div>
+        <div class="fh-tip">💡 Ikke burst blemmer – de beskytter mot infeksjon</div>
+      </div>
+    </div>
+
+    <div class="fh-card" onclick="toggleFH(this)">
+      <div class="fh-header"><span class="fh-emoji">🥶</span><div><div class="fh-title">Hypotermi (nedkjøling)</div><div class="fh-sub">Kroppstemperatur under 35°C</div></div><span class="fh-arrow">▾</span></div>
+      <div class="fh-body">
+        <div class="fh-step"><div class="fh-num">1</div><div>Flytt personen til ly for vind og kulde</div></div>
+        <div class="fh-step"><div class="fh-num">2</div><div>Fjern våte klær forsiktig – bruk klipser om tilgjengelig</div></div>
+        <div class="fh-step"><div class="fh-num">3</div><div>Pakk inn i tepper, sovepose eller metallfolie (romtemperatur)</div></div>
+        <div class="fh-step"><div class="fh-num">4</div><div>Gi varm, søt drikke kun om personen er ved bevissthet og kan svelge</div></div>
+        <div class="fh-step"><div class="fh-num">5</div><div>Ring 113 – ikke gni eller massér huden da det kan forverre tilstanden</div></div>
+        <div class="fh-tip">💡 Bevisstløs ved hypotermi: start HLR og ring 113 øyeblikkelig</div>
+      </div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;margin-top:8px;">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:10px;">Lær mer – ta et kurs</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+        <a href="https://www.rodekors.no/aktiviteter/kurs/" target="_blank" style="background:rgba(214,40,40,0.15);border:1px solid rgba(214,40,40,0.3);color:var(--red);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;">❤️ Røde Kors-kurs</a>
+        <a href="https://www.hjelp30.no" target="_blank" style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);color:var(--blue);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;">📘 Hjelp 3.0</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- INFO -->
+  <div id="info" class="tab">
+    <div class="alert-box"><span>⚠️ Myndighetene anbefaler at alle husstander er forberedt på å klare seg selv i minst <strong>72 timer</strong> ved en krisesituasjon.</span></div>
+    <div class="info-card"><h3>💧 Vann</h3><p>Ha minst <strong>3 liter per person per dag</strong>. Fyll opp badekaret tidlig ved varsel om kriser.</p></div>
+    <div class="info-card"><h3>🔦 Strømbrudd</h3><ul><li>Ha lommelykt og batterier klart</li><li>Stearinlys med lighter/fyrstikker</li><li>Hold mobilbatteriet ladet</li><li>En gammeldags radioapparat fungerer uten strøm</li></ul></div>
+    <div class="info-card"><h3>🍎 Mat</h3><p>Lagre mat med lang holdbarhet: hermetikk, tørrmat, nøtter, knekkebrød. Roter lagrene dine jevnlig.</p></div>
+    <div class="info-card"><h3>📻 Informasjon</h3><ul><li>NRK P1 – offisiell kriseinformasjon</li><li>Varsom.no – natur- og hendelsesvarsel</li><li>yr.no – vær og farevarsel</li></ul></div>
+    <div class="info-card"><h3>🏃 Evakuering</h3><ul><li>Kjenn to fluktveier fra hjemmet ditt</li><li>Ha avtalt møtepunkt med familien</li><li>Grab-and-go bag klar ved dørene</li></ul></div>
+
+    <div class="info-card">
+      <h3>📡 Kommunikasjon uten internett</h3>
+      <p style="margin-bottom:14px;">Når strøm og mobilnett er nede, trenger du alternativer. Disse appene fungerer uten internett – via radio, Bluetooth eller lokalt nettverk:</p>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <a href="https://meshtastic.org" target="_blank" style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;text-decoration:none;display:flex;gap:12px;align-items:flex-start;">
+          <span style="font-size:26px;flex-shrink:0;">📻</span>
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--text);">Meshtastic</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5;">Meldinger via LoRa-radioenheter – rekkevidde opptil 10 km uten mobilnett. Krever billig hardware (ca. 250 kr). Best for nabolag og friluftsliv.</div>
+            <div style="font-size:11px;color:var(--orange);margin-top:4px;">meshtastic.org ↗</div>
+          </div>
+        </a>
+        <a href="https://briarproject.org" target="_blank" style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;text-decoration:none;display:flex;gap:12px;align-items:flex-start;">
+          <span style="font-size:26px;flex-shrink:0;">🔒</span>
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--text);">Briar</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5;">Kryptert meldingsapp som kobler direkte via Bluetooth eller WiFi mellom telefoner – ingen server nødvendig. Fungerer helt offline. Android.</div>
+            <div style="font-size:11px;color:var(--orange);margin-top:4px;">briarproject.org ↗</div>
+          </div>
+        </a>
+        <a href="https://zello.com" target="_blank" style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;text-decoration:none;display:flex;gap:12px;align-items:flex-start;">
+          <span style="font-size:26px;flex-shrink:0;">🎙️</span>
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--text);">Zello</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5;">Walkie-talkie-app via mobil­nett eller WiFi. Brukes aktivt av redningspersonell og frivillige under katastrofer. Krever internett, men lavt båndbreddeforbruk.</div>
+            <div style="font-size:11px;color:var(--orange);margin-top:4px;">zello.com ↗</div>
+          </div>
+        </a>
+      </div>
+      <div style="margin-top:12px;font-size:12px;color:var(--muted);line-height:1.6;padding:10px 12px;background:rgba(247,127,0,0.06);border-radius:8px;">
+        💡 <strong style="color:var(--text);">Tips:</strong> Last ned og test disse appene <em>før</em> krisen. Bli enige med naboer om hvilken app dere bruker – og øv!
+      </div>
+    </div>
+
+    <div style="font-family:'Syne',sans-serif; font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">📤 Del appen</div>
+
+    <div id="installCard" style="background:linear-gradient(135deg,rgba(46,204,113,0.12),rgba(46,204,113,0.05));border:1px solid rgba(46,204,113,0.35);border-radius:14px;padding:16px;margin-bottom:12px;display:flex;gap:12px;align-items:center;">
+      <span style="font-size:36px;">📲</span>
+      <div style="flex:1;">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:#2ECC71;margin-bottom:3px;">Lagre som app</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5;" id="installCardDesc">Legg 72klar! på hjemskjermen – fungerer som en ekte app, også offline!</div>
+      </div>
+      <button id="installCardBtn" onclick="installPWA()" style="background:linear-gradient(135deg,#2ECC71,#27AE60);border:none;color:white;border-radius:10px;padding:10px 14px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">+ Legg til</button>
+    </div>
+
+    <!-- VARSLER CARD -->
+    <div style="background:linear-gradient(135deg,rgba(214,40,40,0.1),rgba(247,127,0,0.08));border:1px solid rgba(247,127,0,0.3);border-radius:14px;padding:16px;margin-bottom:12px;">
+      <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;">
+        <span style="font-size:32px;">🔔</span>
+        <div style="flex:1;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:4px;">Daglige beredskapsvarsler</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.5;">Få daglige tips, milepælmeldinger og månedlige påminnelser direkte på telefonen.</div>
+          <div id="notifStatus" style="font-size:12px;margin-top:6px;color:var(--muted);">Ikke aktivert</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.6;">
+        📅 <strong style="color:var(--text);">Dag 1–7:</strong> Daglige velkomsttips<br>
+        📅 <strong style="color:var(--text);">Uke 2–4:</strong> Annenhver dag + søndagssjekk<br>
+        📅 <strong style="color:var(--text);">Måned 2+:</strong> Månedlig vedlikeholdssjekk<br>
+        🏅 <strong style="color:var(--text);">Milepæler:</strong> Varsler ved 25%, 50%, 75% og 100%
+      </div>
+      <button id="notifToggleBtn" onclick="requestNotifPermission()" style="width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--red),var(--orange));color:white;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">🔔 Aktiver daglige varsler</button>
+    </div>
+
+    <div class="share-card">
+      <div class="share-card-title">Del 72klar! med andre</div>
+      <div class="share-card-sub">Hjelp venner, familie og naboer å bli bedre forberedt. Del appen gratis!</div>
+      <div class="share-btns">
+        <button class="share-btn share-btn-qr" onclick="openQRModal()">📱 Vis QR-kode</button>
+        <button class="share-btn share-btn-copy" onclick="copyLink()">🔗 Kopier lenke</button>
+        <button class="share-btn share-btn-native" id="nativeShareBtn" onclick="nativeShare()" style="display:none">↗️ Del via telefon</button>
+        <button class="share-btn" style="background:rgba(46,204,113,0.12);border:1px solid rgba(46,204,113,0.35);color:var(--green);" onclick="sendNeighbourAlert()">🏘️ Send nabovarsel</button>
+        <button class="share-btn" style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.35);color:var(--blue);" onclick="recommendToMunicipality()">🏛️ Anbefal til kommunen</button>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:center;">
+      <span style="font-size:28px;">📅</span>
+      <div style="flex:1;">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--gold);">Månedlig beredskapssjekk</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px;">Legg til påminnelse i kalenderen din</div>
+      </div>
+      <button onclick="downloadICS()" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.35);color:var(--gold);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;white-space:nowrap;">+ Kalender</button>
+    </div>
+
+    <div style="margin-top:24px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">💬 Tilbakemelding</div>
+
+    <div class="info-card" style="margin-bottom:12px;">
+      <h3 style="margin-bottom:10px;">Hva synes du om appen?</h3>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button class="fb-star" onclick="setRating(1)" id="star1">⭐</button>
+        <button class="fb-star" onclick="setRating(2)" id="star2">⭐</button>
+        <button class="fb-star" onclick="setRating(3)" id="star3">⭐</button>
+        <button class="fb-star" onclick="setRating(4)" id="star4">⭐</button>
+        <button class="fb-star" onclick="setRating(5)" id="star5">⭐</button>
+      </div>
+      <textarea id="fbText" placeholder="Skriv en kommentar eller forslag..." style="width:100%;background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;min-height:80px;outline:none;resize:none;"></textarea>
+      <button onclick="submitFeedback()" style="width:100%;margin-top:10px;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--red),var(--orange));color:white;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Send tilbakemelding</button>
+      <div id="fbThanks" style="display:none;margin-top:10px;text-align:center;color:var(--green);font-weight:600;font-size:13px;">✓ Takk! Tilbakemeldingen er lagret.</div>
+    </div>
+
+    <div style="margin-top:24px; font-family:'Syne',sans-serif; font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">👤 Om appen</div>
+
+    <div class="credits-card">
+      <div class="credits-top">
+        <div class="credits-avatar">👨‍🏫</div>
+        <div>
+          <div class="credits-name">Fisnik Rashica</div>
+          <div class="credits-role">Lærer · Vennesla videregående skole</div>
+        </div>
+      </div>
+      <div class="credits-desc">
+        72klar! er en idé av Fisnik Rashica – med et enkelt mål: at flest mulig vanlige folk skal kunne klare seg selv i krise i minimum 72 timer, til myndighetene får stablet seg på beina.
+      </div>
+    </div>
+
+    <div class="sponsor-box">
+      <div class="sp-title">🤝 Støttespillere & sponsorer</div>
+      <div class="sp-empty">🌟</div>
+      <div class="sp-cta">
+        Ingen støttespillere ennå.<br>
+        Er du eller din organisasjon interessert i å støtte 72klar!?<br><br>
+        <strong>Ta kontakt – vi ønsker deg velkommen om bord!</strong>
+      </div>
+    </div>
+
+    <div class="reset-section">
+      <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;text-align:center;">⚙️ Innstillinger</div>
+      <button class="reset-btn-soft" onclick="toggleTheme()" id="themeBtn">☀️ Bytt til lyst tema</button>
+      <button class="reset-btn-soft" onclick="resetProfile()">👤 Endre husstandsprofil</button>
+      <button class="reset-btn" onclick="resetAll()">🔄 Start appen helt på nytt</button>
+    </div>
+    <div class="app-version" style="cursor:pointer;" onclick="toggleChangelog()">72klar! · v1.3 · Laget for folk flest i Norge · <span style="color:var(--orange);">Hva er nytt? ▾</span></div>
+    <div id="changelogBox" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:8px 0 16px;text-align:left;">
+      <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--orange);margin-bottom:8px;">v1.2 – Mars 2026</div>
+      <ul style="font-size:12px;color:var(--muted);line-height:1.8;padding-left:16px;">
+        <li>Dele-knapp med QR-kode</li>
+        <li>Nabovarsel-funksjon</li>
+        <li>Offline-indikator</li>
+        <li>Engelsk språkstøtte</li>
+        <li>Tilbakemeldingsskjema</li>
+        <li>7-dagersutfordringen</li>
+        <li>Konfetti ved merker</li>
+      </ul>
+      <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--muted);margin:10px 0 6px;">v1.0 – Januar 2026</div>
+      <ul style="font-size:12px;color:var(--muted);line-height:1.8;padding-left:16px;">
+        <li>Første versjon lansert</li>
+        <li>Dynamisk sjekkliste for husstand</li>
+        <li>Merker og gamification</li>
+        <li>Nødkontakter</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- CONFETTI -->
+<canvas id="confettiCanvas"></canvas>
+
+<!-- COPY TOAST -->
+<div class="copy-toast" id="copyToast">✓ Lenke kopiert!</div>
+
+<!-- QR MODAL -->
+<div class="qr-modal-overlay" id="qrModalOverlay">
+  <div class="qr-modal">
+    <button class="qr-modal-close" onclick="closeQRModal()">×</button>
+    <h3>📱 QR-kode</h3>
+    <p>La noen scanne denne koden for å åpne 72klar! direkte på telefonen</p>
+    <canvas id="qrCanvas" width="200" height="200"></canvas>
+    <div class="qr-url" id="qrUrlDisplay"></div>
+    <button class="qr-copy-btn" onclick="copyLink();closeQRModal()">🔗 Kopier lenke i stedet</button>
+  </div>
+</div>
+
+<!-- BADGE MODAL -->
+<div class="badge-modal-overlay" id="badgeModalOverlay">
+  <div class="badge-modal">
+    <button class="badge-modal-close" onclick="closeBadgeModal()">×</button>
+    <div class="badge-modal-emoji" id="bmEmoji">🏅</div>
+    <div class="badge-modal-label">Nytt merke opptjent!</div>
+    <div class="badge-modal-title" id="bmTitle">Merkenavn</div>
+    <div class="badge-modal-desc" id="bmDesc">Beskrivelse</div>
+    <button class="badge-modal-btn" onclick="closeBadgeModal()">🎉 Takk, fortsett!</button>
+  </div>
+</div>
+
+<!-- 7-DAY CHALLENGE MODAL -->
+<div class="challenge-modal-overlay" id="challengeModalOverlay">
+  <div class="challenge-modal">
+    <button class="challenge-modal-close" onclick="closeChallengeModal()">×</button>
+    <div class="challenge-hero-emoji">🗓️</div>
+    <h2>Klar for neste nivå?</h2>
+    <p>Du er 100% klar for 72 timer – det er fantastisk! Myndighetene anbefaler faktisk å sikte på <strong style="color:var(--orange)">én full uke</strong> med egenberedskap. Vil du ta 7-dagersutfordringen?</p>
+    <div class="challenge-items">
+      <div class="ch-item"><div class="ch-item-icon">💧</div><div class="ch-item-text"><strong>Doble vannlageret</strong><span>Fra 9L til 21L per person (7 dager)</span></div></div>
+      <div class="ch-item"><div class="ch-item-icon">🥫</div><div class="ch-item-text"><strong>Utvid matlageret</strong><span>Mat for 7 dager i stedet for 3</span></div></div>
+      <div class="ch-item"><div class="ch-item-icon">🔋</div><div class="ch-item-text"><strong>Ekstra energi</strong><span>Solcellelader og større powerbank</span></div></div>
+      <div class="ch-item"><div class="ch-item-icon">💊</div><div class="ch-item-text"><strong>Medisinlager</strong><span>30 dagers forsyning av faste medisiner</span></div></div>
+    </div>
+    <button class="challenge-yes-btn" onclick="accept7DayChallenge()">🚀 Ja, jeg tar utfordringen!</button>
+    <button class="challenge-no-btn" onclick="closeChallengeModal()">Kanskje senere</button>
+  </div>
+</div>
+
+<!-- CONTACT MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3>Legg til kontakt</h3>
+    <div class="form-group"><label>Navn</label><input type="text" id="inputNavn" placeholder="Eks. Mormor"></div>
+    <div class="form-group"><label>Rolle / Relasjon</label><input type="text" id="inputRolle" placeholder="Eks. Familie, Nabo"></div>
+    <div class="form-group"><label>Telefonnummer</label><input type="tel" id="inputTlf" placeholder="Eks. 900 00 000"></div>
+    <div class="form-group"><label>Ikon</label>
+      <select id="inputEmoji">
+        <option value="👤">👤 Person</option><option value="👵">👵 Besteforeldre</option>
+        <option value="🏠">🏠 Nabo</option><option value="👨‍⚕️">👨‍⚕️ Lege</option>
+        <option value="👫">👫 Familie</option><option value="🤝">🤝 Venn</option>
+      </select>
+    </div>
+    <div class="modal-btns"><button class="btn-cancel" onclick="closeModal()">Avbryt</button><button class="btn-save" onclick="saveContact()">Lagre</button></div>
+  </div>
+</div>
+
+<script>
+// STATE
+let profile = JSON.parse(localStorage.getItem('72t_profile') || 'null');
+let checkedItems = JSON.parse(localStorage.getItem('72t_checked') || '[]');
+let contacts = JSON.parse(localStorage.getItem('72t_contacts') || '[]');
+let earnedBadges = JSON.parse(localStorage.getItem('72t_badges') || '[]');
+let selectedPersons = 1, customNum = 6, selectedNeeds = new Set();
+
+// DAILY TIPS
+const TIPS = [
+  { t:"Vann er det viktigste du kan lagre. En voksen trenger minimum 2–3 liter per dag – mer ved sykdom eller varme. Fyll flasker i dag!", s:"DSB – Direktoratet for samfunnssikkerhet og beredskap" },
+  { t:"En batteriradio er din livline under strømbrudd. NRK sender alltid offisiell kriseinformasjon på radio, selv når nettet er nede.", s:"NRK / DSB" },
+  { t:"Sjekk holdbarhetsdatoen på hermetikken din jevnlig. Mat kan holde seg lenge, men kvaliteten synker gradvis over tid.", s:"Mattilsynet" },
+  { t:"Ha alltid en fulladet powerbank. I en krise er mobilen din viktigste verktøy for informasjon og kontakt med nære og kjære.", s:"Nasjonal sikkerhetsmyndighet" },
+  { t:"Kontanter kan redde deg. Kortterminaler og minibanker fungerer ikke uten strøm. Ha et lite kontantbeløp hjemme til nødsituasjoner.", s:"DSB" },
+  { t:"Lær deg å stenge av vann og strøm i boligen din. Ved rørbrudd eller brann kan det stoppe store skader og redde liv.", s:"DSB" },
+  { t:"Et møtepunkt er viktig. Avtal med familien et sted dere møtes om mobilnettet er nede og dere ikke kan nå hverandre.", s:"DSB" },
+  { t:"Stearinlys gir varme og lys, men vær alltid oppmerksom på brannfare. Sett dem aldri i nærheten av gardiner eller tekstiler.", s:"Direktoratet for samfunnssikkerhet" },
+  { t:"Kjenn fluktveiene fra hjemmet ditt. Ha to alternative ruter ut – en primær og en reserve. Øv gjerne med familien.", s:"DSB" },
+  { t:"Frysmat holder seg i opptil 48 timer etter strømbrudd hvis du ikke åpner fryseren. Plan for hva du skal spise først.", s:"Mattilsynet" },
+  { t:"Vannrensingstabletter er billige og kompakte. Med disse kan du rense vann fra bekk, innsjø eller regnvann til drikkevann.", s:"Røde Kors" },
+  { t:"Førstehjelp-kunnskap kan redde liv. Meld deg på et gratis kurs hos Røde Kors eller St. John – det tar bare noen timer.", s:"Røde Kors Norge" },
+  { t:"Nøtter og tørket frukt er perfekt nødmat. Høy kaloritetthet, lang holdbarhet og trenger ingen tilberedning.", s:"DSB" },
+  { t:"Ha en liten nødsekk klar ved døren: pass, medisiner, varme klær, litt mat og vann. Kan brukes til evakuering på kort varsel.", s:"DSB" },
+  { t:"Sjekk ut varsom.no regelmessig. Siden viser alle aktive naturfarer i Norge: skred, flom, storm og ekstremvær.", s:"NVE / Varsom.no" },
+  { t:"Sørg for at CO-alarmen din fungerer. Karbonmonoksid er luktfri og dødelig – viktig ved bruk av parafinvarmere.", s:"DSB" },
+  { t:"Lagre kopier av viktige dokumenter digitalt. Ta bilder av pass, forsikringsbevis og ID og lagre i nettskyen.", s:"Datatilsynet" },
+  { t:"Nabohjelp er undervurdert. Bli kjent med naboene dine – i en krise er lokalsamfunnet den første og viktigste ressursen.", s:"Sivilforsvaret" },
+  { t:"Ha minst to lyskilder. Én for hånden og én i reserve. Lommelykt pluss hodelykt er en god kombinasjon.", s:"DSB" },
+  { t:"Kontroller røykvarslerne dine månedlig og skift batteriene minst en gang i året.", s:"DSB" },
+  { t:"Vet du hvor nærmeste tilfluktsrom er? Sivilforsvaret har kart over tilfluktsrom på sivilforsvaret.no.", s:"Sivilforsvaret" },
+  { t:"Last ned offline-kart til mobilen din eller skriv ut et fysisk kart av nærområdet. GPS og navigasjonsapper fungerer ikke uten nett.", s:"Kartverket" },
+];
+
+// BADGES
+const BADGES = [
+  { id:'first',    e:'🌱', n:'Første skritt',   d:'Hukket av første punkt',      chk:(p)=>p>=1   },
+  { id:'q25',      e:'⚡',  n:'25% klar',        d:'En kvarting på plass',         chk:(p)=>p>=25  },
+  { id:'q50',      e:'🔥', n:'Halvveis!',        d:'50% av lista klargjort',       chk:(p)=>p>=50  },
+  { id:'q75',      e:'🦾', n:'75% klar',         d:'Nesten i mål!',                chk:(p)=>p>=75  },
+  { id:'full',     e:'🛡️', n:'100% klar!',      d:'Fullt beredt i 72 timer',      chk:(p)=>p>=100 },
+  { id:'contacts', e:'📞', n:'Kontaktliste',     d:'La til en privat kontakt',     chk:(_,c)=>c>=1 },
+  { id:'weekly',   e:'📅', n:'Ukessjekk',        d:'Fullførte ukentlig sjekk',     chk:()=>!!localStorage.getItem('72t_weekly_done') },
+  { id:'water',    e:'💧', n:'Vanntanken',       d:'Vann klargjort',               chk:(_,_2,items)=>items.some(i=>i.includes('Vann & Drikke_0')) },
+  { id:'food',     e:'🥫', n:'Matlageret',       d:'Hermetikk klargjort',          chk:(_,_2,items)=>items.some(i=>i.includes('Mat_0')) },
+];
+
+// MOTIVATION MESSAGES
+function getMotMsg(p) {
+  if(p===0)  return {l:'Kom i gang! 🚀',       m:'Du har ikke startet ennå. Første steg er det viktigste – bare ett punkt gjør en forskjell!'};
+  if(p<10)   return {l:'Godt begynt! 💪',      m:'Du har tatt de første skrittene. Det er mer enn de fleste gjør. Fortsett!'};
+  if(p<25)   return {l:'På rett vei! 🌱',      m:p+'% er et godt fundament. Litt mer, og du er bedre forberedt enn de fleste nordmenn.'};
+  if(p<50)   return {l:'Du nærmer deg! ⚡',     m:'Du er i gang og det merkes! Halvveis betyr at du kan klare deg gjennom en krise.'};
+  if(p<75)   return {l:'Imponerende! 🔥',       m:'Over halvparten er klart – du er blant de best forberedte i landet. Ikke stopp nå!'};
+  if(p<90)   return {l:'Nesten i mål! 🦾',     m:'De siste punktene er ofte de enkleste. Fullfør lista!'};
+  if(p<100)  return {l:'Siste innspurt! 🏁',   m:'Utrolig jobba! Bare noen få punkter gjenstår. Du er snart 100% klar!'};
+  return             {l:'🛡️ Fullt beredt!',    m:'Du er blant de best forberedte i Norge. Del appen med venner og familie – de trenger den også!'};
+}
+
+// CHECKLIST DATA
+function getCats(n, needs) {
+  const w = Math.round(n*9);
+  const cats = [
+    {name:"💧 Vann & Drikke", items:[
+      {name:"Drikkevann",desc:()=>'Minst '+w+'L totalt (3L × '+n+' person'+n>1?'er':''+' × 3 dager)',qty:()=>w+' liter',emoji:"💧"},
+      {name:"Vannrensingstabletter",desc:()=>"For rensing av usikkert vann",qty:()=>"1 pakke",emoji:"🧪"},
+    ]},
+    {name:"🍎 Mat", items:[
+      {name:"Hermetikkmat",desc:()=>'Nok til '+n+' person'+n>1?'er':''+' i 3 dager',qty:()=>n*3+' bokser/pakker',emoji:"🥫"},
+      {name:"Knekkebrød / tørrmat",desc:()=>"Lang holdbarhet, enkelt å spise",qty:()=>Math.ceil(n*1.5)+' pakker',emoji:"🍞"},
+      {name:"Nøtter og tørket frukt",desc:()=>"Energirikt nødnæring",qty:()=>Math.ceil(n*0.5)+' kg',emoji:"🥜"},
+      {name:"Manuell boksåpner",desc:()=>"Fungerer uten strøm",qty:()=>"1 stk",emoji:"🔧"},
+    ]},
+    {name:"💊 Helse & Førstehjelp", items:[
+      {name:"Førstehjelpsskrin",desc:()=>"Bandasjer, desinfeksjon, saks, plaster",qty:()=>n>=4?"2 stk":"1 stk",emoji:"🩹"},
+      {name:"Smertestillende",desc:()=>"Paracetamol, ibuprofen",qty:()=>n+' pakker',emoji:"🩺"},
+    ]},
+    {name:"🔦 Lys & Energi", items:[
+      {name:"Lommelykt + batterier",desc:()=>"Ladbare eller AA-batterier",qty:()=>n>=3?Math.ceil(n/2)+' stk':"1 stk",emoji:"🔦"},
+      {name:"Stearinlys + lighter",desc:()=>"Varme og lys ved strømbrudd",qty:()=>n*3+' lys',emoji:"🕯️"},
+      {name:"Powerbank (ladet)",desc:()=>"For å holde mobilen i live",qty:()=>n>=3?Math.ceil(n/2)+' stk':"1 stk",emoji:"🔋"},
+      {name:"Radio med batterier",desc:()=>"Nød-kringkasting uten nett",qty:()=>"1 stk",emoji:"📻"},
+    ]},
+    {name:"🏠 Varme & Hygiene", items:[
+      {name:"Varme tepper / sovepose",desc:()=>"Viktig ved strømbrudd om vinteren",qty:()=>n+' stk',emoji:"🛏️"},
+      {name:"Varme klær og regnjakke",desc:()=>"Ekstraklær i beredskapsbag",qty:()=>n+' sett',emoji:"🧥"},
+      {name:"Toalettpapir",desc:()=>"Grunnleggende hygienebehov",qty:()=>n*2+' ruller',emoji:"🧻"},
+      {name:"Håndsprit / desinfeksjon",desc:()=>"Viktig ved begrensede vannressurser",qty:()=>Math.ceil(n*0.5)+'L',emoji:"🧴"},
+    ]},
+    {name:"📄 Dokumenter & Annet", items:[
+      {name:"Kopier av viktige dokumenter",desc:()=>"Pass, forsikring, ID – i vanntett pose",qty:()=>n+' person'+n>1?'er':'',emoji:"📄"},
+      {name:"Kontanter (noe)",desc:()=>"Kortautomater fungerer ikke alltid",qty:()=>'ca. '+n*500+' kr',emoji:"💵"},
+      {name:"Kart over lokalmiljøet",desc:()=>"Fysisk kart, GPS virker ikke alltid",qty:()=>"1 stk",emoji:"🗺️"},
+    ]},
+  ];
+  if(needs.has('medisin')) cats[2].items.splice(1,0,{name:"Faste medisiner (14 dager)",desc:()=>"Ekstra forsyning av reseptbelagte medisiner",qty:()=>"14 dagers forsyning",emoji:"💊"});
+  if(needs.has('baby'))    cats.push({name:"👶 Baby & Småbarn",items:[{name:"Bleier",desc:()=>"Nok for 3+ dager",qty:()=>"1 pakke (stor)",emoji:"🧷"},{name:"Barnemat / morsmelkerstatning",desc:()=>"3 dagers forsyning",qty:()=>"3+ dagers forsyning",emoji:"🍼"},{name:"Våtservietter",desc:()=>"Til stell uten rennende vann",qty:()=>"2 pakker",emoji:"🌿"},{name:"Varme babyklær",desc:()=>"Ekstra lag ved strømbrudd",qty:()=>"2 sett",emoji:"🧦"}]});
+  if(needs.has('eldre'))   cats.push({name:"🧓 Eldre i husstanden",items:[{name:"Ekstra varme tepper",desc:()=>"Eldre er mer sårbare for kulde",qty:()=>"2 ekstra",emoji:"🛏️"},{name:"Lett tilgjengelig mat",desc:()=>"Myk mat, enkelt å tilberede",qty:()=>"3 dagers forsyning",emoji:"🥣"},{name:"Nødliste med helseinfo",desc:()=>"Medisiner, allergier, lege-kontakt",qty:()=>"1 stk (laminert)",emoji:"📋"}]});
+  if(needs.has('hund'))    cats.push({name:"🐾 Kjæledyr",items:[{name:"Kjæledyrmat (3 dager)",desc:()=>"Tørrfôr med lang holdbarhet",qty:()=>"3 dagers forsyning",emoji:"🐕"},{name:"Vann til kjæledyr",desc:()=>"3L per dag per stort dyr",qty:()=>"9+ liter",emoji:"💧"},{name:"Bur / transportkasse",desc:()=>"For evakuering med dyr",qty:()=>"1 stk",emoji:"🏠"}]});
+  return cats;
+}
+
+// ONBOARDING
+let curStep = 0;
+function goStep(s) {
+  if(s===1){const n=document.getElementById('inputName').value.trim();if(!n){document.getElementById('inputName').focus();return;}}
+  document.getElementById('step'+curStep).classList.remove('active');
+  curStep=s; document.getElementById('step'+s).classList.add('active');
+  for(let i=0;i<=s;i++) document.getElementById('dot'+i).classList.add('done');
+}
+function selectPersonPreset(n,el){document.querySelectorAll('.person-option').forEach(o=>o.classList.remove('selected'));el.classList.add('selected');selectedPersons=n;document.getElementById('customNumberRow').style.display='none';document.getElementById('customOption').classList.remove('selected');}
+function selectCustom(){document.querySelectorAll('.person-option').forEach(o=>o.classList.remove('selected'));document.getElementById('customOption').classList.add('selected');document.getElementById('customNumberRow').style.display='flex';document.getElementById('customNumberRow').classList.add('selected');selectedPersons=customNum;}
+function changeNum(d){customNum=Math.max(1,Math.min(20,customNum+d));document.getElementById('numVal').textContent=customNum;selectedPersons=customNum;}
+function toggleNeed(k,el){if(selectedNeeds.has(k)){selectedNeeds.delete(k);el.classList.remove('selected');document.getElementById('need-'+k).textContent='';}else{selectedNeeds.add(k);el.classList.add('selected');document.getElementById('need-'+k).textContent='✓';}}
+function finishOnboarding(){
+  const name=document.getElementById('inputName').value.trim()||'deg';
+  profile={name,persons:selectedPersons,needs:Array.from(selectedNeeds),startDate:Date.now()};
+  localStorage.setItem('72t_profile',JSON.stringify(profile));
+  checkedItems=[];localStorage.setItem('72t_checked','[]');
+  startApp();
+}
+
+// APP START
+function startApp(){
+  document.getElementById('onboarding').style.display='none';
+  document.getElementById('app').style.display='block';
+  const p=profile,n=p.persons,needs=new Set(p.needs);
+  const ems=['','🧍','👫','👨‍👩‍👦','👨‍👩‍👧‍👦','🏘️'];
+  document.getElementById('householdBadge').textContent=n<=5?ems[n]:'🏘️'+' '+n+' person'+n>1?'er':'';
+  document.getElementById('headerSub').textContent='Hei, '+p.name+'! Klar for 72 timer.';
+  const nl=[];if(needs.has('baby'))nl.push('baby');if(needs.has('eldre'))nl.push('eldre');if(needs.has('hund'))nl.push('kjæledyr');if(needs.has('medisin'))nl.push('medisiner');
+  document.getElementById('householdSummary').textContent='📊 '+n+' person'+n>1?'er':''+' · '+Math.round(n*9)+'L vann · '+n*3+' porsjoner/dag'+(nl.length?' · '+nl.join(', ') :'');
+  renderDailyTip(); renderWeeklyReminder(); renderChecklist(); renderContacts(); renderMotivation(); show7DayBanner();
+}
+function _goToOnboarding(){
+  document.getElementById('app').style.display='none';
+  document.getElementById('onboarding').style.display='flex';
+  curStep=0;
+  ['step0','step1','step2'].forEach((s,i)=>document.getElementById(s).classList.toggle('active',i===0));
+  // Reset onboarding state
+  selectedPersons=1; selectedNeeds=new Set(); customNum=6;
+  document.querySelectorAll('.person-option').forEach(o=>o.classList.remove('selected'));
+  document.querySelector('.person-option').classList.add('selected');
+  document.getElementById('customNumberRow').style.display='none';
+  document.querySelectorAll('.needs-option').forEach(o=>o.classList.remove('selected'));
+  ['baby','eldre','hund','medisin'].forEach(k=>{ const el=document.getElementById('need-'+k); if(el)el.textContent=''; });
+  document.getElementById('inputName').value='';
+}
+function resetOnboarding(){
+  if(!confirm('Vil du endre husstandsprofilen din?'))return;
+  localStorage.removeItem('72t_profile'); profile=null;
+  _goToOnboarding();
+}
+function resetProfile(){
+  if(!confirm('Endre husstandsprofil?\nSjekklisten din beholdes.'))return;
+  localStorage.removeItem('72t_profile'); profile=null;
+  _goToOnboarding();
+}
+function resetAll(){
+  if(!confirm('Start helt på nytt?\nDette sletter ALLE data:\n• Husstandsprofil\n• Alle avkrysninger\n• Kontakter\n• Merker\n\nBruk dette for å vise appen til noen nye.'))return;
+  ['72t_profile','72t_checked','72t_contacts','72t_badges','72t_weekly_done','72t_7day','72t_7day_shown']
+    .forEach(k=>localStorage.removeItem(k));
+  profile=null; checkedItems=[]; contacts=[]; earnedBadges=[];
+  window._show7Day=false;
+  _goToOnboarding();
+}
+
+// DAILY TIP
+function renderDailyTip(){
+  const day=Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/86400000);
+  const tip=TIPS[day%TIPS.length];
+  document.getElementById('dailyTipText').textContent=tip.t;
+  document.getElementById('dailyTipSource').textContent='— Kilde: '+tip.s;
+}
+
+// WEEKLY REMINDER
+function renderWeeklyReminder(){
+  const box=document.getElementById('weeklyReminderBox');
+  const last=localStorage.getItem('72t_weekly_done');
+  const weekAgo=Date.now()-7*24*60*60*1000;
+  if(last&&parseInt(last)>weekAgo){
+    box.innerHTML='<div class="wr-icon">✅</div><div class="wr-body"><strong style="color:var(--green)">Ukessjekk fullført!</strong><span>Bra jobba! Kom tilbake om en uke for neste sjekk.</span></div>';
+  } else {
+    box.innerHTML='<div class="wr-icon">📅</div><div class="wr-body"><strong>Ukentlig sjekk</strong><span>Sjekk at mat og vann er innen holdbarhetsdato, og at powerbanken er ladet!</span><br><button class="wr-done-btn" onclick="markWeeklyDone()">✓ Gjort for denne uken</button></div>';
+  }
+}
+function markWeeklyDone(){localStorage.setItem('72t_weekly_done',Date.now().toString());renderWeeklyReminder();checkBadges();}
+
+// MOTIVATION
+function getPct(){
+  const cats=getCats(profile.persons,new Set(profile.needs));
+  let t=0,c=0;cats.forEach(cat=>cat.items.forEach((_,i)=>{t++;if(checkedItems.includes(cat.name+'_'+i))c++;}));
+  return t?Math.round((c/t)*100):0;
+}
+function renderMotivation(){
+  const pct=getPct();
+  const circ=289,offset=circ-(circ*(pct/100));
+  document.getElementById('ringFill').style.strokeDashoffset=offset;
+  document.getElementById('ringPct').textContent=pct+'%';
+  const {l,m}=getMotMsg(pct);
+  document.getElementById('motStatusLabel').textContent=l;
+  document.getElementById('motStatusMsg').textContent=m;
+  // Show challenge card if 100% and not yet accepted
+  const card=document.getElementById('challengeCard');
+  if(card){
+    const accepted=localStorage.getItem('72t_7day')&&JSON.parse(localStorage.getItem('72t_7day')).accepted;
+    card.style.display=(pct>=100&&!accepted)?'block':'none';
+  }
+  renderBadges();
+}
+function renderBadges(){
+  const g=document.getElementById('badgesGrid');g.innerHTML='';
+  BADGES.forEach(b=>{
+    const earned=earnedBadges.includes(b.id);
+    const c=document.createElement('div');c.className='badge-card'+(earned?' earned':'');
+    c.innerHTML='<div class="badge-emoji">'+b.e+'</div><div class="badge-name">'+b.n+'</div><div class="badge-desc">'+b.d+'</div>';
+    g.appendChild(c);
+  });
+}
+function checkBadges(){
+  const pct=getPct();const newOnes=[];
+  BADGES.forEach(b=>{
+    if(!earnedBadges.includes(b.id)&&b.chk(pct,contacts.length,checkedItems)){earnedBadges.push(b.id);newOnes.push(b);}
+  });
+  if(newOnes.length){
+    localStorage.setItem('72t_badges',JSON.stringify(earnedBadges));
+    // Queue badge modals one at a time
+    let delay=0;
+    newOnes.forEach(b=>{
+      setTimeout(()=>showBadgeModal(b),delay);
+      delay+=600; // stagger slightly but modal must be closed before next
+    });
+  }
+  renderBadges();renderMotivation();
+}
+
+// ── BADGE MODAL ──
+let badgeQueue=[];
+let badgeModalOpen=false;
+
+function showBadgeModal(b){
+  badgeQueue.push(b);
+  if(!badgeModalOpen) _showNextBadge();
+}
+function _showNextBadge(){
+  if(!badgeQueue.length){badgeModalOpen=false;return;}
+  badgeModalOpen=true;
+  const b=badgeQueue.shift();
+  document.getElementById('bmEmoji').textContent=b.e;
+  document.getElementById('bmTitle').textContent=b.n;
+  document.getElementById('bmDesc').textContent=b.d;
+  document.getElementById('badgeModalOverlay').classList.add('open');
+  launchConfetti();
+  // Special: if this is the 100% badge, queue the 7-day challenge after closing
+  if(b.id==='full') window._show7Day=true;
+}
+function closeBadgeModal(){
+  document.getElementById('badgeModalOverlay').classList.remove('open');
+  badgeModalOpen=false;
+  if(badgeQueue.length){
+    setTimeout(_showNextBadge,300);
+  } else if(window._show7Day){
+    window._show7Day=false;
+    const alreadyAccepted=localStorage.getItem('72t_7day')&&JSON.parse(localStorage.getItem('72t_7day')).accepted;
+    if(!alreadyAccepted){
+      setTimeout(()=>document.getElementById('challengeModalOverlay').classList.add('open'),400);
+    }
+  }
+}
+
+// ── 7-DAY CHALLENGE ──
+function accept7DayChallenge(){
+  localStorage.setItem('72t_7day',JSON.stringify({accepted:true,date:Date.now()}));
+  localStorage.setItem('72t_7day_shown','1');
+  closeChallengeModal();
+  // Add a new badge for accepting the challenge
+  if(!earnedBadges.includes('week7')){
+    earnedBadges.push('week7');
+    localStorage.setItem('72t_badges',JSON.stringify(earnedBadges));
+    renderBadges();
+    setTimeout(()=>showBadgeModal({e:'🗓️',n:'7-dagershelten!',d:'Du sikter på full ukes egenberedskap – du er en inspirasjon!'}),500);
+  }
+  // Show a banner in sjekkliste tab
+  show7DayBanner();
+}
+function openChallengeModal(){
+  document.getElementById('challengeModalOverlay').classList.add('open');
+}
+function closeChallengeModal(){
+  // Don't permanently suppress – just close. Only accept7DayChallenge sets the flag.
+  document.getElementById('challengeModalOverlay').classList.remove('open');
+}
+function show7DayBanner(){
+  const existing=document.getElementById('sevenDayBanner');
+  if(existing||!localStorage.getItem('72t_7day'))return;
+  const data=JSON.parse(localStorage.getItem('72t_7day'));
+  if(!data.accepted)return;
+  const banner=document.createElement('div');
+  banner.id='sevenDayBanner';
+  banner.style.cssText='background:linear-gradient(135deg,rgba(247,127,0,0.12),rgba(214,40,40,0.08));border:1px solid rgba(247,127,0,0.4);border-radius:14px;padding:16px;margin-bottom:16px;text-align:center;';
+  banner.innerHTML='<div style="font-size:28px;margin-bottom:6px">🗓️</div><div style="font-family:Syne,sans-serif;font-size:14px;font-weight:800;color:var(--orange);margin-bottom:4px">7-dagersutfordringen er i gang!</div><div style="font-size:12px;color:var(--muted)">Sikter mot full ukes beredskap. Du har det i deg!</div>';
+  const con=document.getElementById('checklistContainer');
+  if(con)con.parentNode.insertBefore(banner,con);
+}
+
+// ── CONFETTI ──
+function launchConfetti(){
+  const canvas=document.getElementById('confettiCanvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  const pieces=[];
+  const colors=['#D62828','#F77F00','#F59E0B','#2ECC71','#3B82F6','#8B5CF6','#EC4899','#ffffff'];
+  for(let i=0;i<120;i++){
+    pieces.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height-canvas.height,
+      w:8+Math.random()*8,h:6+Math.random()*6,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      rot:Math.random()*360,
+      rotSpeed:(Math.random()-0.5)*6,
+      vx:(Math.random()-0.5)*4,
+      vy:3+Math.random()*4,
+      opacity:1
+    });
+  }
+  let frame=0;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p=>{
+      ctx.save();
+      ctx.globalAlpha=p.opacity;
+      ctx.translate(p.x+p.w/2,p.y+p.h/2);
+      ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.color;
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+      p.x+=p.vx;p.y+=p.vy;p.rot+=p.rotSpeed;
+      if(frame>80)p.opacity-=0.018;
+    });
+    frame++;
+    if(frame<140)requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  draw();
+}
+
+// CHECKLIST
+function renderChecklist(){
+  const n=profile.persons,needs=new Set(profile.needs),cats=getCats(n,needs);
+  const con=document.getElementById('checklistContainer');con.innerHTML='';
+  let tot=0,chk=0;
+  cats.forEach(cat=>{
+    const div=document.createElement('div');div.className='category';div.innerHTML='<div class="category-title">'+cat.name+'</div>';
+    cat.items.forEach((item,i)=>{
+      const id=cat.name+'_'+i,isC=checkedItems.includes(id);tot++;if(isC)chk++;
+      const el=document.createElement('div');el.className='checklist-item'+(isC?' checked':'');
+      el.innerHTML='<div class="checkbox">'+(isC?'✓':'')+'</div><div class="item-info"><div class="item-name">'+item.name+'</div><div class="item-desc">'+item.desc()+'</div><div class="item-qty">'+item.qty()+'</div></div><div class="item-emoji">'+item.emoji+'</div>';
+      el.onclick=()=>toggleItem(id);div.appendChild(el);
+    });
+    con.appendChild(div);
+  });
+  const pct=tot?Math.round((chk/tot)*100):0;
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressPct').textContent=pct+'%';
+  document.getElementById('progressText').textContent=chk+' av '+tot;
+}
+function toggleItem(id){
+  markChecklistUpdated();
+  if(checkedItems.includes(id))checkedItems=checkedItems.filter(i=>i!==id);
+  else checkedItems.push(id);
+  localStorage.setItem('72t_checked',JSON.stringify(checkedItems));
+  renderChecklist();checkBadges();
+}
+
+// CONTACTS
+function renderContacts(){
+  const c=document.getElementById('privateContacts'),l=document.getElementById('privateLabel');
+  c.innerHTML='';l.style.display=contacts.length?'block':'none';
+  contacts.forEach((ct,i)=>{const d=document.createElement('div');d.className='contact-card';d.innerHTML='<div class="contact-avatar">'+ct.emoji+'</div><div class="contact-info"><div class="contact-name">'+ct.name+'</div><div class="contact-role">'+ct.rolle+'</div><div class="contact-number">'+ct.tlf+'</div></div><div class="contact-actions"><a href="tel:'+ct.tlf.replace(/\s/g,'')+'" class="call-btn">Ring</a><button class="del-btn" onclick="deleteContact('+i+')">Slett</button></div>';c.appendChild(d);});
+}
+function deleteContact(i){contacts.splice(i,1);localStorage.setItem('72t_contacts',JSON.stringify(contacts));renderContacts();}
+function openModal(){document.getElementById('modalOverlay').classList.add('open');}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');['inputNavn','inputRolle','inputTlf'].forEach(id=>document.getElementById(id).value='');}
+function saveContact(){
+  const n=document.getElementById('inputNavn').value.trim(),r=document.getElementById('inputRolle').value.trim(),t=document.getElementById('inputTlf').value.trim(),e=document.getElementById('inputEmoji').value;
+  if(!n||!t){alert('Fyll inn navn og telefon');return;}
+  contacts.push({name:n,rolle:r,tlf:t,emoji:e});localStorage.setItem('72t_contacts',JSON.stringify(contacts));
+  renderContacts();checkBadges();closeModal();
+}
+function switchTab(tab,ev){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');ev.target.classList.add('active');
+}
+
+// SHARE & QR
+const APP_URL = window.location.href.split('?')[0];
+
+function openQRModal(){
+  document.getElementById('qrUrlDisplay').textContent = APP_URL;
+  document.getElementById('qrModalOverlay').classList.add('open');
+  drawQR(APP_URL);
+}
+function closeQRModal(){
+  document.getElementById('qrModalOverlay').classList.remove('open');
+}
+
+function copyLink(){
+  navigator.clipboard.writeText(APP_URL).then(()=>{
+    const t=document.getElementById('copyToast');
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2200);
+  }).catch(()=>{
+    // fallback
+    const ta=document.createElement('textarea');
+    ta.value=APP_URL; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    const t=document.getElementById('copyToast');
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2200);
+  });
+}
+
+function nativeShare(){
+  navigator.share({title:'72klar!',text:'Bli klar for 72 timer – gratis norsk beredskapsapp!',url:APP_URL});
+}
+
+// Show native share button if supported
+if(navigator.share) document.getElementById('nativeShareBtn').style.display='flex';
+
+// QR code generator (pure JS, no library needed)
+function drawQR(text){
+  const canvas=document.getElementById('qrCanvas');
+  const ctx=canvas.getContext('2d');
+  const size=200;
+  canvas.width=size; canvas.height=size;
+
+  // Simple QR using a free API rendered as image
+  const img=new Image();
+  img.crossOrigin='anonymous';
+  img.onload=()=>{
+    ctx.clearRect(0,0,size,size);
+    ctx.fillStyle='white';
+    ctx.fillRect(0,0,size,size);
+    ctx.drawImage(img,0,0,size,size);
+  };
+  img.onerror=()=>{
+    // Fallback: draw a placeholder with URL text
+    ctx.fillStyle='white'; ctx.fillRect(0,0,size,size);
+    ctx.fillStyle='#0A0A0F'; ctx.font='bold 13px Arial';
+    ctx.textAlign='center';
+    ctx.fillText('72klar.app',size/2,size/2-10);
+    ctx.font='11px Arial'; ctx.fillStyle='#6B6B88';
+    ctx.fillText('Scan for å åpne',size/2,size/2+10);
+  };
+  // Use Google Charts QR API (free, no auth needed)
+  img.src='https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl='+encodeURIComponent(text)+'&choe=UTF-8';
+}
+
+// ── PUNKT 2: NABOVARSEL ──
+function sendNeighbourAlert(){
+  const url = APP_URL;
+  const msg = encodeURIComponent('Hei! 👋 Har du hørt om 72klar!? En gratis norsk beredskapsapp som hjelper deg å bli klar for krise i 72 timer. Ta en titt: ' + url);
+  if(navigator.share){
+    navigator.share({title:'72klar! – beredskapsapp',text:'Hei! Har du hørt om 72klar!? En gratis norsk beredskapsapp som hjelper deg å bli klar for krise i 72 timer.',url:url});
+  } else {
+    window.open('sms:?&body='+msg);
+  }
+}
+
+// ── PUNKT 3: OFFLINE INDIKATOR ──
+function updateOnlineStatus(){
+  const badge = document.getElementById('offlineBadge');
+  const dot = document.getElementById('statusDot');
+  const txt = document.getElementById('statusText');
+  if(badge){
+    badge.style.display = 'inline-block';
+    badge.textContent = navigator.onLine ? '✓ Online' : '✓ Fungerer offline';
+    badge.style.background = navigator.onLine ? 'rgba(59,130,246,0.15)' : 'rgba(46,204,113,0.15)';
+    badge.style.color = navigator.onLine ? 'var(--blue)' : 'var(--green)';
+    badge.style.borderColor = navigator.onLine ? 'rgba(59,130,246,0.3)' : 'rgba(46,204,113,0.3)';
+  }
+}
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+setTimeout(updateOnlineStatus, 500);
+
+// ── PUNKT 4: SPRÅK-TOGGLE ──
+let currentLang = localStorage.getItem('72t_lang') || 'no';
+const TRANSLATIONS = {
+  nav: { no: ['🏅 Fremgang','✅ Sjekkliste','📞 Kontakter','ℹ️ Info'], en: ['🏅 Progress','✅ Checklist','📞 Contacts','ℹ️ Info'] },
+  headerSub: { no: null, en: 'Ready for 72 hours of self-sufficiency' },
+  statusText: { no: 'Status: Normal beredskap', en: 'Status: Normal preparedness' },
+  motLabel: { no: null, en: null }, // dynamic
+};
+function toggleLang(){
+  currentLang = currentLang === 'no' ? 'en' : 'no';
+  localStorage.setItem('72t_lang', currentLang);
+  applyLang();
+}
+function applyLang(){
+  const btn = document.getElementById('langToggle');
+  if(!btn) return;
+  btn.textContent = currentLang === 'no' ? '🌐 EN' : '🌐 NO';
+  // Nav buttons
+  const navBtns = document.querySelectorAll('nav button');
+  const labels = TRANSLATIONS.nav[currentLang];
+  navBtns.forEach((b,i) => { if(labels[i]) b.textContent = labels[i]; });
+  // Status text
+  const stEl = document.getElementById('statusText');
+  if(stEl) stEl.textContent = TRANSLATIONS.statusText[currentLang];
+  // Offline badge
+  updateOnlineStatus();
+  // Header sub (only if profile loaded)
+  if(profile){
+    const hSub = document.getElementById('headerSub');
+    if(currentLang === 'en' && hSub) hSub.textContent = 'Hi, '+profile.name+'! Ready for 72 hours.';
+  }
+  // Checklist title
+  const pTitle = document.querySelector('.progress-title');
+  if(pTitle) pTitle.textContent = currentLang === 'en' ? 'Preparedness status' : 'Beredskapsstatus';
+}
+
+// ── PUNKT 5: TILBAKEMELDING ──
+let fbRating = 0;
+function setRating(n){
+  fbRating = n;
+  for(let i=1;i<=5;i++){
+    const s=document.getElementById('star'+i);
+    if(s) s.classList.toggle('active', i<=n);
+  }
+}
+function submitFeedback(){
+  const txt = document.getElementById('fbText').value.trim();
+  if(!fbRating){ alert('Velg antall stjerner først'); return; }
+  const fb = { rating: fbRating, comment: txt, date: new Date().toLocaleDateString('no-NO'), version: 'v1.2' };
+  const all = JSON.parse(localStorage.getItem('72t_feedback') || '[]');
+  all.push(fb);
+  localStorage.setItem('72t_feedback', JSON.stringify(all));
+  document.getElementById('fbText').value = '';
+  fbRating = 0;
+  for(let i=1;i<=5;i++){ const s=document.getElementById('star'+i); if(s) s.classList.remove('active'); }
+  const thanks = document.getElementById('fbThanks');
+  if(thanks){ thanks.style.display='block'; setTimeout(()=>thanks.style.display='none', 3000); }
+}
+
+
+// ══════════════════════════════════════════════════════
+// PUSH-VARSLER / NOTIFICATIONS
+// ══════════════════════════════════════════════════════
+
+const NOTIF_TIPS = [
+  'Vann er det viktigste. En husstand på 2 trenger 12 liter for 72 timer. Har du det hjemme?',
+  'En batteriradio koster 200 kr og kan redde deg når nettet er nede. NRK P1 sender alltid ved krise.',
+  'Kontanter. Kortterminaler fungerer ikke uten strøm. Ha litt hjemme – du trenger ikke mye.',
+  'Vet familien din hvor dere skal møtes om mobilnettet er nede? Avtal et møtepunkt i dag.',
+  'Sjekk holdbarhetsdatoen på hermetikken din jevnlig. Mat kan holde seg lenge, men kvaliteten synker.',
+  'Ha alltid en fulladet powerbank. I en krise er mobilen din viktigste verktøy.',
+  'Lær deg å stenge av vann og strøm i boligen din. Det kan stoppe store skader og redde liv.',
+  'Stearinlys gir varme og lys – men sett dem aldri i nærheten av gardiner eller tekstiler.',
+  'Kjenn fluktveiene fra hjemmet ditt. Ha to alternative ruter ut og øv gjerne med familien.',
+  'Frysmat holder seg i opptil 48 timer etter strømbrudd hvis du ikke åpner fryseren.',
+  'Vannrensingstabletter er billige og kompakte – kan rense vann fra bekk eller innsjø.',
+  'Førstehjelp-kunnskap kan redde liv. Meld deg på et gratis kurs hos Røde Kors.',
+  'Nøtter og tørket frukt er perfekt nødmat – høy kaloritetthet og lang holdbarhet.',
+  'Ha en liten nødsekk klar ved døren: pass, medisiner, varme klær, litt mat og vann.',
+  'Sjekk varsom.no regelmessig – siden viser alle aktive naturfarer i Norge.',
+  'Sørg for at CO-alarmen din fungerer. Karbonmonoksid er luktfri og dødelig.',
+  'Lagre kopier av viktige dokumenter digitalt – ta bilder av pass og forsikringsbevis.',
+  'Bli kjent med naboene dine – i en krise er lokalsamfunnet den første ressursen.',
+  'Ha minst to lyskilder. Lommelykt pluss hodelykt er en god kombinasjon.',
+  'Sjekk at røykvarslerne dine fungerer. Bytt batteri hvert år.',
+  'En førstehjelpskoffert er en investering. Sjekk at den er komplett og ikke utdatert.',
+  'Del 72klar! med en nabo i dag – kanskje de trenger litt hjelp å komme i gang.'
+];
+
+const NOTIF_SCHEDULE = [
+  // Fase 1: Velkommen dag 1-7
+  { day: 0, hour: 18, title: '👋 Velkommen til 72klar!', body: 'Du har tatt et viktig steg! Visste du at bare 1 av 5 norske husstander er forberedt på krise? Start sjekklisten i dag – det tar 2 minutter.' },
+  { day: 1, hour: 8,  title: '💧 Dagens tips', body: 'Vann er det viktigste. En husstand på 2 trenger 12 liter for 72 timer. Har du det hjemme?' },
+  { day: 2, hour: 8,  title: '📻 Dagens tips', body: 'En batteriradio koster 200 kr og kan redde deg når nettet er nede. NRK P1 sender alltid ved krise.' },
+  { day: 3, hour: 18, title: '🏅 Godt jobbet!', body: 'Du er allerede bedre forberedt enn de fleste. Sjekk om du har lommelykt og batterier – enkelt, men viktig.' },
+  { day: 4, hour: 8,  title: '💵 Dagens tips', body: 'Kontanter. Kortterminaler fungerer ikke uten strøm. Ha litt hjemme – du trenger ikke mye.' },
+  { day: 5, hour: 8,  title: '📍 Dagens tips', body: 'Vet familien din hvor dere skal møtes om mobilnettet er nede? Avtal et møtepunkt i dag.' },
+  { day: 6, hour: 10, title: '📊 En uke siden du startet!', body: 'Hvor langt har du kommet? Åpne 72klar! og se fremgangen din.' },
+  // Fase 2: Annenhver dag uke 2-4 (tips roteres)
+  { day: 8,  hour: 8, title: '💡 Beredskapstips', body: null, tipIndex: 0 },
+  { day: 10, hour: 8, title: '💡 Beredskapstips', body: null, tipIndex: 1 },
+  { day: 12, hour: 8, title: '💡 Beredskapstips', body: null, tipIndex: 2 },
+  { day: 13, hour: 10, title: '📊 Søndagssjekk', body: 'Hvordan ligger du an? Åpne 72klar! og se om du kan hake av ett nytt punkt i dag.' },
+  { day: 14, hour: 8, title: '💡 Beredskapstips', body: null, tipIndex: 3 },
+  { day: 16, hour: 8, title: '💡 Beredskapstips', body: null, tipIndex: 4 },
+  { day: 18, hour: 8, title: '💡 Beredskapstips', body: null, tipIndex: 5 },
+  { day: 20, hour: 10, title: '📊 Søndagssjekk', body: 'Tre uker inne – du gjør det bra! Har du husket å fylle opp vannlagrene?' },
+  { day: 22, hour: 8, title: '💡 Beredskapstips', body: null, tipIndex: 6 },
+  { day: 24, hour: 8, title: '💡 Beredskapstips', body: null, tipIndex: 7 },
+  { day: 26, hour: 8, title: '💡 Beredskapstips', body: null, tipIndex: 8 },
+  { day: 27, hour: 10, title: '📊 Søndagssjekk', body: 'En måned! Du er nå blant de best forberedte i Norge. Stolt av deg 🛡️' },
+  // Fase 3: Månedlig vedlikehold
+  { day: 30, hour: 10, title: '🔄 Månedlig beredskapssjekk', body: 'Sjekk holdbarhetsdatoen på hermetikken, lad powerbanken og fyll opp vannflaskene.' },
+  { day: 60, hour: 10, title: '🔄 Månedlig beredskapssjekk', body: 'To måneder! Roter matlageret og sjekk at røykvarslerne fungerer.' },
+  { day: 90, hour: 10, title: '🔄 Kvartalssjekk', body: 'Tre måneder forberedt! Oppdater nødkontaktlisten og sjekk medisinlageret ditt.' },
+];
+
+function requestNotifPermission(){
+  if(!('Notification' in window)){ showToastMsg('Varsler støttes ikke i denne nettleseren'); return; }
+  Notification.requestPermission().then(perm => {
+    if(perm === 'granted'){
+      scheduleAllNotifications();
+      localStorage.setItem('72k_notif', '1');
+      localStorage.setItem('72k_notif_start', Date.now().toString());
+      showToastMsg('🔔 Varsler aktivert! Du får daglige tips.');
+      updateNotifUI();
+    } else {
+      showToastMsg('Varsler ble ikke tillatt. Du kan endre dette i nettleserinnstillingene.');
+    }
+  });
+}
+
+function scheduleAllNotifications(){
+  if(!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.ready.then(reg => {
+    const start = parseInt(localStorage.getItem('72k_notif_start') || Date.now().toString());
+    NOTIF_SCHEDULE.forEach((notif, idx) => {
+      const fireTime = new Date(start);
+      fireTime.setDate(fireTime.getDate() + notif.day);
+      fireTime.setHours(notif.hour, 0, 0, 0);
+      const delay = fireTime.getTime() - Date.now();
+      if(delay > 0){
+        const body = notif.body || NOTIF_TIPS[notif.tipIndex % NOTIF_TIPS.length];
+        setTimeout(() => {
+          if(Notification.permission === 'granted'){
+            reg.showNotification(notif.title, {
+              body: body,
+              icon: 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23D62828%22/><text y=%22.9em%22 font-size=%2275%22 x=%2212%22>&#x1F6E1;&#xFE0F;</text></svg>',
+              badge: 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x1F6E1;</text></svg>',
+              tag: '72klar-notif-' + idx,
+              renotify: true,
+              data: { url: './' }
+            });
+          }
+        }, delay);
+      }
+    });
+  });
+}
+
+// Milestone notifications (triggered by progress)
+function sendMilestoneNotif(pct){
+  if(!('Notification' in window) || Notification.permission !== 'granted') return;
+  const key = '72k_mile_' + pct;
+  if(localStorage.getItem(key)) return;
+  localStorage.setItem(key, '1');
+  navigator.serviceWorker.ready.then(reg => {
+    setTimeout(() => {
+      let title, body;
+      if(pct >= 100){ title = '🥇 100% – Du er klar!'; body = 'Fantastisk! Del 72klar! med en nabo – kanskje de trenger hjelp?'; }
+      else if(pct >= 75){ title = '🏅 75% – Nesten i mål!'; body = 'Du er blant de best forberedte i Norge. Bare litt igjen!'; }
+      else if(pct >= 50){ title = '⭐ Halvveis!'; body = 'Du er nå bedre forberedt enn 8 av 10 nordmenn. Fortsett!'; }
+      else if(pct >= 25){ title = '🚀 Godt i gang!'; body = '25% fullført. Hvert steg gjør deg tryggere. Fortsett!'; }
+      if(title) reg.showNotification(title, { body, icon: 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23D62828%22/><text y=%22.9em%22 font-size=%2275%22 x=%2212%22>&#x1F6E1;&#xFE0F;</text></svg>', tag: '72klar-mile-'+pct, data: { url: './' } });
+    }, 3000);
+  });
+}
+
+function disableNotifications(){
+  localStorage.removeItem('72k_notif');
+  localStorage.removeItem('72k_notif_start');
+  updateNotifUI();
+  showToastMsg('Varsler deaktivert.');
+}
+
+function updateNotifUI(){
+  const enabled = localStorage.getItem('72k_notif') === '1' && Notification.permission === 'granted';
+  const btn = document.getElementById('notifToggleBtn');
+  const status = document.getElementById('notifStatus');
+  if(btn) btn.textContent = enabled ? '🔕 Deaktiver varsler' : '🔔 Aktiver daglige varsler';
+  if(btn) btn.onclick = enabled ? disableNotifications : requestNotifPermission;
+  if(status) status.textContent = enabled ? '✓ Varsler er aktivert' : 'Ikke aktivert';
+  if(status) status.style.color = enabled ? 'var(--green)' : 'var(--muted)';
+}
+
+// Init notifications if previously enabled
+if(localStorage.getItem('72k_notif') === '1' && Notification.permission === 'granted'){
+  scheduleAllNotifications();
+}
+
+// ── PUNKT 6: CHANGELOG ──
+function toggleChangelog(){
+  const box = document.getElementById('changelogBox');
+  if(box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+}
+
+// ── PWA INSTALL ──
+let pwaPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  pwaPrompt = e;
+  // Show banner
+  if(!localStorage.getItem('72t_pwa_dismissed')){
+    const b = document.getElementById('pwaBanner');
+    if(b) b.style.display='flex';
+  }
+  // Show onboarding install button
+  const ob = document.getElementById('obInstallBtn');
+  if(ob) ob.style.display='flex';
+  // Update install card
+  updateInstallCard();
+});
+// Detect if already installed
+window.addEventListener('appinstalled', () => {
+  updateInstallCard(true);
+  dismissPWA();
+});
+function updateInstallCard(installed){
+  const card = document.getElementById('installCard');
+  const btn = document.getElementById('installCardBtn');
+  const desc = document.getElementById('installCardDesc');
+  if(!card) return;
+  if(installed || window.matchMedia('(display-mode: standalone)').matches){
+    // Already installed
+    card.style.background='rgba(59,130,246,0.08)';
+    card.style.borderColor='rgba(59,130,246,0.25)';
+    if(desc) desc.textContent='72klar! er installert som app på denne enheten!';
+    if(btn){ btn.textContent='✓ Installert'; btn.style.background='rgba(59,130,246,0.2)'; btn.style.color='var(--blue)'; btn.onclick=null; }
+  } else if(!pwaPrompt){
+    // iOS or unsupported - show manual instructions
+    if(desc) desc.textContent='iPhone: trykk Del-ikonet i Safari → "Legg til på Hjem-skjerm"';
+    if(btn){ btn.textContent='Hvordan?'; btn.onclick=function(){ showToastMsg('Safari: trykk Del-knappen nederst → Legg til på Hjem-skjerm'); }; }
+  }
+}
+function installPWA(){
+  if(pwaPrompt){
+    pwaPrompt.prompt();
+    pwaPrompt.userChoice.then((choice)=>{
+      if(choice.outcome==='accepted') updateInstallCard(true);
+      dismissPWA();
+    });
+  } else if(window.matchMedia('(display-mode: standalone)').matches){
+    showToastMsg('✓ Allerede installert som app!');
+  } else {
+    showToastMsg('iPhone/Safari: trykk Del-knappen → "Legg til på Hjem-skjerm"');
+  }
+}
+function dismissPWA(){
+  localStorage.setItem('72t_pwa_dismissed','1');
+  const b = document.getElementById('pwaBanner');
+  if(b) b.style.display='none';
+}
+// Check install state on load
+setTimeout(updateInstallCard, 800);
+function showToastMsg(msg){
+  const t=document.getElementById('copyToast');
+  const orig=t.textContent; t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>{ t.classList.remove('show'); t.textContent=orig; },3500);
+}
+
+// ── DATO PÅ SJEKKLISTE ──
+function updateChecklistDate(){
+  const el=document.getElementById('checklistLastUpdated');
+  if(!el) return;
+  const d=localStorage.getItem('72t_last_check');
+  if(d) el.textContent='Sist oppdatert: '+d;
+  else el.textContent='';
+}
+function markChecklistUpdated(){
+  localStorage.setItem('72t_last_check', new Date().toLocaleDateString('no-NO'));
+  updateChecklistDate();
+}
+
+// ── KOMMUNE E-POST ──
+function recommendToMunicipality(){
+  const subject=encodeURIComponent('Tips: 72klar! – gratis beredskapsapp for innbyggere');
+  const body=encodeURIComponent('Hei,\n\nJeg vil gjerne anbefale appen 72klar! ('+APP_URL+') til kommunen.\n\nAppen er gratis, krever ingen installasjon og hjelper innbyggere med å bli selvhjulpne i 72 timer ved en krisesituasjon – i tråd med DSBs anbefalinger.\n\nDen inneholder:\n– Tilpasset sjekkliste basert på husstandsstørrelse\n– Nødkontakter og kriseinformasjon\n– Gamification som motiverer til å fullføre forberedelsene\n\nVille kommunen vurdere å anbefale denne til innbyggerne?\n\nMed vennlig hilsen');
+  window.open('mailto:postmottak@kommune.no?subject='+subject+'&body='+body);
+}
+
+// ── SOCIAL SHARE SCORE ──
+function updateSocialShare(pct){
+  const card=document.getElementById('socialShareCard');
+  const txt=document.getElementById('socialShareText');
+  if(!card||!txt) return;
+  if(pct>=20){
+    card.style.display='block';
+    const emoji = pct>=100?'🥇':pct>=75?'🏅':pct>=50?'⭐':'🚀';
+    txt.textContent = emoji+' Jeg er '+pct+'% klar for 72 timer! Er du? 🛡️';
+  } else {
+    card.style.display='none';
+  }
+}
+function shareScore(){
+  const txt=document.getElementById('socialShareText');
+  const shareText=(txt?txt.textContent+' ':'')+APP_URL;
+  if(navigator.share){
+    navigator.share({title:'72klar!',text:shareText,url:APP_URL});
+  } else {
+    navigator.clipboard.writeText(shareText).then(()=>showToastMsg('✓ Tekst kopiert – lim inn i sosiale medier!'));
+  }
+}
+
+// ── FØRSTEHJELP ACCORDION ──
+function toggleFH(card){
+  card.classList.toggle('open');
+}
+
+// ── LYS/MØRK MODUS ──
+function toggleTheme(){
+  const isLight=document.body.classList.toggle('light');
+  localStorage.setItem('72t_theme', isLight?'light':'dark');
+  const btn=document.getElementById('themeBtn');
+  if(btn) btn.textContent=isLight?'🌙 Bytt til mørkt tema':'☀️ Bytt til lyst tema';
+}
+function applyTheme(){
+  const t=localStorage.getItem('72t_theme');
+  if(t==='light'){
+    document.body.classList.add('light');
+    const btn=document.getElementById('themeBtn');
+    if(btn) btn.textContent='🌙 Bytt til mørkt tema';
+  }
+}
+
+// ── SKRIV UT SJEKKLISTE ──
+function printChecklist(){
+  const profile_=JSON.parse(localStorage.getItem('72t_profile')||'null');
+  const checked_=JSON.parse(localStorage.getItem('72t_checked')||'[]');
+  const pct=Math.round((checked_.length/Math.max(1,document.querySelectorAll('.check-item').length))*100);
+  const items=[...document.querySelectorAll('.check-item')];
+  let rows='';
+  items.forEach(it=>{
+    const id=it.dataset.id;
+    const done=checked_.includes(id);
+    const label=it.querySelector('.item-name')||it.querySelector('span');
+    rows+='<tr style="border-bottom:1px solid #eee;"><td style="padding:8px 4px;font-size:22px;">'+(done?'&#9989;':'&#11036;')+'</td><td style="padding:8px;font-size:14px;">'+(label?label.textContent:id)+'</td></tr>';
+  });
+  const name_=profile_?profile_.name:'';
+  const w=window.open('','_blank');
+  var printHtml = '<!DOCTYPE html><html><head><title>72klar! Sjekkliste</title>'
+    + '<style>body{font-family:Arial,sans-serif;max-width:600px;margin:40px auto;color:#1a1a1a;}'
+    + 'h1{color:#D62828;}table{width:100%;border-collapse:collapse;}'
+    + '@media print{button{display:none;}}</style></head><body>'
+    + '<h1>72klar! Sjekkliste</h1>'
+    + '<p>Husstand: <strong>' + name_ + '</strong> &nbsp;|&nbsp; Beredskap: <strong>' + pct + '%</strong>'
+    + ' &nbsp;|&nbsp; Dato: ' + new Date().toLocaleDateString('no-NO') + '</p>'
+    + '<table>' + rows + '</table><br>'
+    + '<p style="font-size:12px;color:#888;">Generert av 72klar!</p><br>'
+    + '<button onclick="window.print()">Skriv ut</button>'
+    + '</body></html>';
+  w.document.write(printHtml);
+  w.document.close();
+}
+
+// ── ICS KALENDER ──
+function downloadICS(){
+  const now=new Date();
+  const next=new Date(now.getFullYear(),now.getMonth()+1,1);
+  const fmt=function(d){ return d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0'); };
+  var ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//72klar//NO\r\n'
+    + 'BEGIN:VEVENT\r\nUID:72klar-monthly-check@app\r\n'
+    + 'DTSTART;VALUE=DATE:' + fmt(next) + '\r\n'
+    + 'DTEND;VALUE=DATE:' + fmt(next) + '\r\n'
+    + 'RRULE:FREQ=MONTHLY\r\n'
+    + 'SUMMARY:Maanedlig beredskapssjekk 72klar!\r\n'
+    + 'DESCRIPTION:Sjekk beredskapsutstyret ditt. Aapne appen: ' + APP_URL + '\r\n'
+    + 'END:VEVENT\r\nEND:VCALENDAR';
+  const blob=new Blob([ics],{type:'text/calendar'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='72klar-beredskapspaaminelse.ics';
+  a.click();
+}
+
+// INIT
+applyTheme();
+if(profile){startApp();updateChecklistDate();setTimeout(updateNotifUI,500);}else{document.getElementById('onboarding').style.display='flex';}
+</script>
+
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => {
+        // Sjekk om ny versjon er tilgjengelig
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          newWorker.addEventListener('statechange', () => {
+            if(newWorker.state === 'installed' && navigator.serviceWorker.controller){
+              // Ny versjon klar – vis melding
+              const t = document.getElementById('copyToast');
+              if(t){ t.textContent = '🔄 Ny versjon tilgjengelig – last inn på nytt!'; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 5000); }
+            }
+          });
+        });
+      });
+  });
+}
+</script>
+</body>
+</html>
