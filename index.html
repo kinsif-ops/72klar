@@ -319,18 +319,28 @@
 <body>
 
 <!-- ONBOARDING -->
-<div id="onboarding">
+<div id="onboarding" style="display:none;flex-direction:column;min-height:100vh;">
   <div class="ob-hero"><h1>72klar!</h1><p>Klar til å klare deg selv<br>– i 72 timer</p></div>
   <div class="ob-steps">
     <div class="ob-step-indicator">
-      <div class="ob-dot done" id="dot0"></div><div class="ob-dot" id="dot1"></div><div class="ob-dot" id="dot2"></div>
+      <div class="ob-dot done" id="dot0"></div>
+      <div class="ob-dot" id="dot1"></div>
+      <div class="ob-dot" id="dot2"></div>
+      <div class="ob-dot" id="dot3"></div>
     </div>
+
+    <!-- STEG 0: Navn -->
     <div class="ob-step active" id="step0">
       <div class="ob-step-title">Hva heter du?</div>
       <div class="ob-step-sub">Vi personaliserer appen for deg og husstanden din.</div>
-      <div class="name-input-wrap"><label>Ditt navn</label><input type="text" id="inputName" placeholder="Skriv navn her..." autocomplete="given-name"></div>
-      <button class="ob-btn" onclick="goStep(1)">Fortsett →</button>
+      <div class="name-input-wrap">
+        <label>Ditt navn</label>
+        <input type="text" id="inputName" placeholder="Skriv navn her..." autocomplete="given-name">
+      </div>
+      <button class="ob-btn" onclick="obNext(0)">Fortsett →</button>
     </div>
+
+    <!-- STEG 1: Husstand -->
     <div class="ob-step" id="step1">
       <div class="ob-step-title">Hvem forbereder du deg for?</div>
       <div class="ob-step-sub">Alle mengder tilpasses automatisk.</div>
@@ -346,8 +356,10 @@
         <label>Antall personer</label>
         <div class="num-controls"><button class="num-btn" onclick="changeNum(-1)">−</button><div class="num-val" id="numVal">6</div><button class="num-btn" onclick="changeNum(1)">+</button></div>
       </div>
-      <button class="ob-btn" onclick="goStep(2)">Fortsett →</button>
+      <button class="ob-btn" onclick="obNext(1)">Fortsett →</button>
     </div>
+
+    <!-- STEG 2: Spesielle hensyn -->
     <div class="ob-step" id="step2">
       <div class="ob-step-title">Spesielle hensyn?</div>
       <div class="ob-step-sub">Vi legger til ekstra punkter i sjekklisten.</div>
@@ -357,17 +369,32 @@
         <div class="needs-option" onclick="toggleNeed('hund',this)"><div class="needs-icon">🐕</div><div class="needs-text"><strong>Hund eller katt</strong><span>Mat og vann til kjæledyr</span></div><div class="needs-check" id="need-hund"></div></div>
         <div class="needs-option" onclick="toggleNeed('medisin',this)"><div class="needs-icon">💉</div><div class="needs-text"><strong>Faste medisiner</strong><span>Noen er avhengig av medisiner</span></div><div class="needs-check" id="need-medisin"></div></div>
       </div>
-      <div id="obInstallBtn" style="display:none;background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);border-radius:12px;padding:14px 16px;margin-bottom:12px;display:none;align-items:center;gap:12px;">
-        <span style="font-size:28px;">📲</span>
-        <div style="flex:1;">
-          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:#2ECC71;">Lagre som app på telefonen</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px;">Raskere tilgang – fungerer offline!</div>
-        </div>
-        <button onclick="installPWA()" style="background:linear-gradient(135deg,#2ECC71,#27AE60);border:none;color:white;border-radius:8px;padding:8px 14px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">+ Legg til</button>
+      <button class="ob-btn" onclick="obNext(2)">Fortsett →</button>
+      <button class="ob-btn-secondary" onclick="obNext(2)">Hopp over</button>
+    </div>
+
+    <!-- STEG 3: Postnummer -->
+    <div class="ob-step" id="step3">
+      <div class="ob-step-title">Hvor bor du?</div>
+      <div class="ob-step-sub">Vi finner nærmeste trygghetspunkt i din kommune.</div>
+      <div class="name-input-wrap" style="margin-bottom:16px;">
+        <label>Postnummer</label>
+        <input type="text" id="inputPostnr" placeholder="F.eks. 4630" maxlength="4" inputmode="numeric" autocomplete="postal-code"
+          style="font-size:28px;font-family:'Syne',sans-serif;font-weight:700;"
+          oninput="previewKommune(this.value)">
       </div>
-      <button class="ob-btn" onclick="finishOnboarding()">🛡️ Start 72klar!!</button>
+      <div id="kommunePreview" style="display:none;background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.25);border-radius:12px;padding:12px 16px;margin-bottom:16px;">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">📍 Kommune funnet</div>
+        <div id="kommunePreviewName" style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:#2ECC71;"></div>
+        <div id="kommunePreviewPunkter" style="font-size:12px;color:var(--muted);margin-top:3px;"></div>
+      </div>
+      <div id="kommuneUnknown" style="display:none;background:rgba(247,127,0,0.08);border:1px solid rgba(247,127,0,0.2);border-radius:12px;padding:12px 16px;margin-bottom:16px;">
+        <div style="font-size:13px;color:var(--orange);">Vi finner trygghetspunkter via DSB for ditt område.</div>
+      </div>
+      <button class="ob-btn" onclick="finishOnboarding()">🛡️ Start 72klar!</button>
       <button class="ob-btn-secondary" onclick="finishOnboarding()">Hopp over</button>
     </div>
+
   </div>
 </div>
 
@@ -554,6 +581,38 @@
     <div class="info-card"><h3>🍎 Mat</h3><p>Lagre mat med lang holdbarhet: hermetikk, tørrmat, nøtter, knekkebrød. Roter lagrene dine jevnlig.</p></div>
     <div class="info-card"><h3>📻 Informasjon</h3><ul><li>NRK P1 – offisiell kriseinformasjon</li><li>Varsom.no – natur- og hendelsesvarsel</li><li>yr.no – vær og farevarsel</li></ul></div>
     <div class="info-card"><h3>🏃 Evakuering</h3><ul><li>Kjenn to fluktveier fra hjemmet ditt</li><li>Ha avtalt møtepunkt med familien</li><li>Grab-and-go bag klar ved dørene</li></ul></div>
+
+    <!-- TRYGGHETSPUNKTER -->
+    <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:20px 0 12px;">🏛️ Trygghetspunkter</div>
+
+    <div class="info-card" style="margin-bottom:10px;">
+      <h3 style="margin-bottom:6px;">Hva er et trygghetspunkt?</h3>
+      <p style="font-size:13px;line-height:1.6;">Kommunale samlingspunkter der du kan få <strong>informasjon, varme, vann og strøm</strong> ved større kriser eller langvarige strømbrudd. Disse er åpne for alle innbyggere.</p>
+    </div>
+
+    <div id="trygghetspunktContainer"></div>
+
+    <!-- TILFLUKTSROM -->
+    <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.8px;margin:14px 0 8px;">🛡️ Tilfluktsrom</div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;">
+      <div style="font-size:13px;line-height:1.6;margin-bottom:12px;">Tilfluktsrom er beskyttede rom som skal gi befolkningen ly ved krigshandlinger. DSB har fullstendig oversikt over alle tilfluktsrom i Norge.</div>
+      <a href="https://kart.dsb.no/share/e09d2487b99b" target="_blank" style="display:flex;align-items:center;gap:10px;background:rgba(214,40,40,0.1);border:1px solid rgba(214,40,40,0.3);border-radius:10px;padding:12px 14px;text-decoration:none;">
+        <span style="font-size:24px;">🗺️</span>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--red);">Finn nærmeste tilfluktsrom</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">Åpner DSBs offisielle kart</div>
+        </div>
+        <span style="margin-left:auto;color:var(--muted);font-size:16px;">↗</span>
+      </a>
+    </div>
+
+    <!-- ANDRE KOMMUNER -->
+    <div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:12px;padding:14px 16px;margin-bottom:8px;">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--blue);margin-bottom:6px;">📍 Bor du i en annen kommune?</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:10px;">Søk etter trygghetspunkter på din kommunes nettside, eller ta kontakt med kommunens servicetorg.</div>
+      <a href="https://www.dsb.no/egenberedskap" target="_blank" style="display:inline-block;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:var(--blue);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;text-decoration:none;">DSB – Egenberedskap ↗</a>
+    </div>
 
     <div class="info-card">
       <h3>📡 Kommunikasjon uten internett</h3>
@@ -880,19 +939,29 @@ function getCats(n, needs) {
 
 // ONBOARDING
 let curStep = 0;
-function goStep(s) {
-  if(s===1){const n=document.getElementById('inputName').value.trim();if(!n){document.getElementById('inputName').focus();return;}}
-  document.getElementById('step'+curStep).classList.remove('active');
-  curStep=s; document.getElementById('step'+s).classList.add('active');
-  for(let i=0;i<=s;i++) document.getElementById('dot'+i).classList.add('done');
+function obNext(from) {
+  if(from===0){
+    var n=document.getElementById('inputName').value.trim();
+    if(!n){ document.getElementById('inputName').focus(); return; }
+  }
+  var next = from + 1;
+  var cur = document.getElementById('step'+from);
+  var nxt = document.getElementById('step'+next);
+  if(!nxt) return;
+  if(cur) cur.classList.remove('active');
+  nxt.classList.add('active');
+  curStep = next;
+  for(var i=0;i<=next;i++){var d=document.getElementById('dot'+i);if(d)d.classList.add('done');}
 }
+function goStep(s) { obNext(s-1); }
 function selectPersonPreset(n,el){document.querySelectorAll('.person-option').forEach(o=>o.classList.remove('selected'));el.classList.add('selected');selectedPersons=n;document.getElementById('customNumberRow').style.display='none';document.getElementById('customOption').classList.remove('selected');}
 function selectCustom(){document.querySelectorAll('.person-option').forEach(o=>o.classList.remove('selected'));document.getElementById('customOption').classList.add('selected');document.getElementById('customNumberRow').style.display='flex';document.getElementById('customNumberRow').classList.add('selected');selectedPersons=customNum;}
 function changeNum(d){customNum=Math.max(1,Math.min(20,customNum+d));document.getElementById('numVal').textContent=customNum;selectedPersons=customNum;}
 function toggleNeed(k,el){if(selectedNeeds.has(k)){selectedNeeds.delete(k);el.classList.remove('selected');document.getElementById('need-'+k).textContent='';}else{selectedNeeds.add(k);el.classList.add('selected');document.getElementById('need-'+k).textContent='✓';}}
 function finishOnboarding(){
   const name=document.getElementById('inputName').value.trim()||'deg';
-  profile={name,persons:selectedPersons,needs:Array.from(selectedNeeds),startDate:Date.now()};
+  const postnr=document.getElementById('inputPostnr')?document.getElementById('inputPostnr').value.trim():'';
+  profile={name,persons:selectedPersons,needs:Array.from(selectedNeeds),postnr,startDate:Date.now()};
   localStorage.setItem('72t_profile',JSON.stringify(profile));
   checkedItems=[];localStorage.setItem('72t_checked','[]');
   startApp();
@@ -908,13 +977,13 @@ function startApp(){
   document.getElementById('headerSub').textContent='Hei, '+p.name+'! Klar for 72 timer.';
   const nl=[];if(needs.has('baby'))nl.push('baby');if(needs.has('eldre'))nl.push('eldre');if(needs.has('hund'))nl.push('kjæledyr');if(needs.has('medisin'))nl.push('medisiner');
   document.getElementById('householdSummary').textContent='📊 '+n+' person'+n>1?'er':''+' · '+Math.round(n*9)+'L vann · '+n*3+' porsjoner/dag'+(nl.length?' · '+nl.join(', ') :'');
-  renderDailyTip(); renderWeeklyReminder(); renderChecklist(); renderContacts(); renderMotivation(); show7DayBanner();
+  renderDailyTip(); renderWeeklyReminder(); renderChecklist(); renderContacts(); renderMotivation(); show7DayBanner(); renderTrygghetspunkter();
 }
 function _goToOnboarding(){
   document.getElementById('app').style.display='none';
   document.getElementById('onboarding').style.display='flex';
   curStep=0;
-  ['step0','step1','step2'].forEach((s,i)=>document.getElementById(s).classList.toggle('active',i===0));
+  ['step0','step1','step2','step3'].forEach(function(s,i){ var el=document.getElementById(s); if(el){ el.classList.remove('active'); if(i===0)el.classList.add('active'); } });
   // Reset onboarding state
   selectedPersons=1; selectedNeeds=new Set(); customNum=6;
   document.querySelectorAll('.person-option').forEach(o=>o.classList.remove('selected'));
@@ -1464,6 +1533,108 @@ if(localStorage.getItem('72k_notif') === '1' && Notification.permission === 'gra
   scheduleAllNotifications();
 }
 
+
+// ══════════════════════════════════════════════════════
+// KOMMUNE / TRYGGHETSPUNKTER DATABASE
+// ══════════════════════════════════════════════════════
+const KOMMUNER = {
+  'Kristiansand': {
+    postnr: ['4600','4601','4602','4603','4604','4605','4606','4607','4608','4609',
+             '4610','4611','4612','4613','4614','4615','4616','4617','4618','4619',
+             '4620','4621','4622','4623','4624','4625','4626','4627','4628','4629',
+             '4630','4631','4632','4633','4634','4635','4636','4637','4638','4639',
+             '4640','4641','4642','4643','4644','4645','4646','4647','4648','4649',
+             '4650','4651','4652','4653','4654','4655','4656','4657','4658','4659',
+             '4660','4661','4662','4663','4664','4665','4666','4667','4668','4669',
+             '4670','4671','4672','4673','4674','4675','4676','4677','4678','4679',
+             '4680','4681','4682','4683','4684','4685','4686','4687','4688','4689',
+             '4690','4691','4692','4693','4694','4695','4696','4697','4698','4699'],
+    trygghetspunkter: [
+      { navn: 'Kvadraturen', adresse: 'Rådhusgata 18, Kristiansand', gmaps: 'https://maps.google.com/?q=Rådhusgata+18,+Kristiansand' },
+      { navn: 'Tangvall', adresse: 'Rådhusveien 1, Søgne', gmaps: 'https://maps.google.com/?q=Rådhusveien+1,+Søgne' },
+      { navn: 'Nodeland', adresse: 'Songdalsvegen 53, Nodeland', gmaps: 'https://maps.google.com/?q=Songdalsvegen+53,+Nodeland' },
+    ]
+  },
+  // Legg til flere kommuner her etterhvert:
+  // 'Oslo': { postnr: ['0001',...,'1299'], trygghetspunkter: [...] },
+  // 'Bergen': { postnr: [...], trygghetspunkter: [...] },
+};
+
+function getKommune(postnr){
+  if(!postnr || postnr.length < 4) return null;
+  const pn = postnr.trim().padStart(4,'0');
+  for(const [navn, data] of Object.entries(KOMMUNER)){
+    if(data.postnr.includes(pn)) return { navn, ...data };
+  }
+  return null;
+}
+
+function previewKommune(val){
+  const preview = document.getElementById('kommunePreview');
+  const unknown = document.getElementById('kommuneUnknown');
+  const nameEl = document.getElementById('kommunePreviewName');
+  const punkterEl = document.getElementById('kommunePreviewPunkter');
+  if(!preview) return;
+  if(val.length < 4){ preview.style.display='none'; unknown.style.display='none'; return; }
+  const k = getKommune(val);
+  if(k){
+    preview.style.display='block';
+    unknown.style.display='none';
+    nameEl.textContent = k.navn + ' kommune';
+    punkterEl.textContent = k.trygghetspunkter.length + ' trygghetspunkt' + (k.trygghetspunkter.length!==1?'er':'') + ' funnet';
+  } else {
+    preview.style.display='none';
+    unknown.style.display='block';
+  }
+}
+
+function renderTrygghetspunkter(){
+  var container = document.getElementById('trygghetspunktContainer');
+  if(!container) return;
+  var postnr = profile ? profile.postnr : '';
+  var k = getKommune(postnr);
+  var h = '';
+  if(k && k.trygghetspunkter.length > 0){
+    h += '<div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">📍 '+k.navn+' kommune</div>';
+    h += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">';
+    k.trygghetspunkter.forEach(function(p){
+      h += '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;">';
+      h += '<span style="font-size:24px;flex-shrink:0;">🏢</span>';
+      h += '<div style="flex:1;">';
+      h += '<div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;">'+p.navn+'</div>';
+      h += '<div style="font-size:12px;color:var(--muted);margin-top:2px;">'+p.adresse+'</div>';
+      h += '<div style="font-size:11px;background:rgba(46,204,113,0.12);color:#2ECC71;border-radius:6px;padding:3px 8px;display:inline-block;margin-top:6px;">Informasjon · Varme · Vann · Strøm</div>';
+      h += '</div>';
+      h += '<a href="'+p.gmaps+'" target="_blank" style="background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:var(--blue);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap;flex-shrink:0;">🗺️ Kart</a>';
+      h += '</div>';
+    });
+    h += '</div>';
+  } else if(postnr && postnr.length >= 4){
+    h += '<div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:12px;padding:14px 16px;margin-bottom:8px;">';
+    h += '<div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--blue);margin-bottom:6px;">📍 Postnummer '+postnr+'</div>';
+    h += '<div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:10px;">Vi har ikke lagt inn trygghetspunkter for din kommune ennå. Finn dem via DSB eller kommunens nettside:</div>';
+    h += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
+    h += '<a href="https://www.dsb.no/egenberedskap" target="_blank" style="background:rgba(214,40,40,0.12);border:1px solid rgba(214,40,40,0.3);color:var(--red);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;text-decoration:none;">DSB.no ↗</a>';
+    h += '<a href="https://www.kommunekatalogen.no" target="_blank" style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);color:var(--blue);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;text-decoration:none;">Din kommune ↗</a>';
+    h += '</div></div>';
+  } else {
+    h += '<div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:12px;padding:14px 16px;margin-bottom:8px;">';
+    h += '<div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:10px;">Legg inn postnummeret ditt for å se trygghetspunkter i din kommune.</div>';
+    h += '<button onclick="openPostnrEdit()" style="background:linear-gradient(135deg,var(--red),var(--orange));border:none;color:white;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;">📍 Legg inn postnummer</button>';
+    h += '</div>';
+  }
+  container.innerHTML = h;
+}
+
+function openPostnrEdit(){
+  const pn = prompt('Skriv inn postnummeret ditt (4 siffer):', profile&&profile.postnr?profile.postnr:'');
+  if(pn && pn.length >= 4){
+    profile.postnr = pn.trim();
+    localStorage.setItem('72t_profile', JSON.stringify(profile));
+    renderTrygghetspunkter();
+  }
+}
+
 // ── PUNKT 6: CHANGELOG ──
 function toggleChangelog(){
   const box = document.getElementById('changelogBox');
@@ -1481,7 +1652,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     if(b) b.style.display='flex';
   }
   // Show onboarding install button
-  const ob = document.getElementById('obInstallBtn');
+  const ob = document.getElementById('obInstallBtn2');
   if(ob) ob.style.display='flex';
   // Update install card
   updateInstallCard();
@@ -1651,7 +1822,17 @@ function downloadICS(){
 
 // INIT
 applyTheme();
-if(profile){startApp();updateChecklistDate();setTimeout(updateNotifUI,500);}else{document.getElementById('onboarding').style.display='flex';}
+document.addEventListener('DOMContentLoaded', function() {
+  applyTheme();
+  if(profile){
+    startApp();
+    updateChecklistDate();
+    setTimeout(updateNotifUI, 500);
+  } else {
+    var ob = document.getElementById('onboarding');
+    if(ob) ob.style.display = 'flex';
+  }
+});
 </script>
 
 <script>
