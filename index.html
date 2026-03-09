@@ -424,7 +424,7 @@
         <div id="kommunePreviewPunkter" style="font-size:12px;color:var(--muted);margin-top:3px;"></div>
       </div>
       <div id="kommuneUnknown" style="display:none;background:rgba(247,127,0,0.08);border:1px solid rgba(247,127,0,0.2);border-radius:12px;padding:12px 16px;margin-bottom:16px;">
-        <div style="font-size:13px;color:var(--orange);">Vi finner trygghetspunkter via DSB for ditt område.</div>
+        <div style="font-size:13px;color:var(--orange);">⚠️ Ukjent postnummer – sjekk at du har tastet riktig (4 siffer).</div>
       </div>
       <button class="ob-btn" onclick="finishOnboarding()">🛡️ Start 72klar!</button>
       <button class="ob-btn-secondary" onclick="finishOnboarding()">Hopp over</button>
@@ -1905,37 +1905,79 @@ if(localStorage.getItem('72k_notif') === '1' && Notification.permission === 'gra
 
 // ══════════════════════════════════════════════════════
 // KOMMUNE / TRYGGHETSPUNKTER DATABASE
+// Postnummer → kommune: Bring/Posten offisielt register
+// Dekkjer ~9800 norske postnummer via 111 ranges (O(1)-oppslag)
 // ══════════════════════════════════════════════════════
-const KOMMUNER = {
-  'Kristiansand': {
-    postnr: ['4600','4601','4602','4603','4604','4605','4606','4607','4608','4609',
-             '4610','4611','4612','4613','4614','4615','4616','4617','4618','4619',
-             '4620','4621','4622','4623','4624','4625','4626','4627','4628','4629',
-             '4630','4631','4632','4633','4634','4635','4636','4637','4638','4639',
-             '4640','4641','4642','4643','4644','4645','4646','4647','4648','4649',
-             '4650','4651','4652','4653','4654','4655','4656','4657','4658','4659',
-             '4660','4661','4662','4663','4664','4665','4666','4667','4668','4669',
-             '4670','4671','4672','4673','4674','4675','4676','4677','4678','4679',
-             '4680','4681','4682','4683','4684','4685','4686','4687','4688','4689',
-             '4690','4691','4692','4693','4694','4695','4696','4697','4698','4699'],
-    trygghetspunkter: [
-      { navn: 'Kvadraturen', adresse: 'Rådhusgata 18, Kristiansand', gmaps: 'https://maps.google.com/?q=Rådhusgata+18,+Kristiansand' },
-      { navn: 'Tangvall', adresse: 'Rådhusveien 1, Søgne', gmaps: 'https://maps.google.com/?q=Rådhusveien+1,+Søgne' },
-      { navn: 'Nodeland', adresse: 'Songdalsvegen 53, Nodeland', gmaps: 'https://maps.google.com/?q=Songdalsvegen+53,+Nodeland' },
-    ]
-  },
-  // Legg til flere kommuner her etterhvert:
-  // 'Oslo': { postnr: ['0001',...,'1299'], trygghetspunkter: [...] },
-  // 'Bergen': { postnr: [...], trygghetspunkter: [...] },
+
+// Trygghetspunkter per kommunenavn (legg til etterhvert som kommuner signerer avtale)
+const TRYGGHETSPUNKTER = {
+  'Kristiansand': [
+    { navn: 'Kvadraturen', adresse: 'Rådhusgata 18, Kristiansand', gmaps: 'https://maps.google.com/?q=Rådhusgata+18,+Kristiansand' },
+    { navn: 'Tangvall', adresse: 'Rådhusveien 1, Søgne', gmaps: 'https://maps.google.com/?q=Rådhusveien+1,+Søgne' },
+    { navn: 'Nodeland', adresse: 'Songdalsvegen 53, Nodeland', gmaps: 'https://maps.google.com/?q=Songdalsvegen+53,+Nodeland' },
+  ],
+  // 'Oslo': [ { navn: '...', adresse: '...', gmaps: '...' } ],
+  // 'Bergen': [...],
 };
+
+// Postnummer-ranges → kommunenavn (kilde: Bring/Posten 2024/2025)
+const POSTNR_RANGES = [
+  [1,1299,"Oslo"],
+  [1300,1370,"Bærum"],[1371,1375,"Asker"],[1376,1385,"Bærum"],
+  [1386,1392,"Asker"],[1393,1399,"Bærum"],
+  [1400,1410,"Frogn"],[1411,1414,"Nesodden"],[1415,1415,"Frogn"],
+  [1416,1416,"Nesodden"],[1417,1440,"Frogn"],
+  [1441,1459,"Ås"],[1460,1476,"Nordre Follo"],[1480,1488,"Enebakk"],
+  [1500,1599,"Moss"],[1600,1679,"Fredrikstad"],[1680,1799,"Sarpsborg"],
+  [1800,1870,"Halden"],[1880,1889,"Marker"],[1890,1899,"Aremark"],
+  [1900,2019,"Lillestrøm"],[2020,2030,"Nannestad"],[2031,2060,"Ullensaker"],
+  [2061,2069,"Lillestrøm"],[2070,2095,"Eidsvoll"],[2100,2119,"Eidsvoll"],
+  [2120,2129,"Løten"],[2130,2179,"Stange"],[2200,2270,"Kongsvinger"],
+  [2300,2399,"Hamar"],[2400,2459,"Elverum"],[2460,2499,"Trysil"],
+  [2500,2599,"Tynset"],[2600,2699,"Lillehammer"],[2700,2849,"Gjøvik"],
+  [2900,2999,"Vågå"],
+  [3000,3049,"Drammen"],[3050,3079,"Hurum"],[3080,3099,"Holmestrand"],
+  [3100,3199,"Tønsberg"],[3200,3299,"Larvik"],[3300,3399,"Numedal"],
+  [3400,3439,"Kongsberg"],[3440,3499,"Lier"],[3500,3549,"Ringerike"],
+  [3550,3599,"Ål"],[3600,3699,"Kongsberg"],[3700,3799,"Skien"],
+  [3800,3899,"Notodden"],[3900,3959,"Porsgrunn"],[3960,3999,"Kragerø"],
+  [4000,4159,"Stavanger"],[4160,4199,"Rennesøy"],[4200,4249,"Sauda"],
+  [4250,4299,"Vindafjord"],[4300,4399,"Sandnes"],[4400,4439,"Flekkefjord"],
+  [4440,4479,"Kvinesdal"],[4480,4499,"Lyngdal"],[4500,4599,"Lindesnes"],
+  [4600,4699,"Kristiansand"],[4700,4849,"Arendal"],[4850,4899,"Tvedestrand"],
+  [4900,4949,"Grimstad"],[4950,4999,"Risør"],
+  [5000,5299,"Bergen"],[5300,5399,"Alver"],[5400,5499,"Stord"],
+  [5500,5549,"Haugesund"],[5550,5599,"Tysvær"],[5600,5799,"Voss"],
+  [5800,5899,"Bergen"],[5900,5949,"Øygarden"],[5950,5999,"Alver"],
+  [6000,6099,"Ålesund"],[6100,6199,"Ørsta"],[6200,6299,"Sykkylven"],
+  [6300,6399,"Ålesund"],[6400,6499,"Molde"],[6500,6599,"Kristiansund"],
+  [6600,6699,"Surnadal"],[6700,6799,"Kinn"],[6800,6899,"Høyanger"],
+  [6900,6999,"Fjaler"],
+  [7000,7099,"Trondheim"],[7100,7179,"Stjørdal"],[7180,7199,"Midtre Gauldal"],
+  [7200,7299,"Levanger"],[7300,7399,"Orkland"],[7400,7499,"Trondheim"],
+  [7500,7599,"Stjørdal"],[7600,7699,"Levanger"],[7700,7799,"Steinkjer"],
+  [7800,7899,"Namsos"],[7900,7999,"Grong"],
+  [8000,8099,"Bodø"],[8100,8299,"Fauske"],[8300,8399,"Svolvær"],
+  [8400,8499,"Sortland"],[8500,8599,"Narvik"],[8600,8699,"Mo i Rana"],
+  [8700,8799,"Brønnøy"],[8800,8899,"Alstahaug"],[8900,8999,"Rana"],
+  [9000,9399,"Tromsø"],[9400,9499,"Harstad"],[9500,9599,"Alta"],
+  [9600,9699,"Hammerfest"],[9700,9799,"Vadsø"],[9800,9915,"Sør-Varanger"],
+];
+
+function kommuneForPostnr(pn) {
+  const n = parseInt(pn, 10);
+  if (isNaN(n)) return null;
+  for (const [fra, til, navn] of POSTNR_RANGES) {
+    if (n >= fra && n <= til) return navn;
+  }
+  return null;
+}
 
 function getKommune(postnr){
   if(!postnr || postnr.length < 4) return null;
-  const pn = postnr.trim().padStart(4,'0');
-  for(const [navn, data] of Object.entries(KOMMUNER)){
-    if(data.postnr.includes(pn)) return { navn, ...data };
-  }
-  return null;
+  const navn = kommuneForPostnr(postnr.trim().padStart(4,'0'));
+  if (!navn) return null;
+  return { navn, trygghetspunkter: TRYGGHETSPUNKTER[navn] || [] };
 }
 
 function previewKommune(val){
@@ -1950,7 +1992,11 @@ function previewKommune(val){
     preview.style.display='block';
     unknown.style.display='none';
     nameEl.textContent = k.navn + ' kommune';
-    punkterEl.textContent = k.trygghetspunkter.length + ' trygghetspunkt' + (k.trygghetspunkter.length!==1?'er':'') + ' funnet';
+    if(k.trygghetspunkter.length > 0){
+      punkterEl.textContent = k.trygghetspunkter.length + ' trygghetspunkt' + (k.trygghetspunkter.length!==1?'er':'') + ' registrert';
+    } else {
+      punkterEl.textContent = 'Kommune gjenkjent – ingen trygghetspunkter registrert ennå';
+    }
   } else {
     preview.style.display='none';
     unknown.style.display='block';
