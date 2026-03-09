@@ -13,7 +13,7 @@
 <style>
   :root {
     --red: #D62828; --orange: #F77F00; --dark: #0A0A0F; --dark2: #14141C;
-    --card: #1C1C28; --border: #2A2A3A; --text: #E8E8F0; --muted: #6B6B88;
+    --card: #1C1C28; --border: #2A2A3A; --text: #F5F5FA; --muted: #A0A0B8;
     --green: #2ECC71; --blue: #3B82F6; --gold: #F59E0B;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -24,11 +24,11 @@
   .ob-hero { background: linear-gradient(135deg, var(--red) 0%, #8B0000 100%); padding: 48px 28px 36px; position: relative; overflow: hidden; text-align: center; }
   .ob-hero::before { content: '🛡️'; position: absolute; right: -20px; top: -20px; font-size: 140px; opacity: 0.1; transform: rotate(15deg); }
   .ob-hero h1 { font-family: 'Syne', sans-serif; font-size: 42px; font-weight: 800; letter-spacing: -1px; }
-  .ob-hero p { font-size: 15px; opacity: 0.85; margin-top: 8px; line-height: 1.5; }
+  .ob-hero p { font-size: 16px; opacity: 0.85; margin-top: 8px; line-height: 1.5; }
   .ob-steps { flex: 1; padding: 28px 20px; }
   .ob-step { display: none; } .ob-step.active { display: block; }
   .ob-step-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 6px; }
-  .ob-step-sub { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
+  .ob-step-sub { font-size: 15px; color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
   .ob-step-indicator { display: flex; gap: 6px; margin-bottom: 28px; }
   .ob-dot { height: 4px; border-radius: 99px; background: var(--border); flex: 1; transition: background 0.3s; }
   .ob-dot.done { background: var(--orange); }
@@ -36,29 +36,29 @@
   .person-option { background: var(--card); border: 2px solid var(--border); border-radius: 14px; padding: 16px 8px; cursor: pointer; text-align: center; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
   .person-option.selected { border-color: var(--orange); background: rgba(247,127,0,0.1); }
   .person-option .po-emoji { font-size: 28px; margin-bottom: 6px; }
-  .person-option .po-label { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; }
-  .person-option .po-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .person-option .po-label { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; }
+  .person-option .po-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
   .custom-number { background: var(--card); border: 2px solid var(--border); border-radius: 14px; padding: 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
   .custom-number.selected { border-color: var(--orange); background: rgba(247,127,0,0.07); }
-  .custom-number label { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; }
+  .custom-number label { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; }
   .num-controls { display: flex; align-items: center; gap: 12px; }
-  .num-btn { width: 32px; height: 32px; border-radius: 8px; background: var(--border); border: none; color: var(--text); font-size: 18px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .num-btn { width: 32px; height: 32px; border-radius: 8px; background: var(--border); border: none; color: var(--text); font-size: 19px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
   .num-val { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; min-width: 24px; text-align: center; color: var(--orange); }
   .needs-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
   .needs-option { background: var(--card); border: 2px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: all 0.2s; }
   .needs-option.selected { border-color: var(--orange); background: rgba(247,127,0,0.07); }
   .needs-icon { font-size: 22px; } .needs-text { flex: 1; }
-  .needs-text strong { display: block; font-size: 14px; font-weight: 600; }
-  .needs-text span { font-size: 12px; color: var(--muted); }
-  .needs-check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+  .needs-text strong { display: block; font-size: 15px; font-weight: 600; }
+  .needs-text span { font-size: 14px; color: var(--muted); }
+  .needs-check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
   .needs-option.selected .needs-check { background: var(--orange); border-color: var(--orange); }
   .name-input-wrap { background: var(--card); border: 2px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 16px; transition: border-color 0.2s; }
   .name-input-wrap:focus-within { border-color: var(--orange); }
-  .name-input-wrap label { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; font-weight: 600; }
-  .name-input-wrap input { width: 100%; background: none; border: none; color: var(--text); font-size: 18px; font-family: 'Syne', sans-serif; font-weight: 700; outline: none; }
+  .name-input-wrap label { display: block; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; font-weight: 600; }
+  .name-input-wrap input { width: 100%; background: none; border: none; color: var(--text); font-size: 19px; font-family: 'Syne', sans-serif; font-weight: 700; outline: none; }
   .name-input-wrap input::placeholder { color: var(--border); }
-  .ob-btn { width: 100%; padding: 16px; border-radius: 12px; border: none; background: linear-gradient(135deg, var(--red), var(--orange)); color: white; font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; }
-  .ob-btn-secondary { width: 100%; padding: 13px; border-radius: 12px; border: 1px solid var(--border); background: none; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; margin-top: 10px; }
+  .ob-btn { width: 100%; padding: 16px; border-radius: 12px; border: none; background: linear-gradient(135deg, var(--red), var(--orange)); color: white; font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; cursor: pointer; }
+  .ob-btn-secondary { width: 100%; padding: 13px; border-radius: 12px; border: 1px solid var(--border); background: none; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 15px; cursor: pointer; margin-top: 10px; }
 
   /* MAIN APP */
   #app { display: none; padding-bottom: 80px; }
@@ -66,16 +66,23 @@
   header::before { content: '🛡️'; position: absolute; right: -10px; top: -10px; font-size: 100px; opacity: 0.12; transform: rotate(15deg); }
   .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
   header h1 { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
-  header p { font-size: 12px; opacity: 0.8; margin-top: 3px; }
-  .household-badge { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 6px 10px; font-size: 12px; font-family: 'Syne', sans-serif; font-weight: 700; cursor: pointer; white-space: nowrap; }
-  .status-bar { background: var(--dark2); padding: 10px 24px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
+  header p { font-size: 14px; opacity: 0.8; margin-top: 3px; }
+  .household-badge { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 6px 10px; font-size: 14px; font-family: 'Syne', sans-serif; font-weight: 700; cursor: pointer; white-space: nowrap; }
+
+  .status-bar { display:flex; align-items:center; gap:8px; padding:10px 16px; background:var(--card); border-bottom:1px solid var(--border); font-size:14px; transition:background 0.2s; }
+  .status-bar:active { background:var(--dark2); }
+  .status-dot { width:9px; height:9px; border-radius:50%; background:var(--green); flex-shrink:0; }
+  .status-dot.yellow { background:#F5BE41; }
+  .status-dot.orange { background:#F97316; }
+  .status-dot.red { background:var(--red); animation:blink 1.2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
   .status-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-  .status-bar span { font-size: 13px; color: var(--muted); }
+  .status-bar span { font-size: 15px; color: var(--muted); }
   nav { display: flex; background: var(--dark2); border-top: 1px solid var(--border); position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; padding-bottom: env(safe-area-inset-bottom); max-width: 480px; margin: 0 auto; }
-  nav button { flex: 1; padding: 8px 2px 10px; background: none; border: none; border-top: 3px solid transparent; color: var(--muted); font-family: 'Syne', sans-serif; font-size: 9px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 3px; line-height: 1; }
+  nav button { flex: 1; padding: 8px 2px 10px; background: none; border: none; border-top: 3px solid transparent; color: var(--muted); font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 3px; line-height: 1; }
   nav button .nav-icon { font-size: 22px; line-height: 1; }
-  nav button .nav-label { font-size: 9px; }
+  nav button .nav-label { font-size: 11px; }
   nav button.active { color: var(--orange); border-top-color: var(--orange); background: rgba(247,127,0,0.06); }
   .tab { display: none; padding: 20px 16px; } .tab.active { display: block; }
 
@@ -87,44 +94,47 @@
   .ring-bg { fill: none; stroke: var(--border); stroke-width: 8; }
   .ring-fill { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.6s ease; }
   .ring-text { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; }
-  .ring-sub { font-size: 11px; color: var(--muted); }
-  .mot-status-label { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 6px; }
-  .mot-status-msg { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .ring-sub { font-size: 13px; color: var(--muted); }
+  .mot-status-label { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .mot-status-msg { font-size: 15px; color: var(--muted); line-height: 1.5; }
   .daily-tip { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 18px 18px 22px; margin-bottom: 14px; position: relative; overflow: hidden; }
   .daily-tip::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(180deg, var(--orange), var(--red)); border-radius: 4px 0 0 4px; }
-  .tip-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--orange); margin-bottom: 6px; }
-  .tip-text { font-size: 14px; line-height: 1.6; }
-  .tip-source { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .tip-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--orange); margin-bottom: 6px; }
+  .tip-text { font-size: 15px; line-height: 1.6; }
+  .tip-source { font-size: 13px; color: var(--muted); margin-top: 6px; }
   .weekly-reminder { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.25); border-radius: 14px; padding: 16px; margin-bottom: 14px; display: flex; gap: 12px; align-items: flex-start; }
   .wr-icon { font-size: 24px; flex-shrink: 0; }
   .wr-body { flex: 1; }
-  .wr-body strong { display: block; font-size: 14px; font-weight: 700; color: var(--blue); margin-bottom: 3px; }
-  .wr-body span { font-size: 13px; color: var(--muted); line-height: 1.5; }
-  .wr-done-btn { margin-top: 10px; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); color: var(--blue); border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
-  .badges-section-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  .wr-body strong { display: block; font-size: 15px; font-weight: 700; color: var(--blue); margin-bottom: 3px; }
+  .wr-body span { font-size: 15px; color: var(--muted); line-height: 1.5; }
+  .wr-done-btn { margin-top: 10px; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); color: var(--blue); border-radius: 8px; padding: 7px 14px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .badges-section-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
   .badges-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
   .badge-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 10px; text-align: center; transition: all 0.3s; }
   .badge-card.earned { border-color: var(--gold); background: rgba(245,158,11,0.08); }
   .badge-emoji { font-size: 28px; margin-bottom: 6px; filter: grayscale(1) opacity(0.3); transition: filter 0.3s; }
   .badge-card.earned .badge-emoji { filter: none; }
-  .badge-name { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; line-height: 1.3; }
+  .badge-name { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; line-height: 1.3; }
   .badge-card.earned .badge-name { color: var(--gold); }
-  .badge-desc { font-size: 10px; color: var(--muted); margin-top: 3px; line-height: 1.3; }
+  .badge-desc { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.3; }
 
+
+  .badge-stat { font-size:11px; color:var(--gold); margin-top:5px; font-weight:600; }
+  .badge-stat-lock { color:var(--muted) !important; font-weight:400 !important; }
   /* BADGE MODAL */
   .badge-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:300; align-items:center; justify-content:center; padding:20px; }
   .badge-modal-overlay.open { display:flex; animation:fadeIn 0.2s ease; }
   @keyframes fadeIn { from{opacity:0} to{opacity:1} }
   .badge-modal { background:var(--card); border:2px solid var(--gold); border-radius:24px; padding:32px 24px 28px; width:100%; max-width:340px; text-align:center; position:relative; animation:popIn 0.35s cubic-bezier(0.34,1.56,0.64,1); }
   @keyframes popIn { from{opacity:0;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
-  .badge-modal-close { position:absolute; top:14px; right:16px; background:var(--border); border:none; color:var(--muted); width:32px; height:32px; border-radius:50%; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; }
+  .badge-modal-close { position:absolute; top:14px; right:16px; background:var(--border); border:none; color:var(--muted); width:32px; height:32px; border-radius:50%; font-size: 19px; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; }
   .badge-modal-close:hover { background:var(--red); color:white; }
-  .badge-modal-emoji { font-size:72px; margin-bottom:12px; animation:badgePop 0.5s 0.2s cubic-bezier(0.34,1.56,0.64,1) both; }
+  .badge-modal-emoji { font-size: 72px; margin-bottom:12px; animation:badgePop 0.5s 0.2s cubic-bezier(0.34,1.56,0.64,1) both; }
   @keyframes badgePop { from{transform:scale(0) rotate(-20deg)} to{transform:scale(1) rotate(0deg)} }
-  .badge-modal-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--gold); margin-bottom:6px; }
-  .badge-modal-title { font-family:'Syne',sans-serif; font-size:26px; font-weight:800; color:var(--gold); margin-bottom:8px; }
-  .badge-modal-desc { font-size:14px; color:var(--muted); line-height:1.5; margin-bottom:22px; }
-  .badge-modal-btn { width:100%; padding:14px; border-radius:12px; border:none; background:linear-gradient(135deg,var(--red),var(--orange)); color:white; font-family:'Syne',sans-serif; font-size:15px; font-weight:800; cursor:pointer; }
+  .badge-modal-label { font-size: 13px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--gold); margin-bottom:6px; }
+  .badge-modal-title { font-family:'Syne',sans-serif; font-size: 26px; font-weight:800; color:var(--gold); margin-bottom:8px; }
+  .badge-modal-desc { font-size: 15px; color:var(--muted); line-height:1.5; margin-bottom:22px; }
+  .badge-modal-btn { width:100%; padding:14px; border-radius:12px; border:none; background:linear-gradient(135deg,var(--red),var(--orange)); color:white; font-family:'Syne',sans-serif; font-size: 16px; font-weight:800; cursor:pointer; }
 
   /* CONFETTI CANVAS */
   #confettiCanvas { position:fixed; inset:0; pointer-events:none; z-index:299; }
@@ -133,102 +143,111 @@
   .challenge-card { background:linear-gradient(135deg,rgba(247,127,0,0.12),rgba(214,40,40,0.08)); border:1px solid rgba(247,127,0,0.5); border-radius:16px; padding:20px; margin-bottom:14px; display:none; cursor:pointer; transition:all 0.2s; }
   .challenge-card:active { transform:scale(0.98); }
   .challenge-card-top { display:flex; align-items:center; gap:12px; margin-bottom:8px; }
-  .challenge-card-emoji { font-size:32px; flex-shrink:0; }
-  .challenge-card-title { font-family:'Syne',sans-serif; font-size:15px; font-weight:800; color:var(--orange); }
-  .challenge-card-sub { font-size:12px; color:var(--muted); margin-top:2px; }
-  .challenge-card-btn { display:inline-block; margin-top:10px; background:linear-gradient(135deg,var(--orange),var(--red)); color:white; border:none; border-radius:8px; padding:9px 18px; font-family:'Syne',sans-serif; font-size:13px; font-weight:700; cursor:pointer; }
+  .challenge-card-emoji { font-size: 32px; flex-shrink:0; }
+  .challenge-card-title { font-family:'Syne',sans-serif; font-size: 16px; font-weight:800; color:var(--orange); }
+  .challenge-card-sub { font-size: 14px; color:var(--muted); margin-top:2px; }
+  .challenge-card-btn { display:inline-block; margin-top:10px; background:linear-gradient(135deg,var(--orange),var(--red)); color:white; border:none; border-radius:8px; padding:9px 18px; font-family:'Syne',sans-serif; font-size: 15px; font-weight:700; cursor:pointer; }
 
   /* 7-DAY CHALLENGE MODAL */
   .challenge-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.82); z-index:400; align-items:center; justify-content:center; padding:20px; }
   .challenge-modal-overlay.open { display:flex; animation:fadeIn 0.25s ease; }
   .challenge-modal { background:linear-gradient(135deg,#1a1a2e,#16213e); border:2px solid var(--orange); border-radius:24px; padding:32px 24px 28px; width:100%; max-width:360px; text-align:center; position:relative; animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1); }
-  .challenge-modal-close { position:absolute; top:14px; right:16px; background:rgba(255,255,255,0.1); border:none; color:var(--muted); width:32px; height:32px; border-radius:50%; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-  .challenge-hero-emoji { font-size:64px; margin-bottom:10px; }
-  .challenge-modal h2 { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:white; margin-bottom:8px; }
-  .challenge-modal p { font-size:13px; color:var(--muted); line-height:1.6; margin-bottom:20px; }
+  .challenge-modal-close { position:absolute; top:14px; right:16px; background:rgba(255,255,255,0.1); border:none; color:var(--muted); width:32px; height:32px; border-radius:50%; font-size: 19px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .challenge-hero-emoji { font-size: 64px; margin-bottom:10px; }
+  .challenge-modal h2 { font-family:'Syne',sans-serif; font-size: 22px; font-weight:800; color:white; margin-bottom:8px; }
+  .challenge-modal p { font-size: 15px; color:var(--muted); line-height:1.6; margin-bottom:20px; }
   .challenge-items { text-align:left; margin-bottom:22px; display:flex; flex-direction:column; gap:10px; }
   .ch-item { background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:12px; }
-  .ch-item-icon { font-size:22px; flex-shrink:0; }
-  .ch-item-text strong { display:block; font-size:13px; font-weight:700; color:var(--text); }
-  .ch-item-text span { font-size:11px; color:var(--muted); }
-  .challenge-yes-btn { width:100%; padding:15px; border-radius:12px; border:none; background:linear-gradient(135deg,var(--orange),var(--red)); color:white; font-family:'Syne',sans-serif; font-size:16px; font-weight:800; cursor:pointer; margin-bottom:10px; }
-  .challenge-no-btn { width:100%; padding:11px; border-radius:12px; border:1px solid var(--border); background:none; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; }
+  .ch-item-icon { font-size: 22px; flex-shrink:0; }
+  .ch-item-text strong { display:block; font-size: 15px; font-weight:700; color:var(--text); }
+  .ch-item-text span { font-size: 13px; color:var(--muted); }
+  .challenge-yes-btn { width:100%; padding:15px; border-radius:12px; border:none; background:linear-gradient(135deg,var(--orange),var(--red)); color:white; font-family:'Syne',sans-serif; font-size: 17px; font-weight:800; cursor:pointer; margin-bottom:10px; }
+  .challenge-no-btn { width:100%; padding:11px; border-radius:12px; border:1px solid var(--border); background:none; color:var(--muted); font-family:'DM Sans',sans-serif; font-size: 15px; cursor:pointer; }
 
   /* CHECKLIST */
+  .cat-accordion { margin-bottom:10px; background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+  .cat-head { width:100%; background:none; border:none; padding:14px 16px; display:flex; align-items:center; gap:10px; cursor:pointer; text-align:left; }
+  .cat-head-title { flex:1; font-family:'Syne',sans-serif; font-size:15px; font-weight:700; color:var(--text); }
+  .cat-head-meta { font-size:13px; color:var(--muted); margin-right:6px; }
+  .cat-head-arrow { color:var(--muted); font-size:16px; transition:transform 0.25s; }
+  .cat-accordion.open .cat-head-arrow { transform:rotate(180deg); color:var(--orange); }
+  .cat-accordion.open .cat-head { border-bottom:1px solid var(--border); }
+  .cat-body { display:none; padding:8px; }
+  .cat-accordion.open .cat-body { display:block; }
   .progress-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
   .progress-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-  .progress-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .progress-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
   .progress-pct { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--orange); }
   .progress-bar { background: var(--border); border-radius: 99px; height: 10px; overflow: hidden; margin-bottom: 8px; }
   .progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--red), var(--orange)); transition: width 0.4s ease; }
-  .progress-label { font-size: 13px; color: var(--muted); }
+  .progress-label { font-size: 15px; color: var(--muted); }
   .progress-label span { color: var(--orange); font-weight: 600; }
-  .household-summary { background: rgba(247,127,0,0.08); border: 1px solid rgba(247,127,0,0.25); border-radius: 10px; padding: 10px 14px; margin-top: 12px; font-size: 13px; color: var(--orange); }
+  .household-summary { background: rgba(247,127,0,0.08); border: 1px solid rgba(247,127,0,0.25); border-radius: 10px; padding: 10px 14px; margin-top: 12px; font-size: 15px; color: var(--orange); }
   .category { margin-bottom: 20px; }
-  .category-title { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 10px; padding-left: 4px; }
-  .checklist-item { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
+  .category-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 10px; padding-left: 4px; }
+  .checklist-item { background: var(--dark2); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 6px; display: flex; align-items: center; gap: 14px; transition: all 0.2s; cursor:default; }
   .checklist-item:active { transform: scale(0.98); }
   .checklist-item.checked { border-color: var(--green); background: rgba(46,204,113,0.07); }
-  .checkbox { width: 24px; height: 24px; border-radius: 6px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; font-size: 13px; }
+  .checkbox { width: 32px; height: 32px; border-radius: 8px; border: 2.5px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; font-size: 18px; cursor:pointer; -webkit-tap-highlight-color: transparent; }
   .checklist-item.checked .checkbox { background: var(--green); border-color: var(--green); }
   .item-info { flex: 1; }
-  .item-name { font-size: 15px; font-weight: 500; transition: color 0.2s; }
+  .item-name { font-size: 16px; font-weight: 500; transition: color 0.2s; }
   .checklist-item.checked .item-name { color: var(--muted); text-decoration: line-through; }
-  .item-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
-  .item-qty { font-size: 11px; background: rgba(247,127,0,0.15); color: var(--orange); border-radius: 6px; padding: 2px 7px; font-weight: 600; white-space: nowrap; margin-top: 4px; display: inline-block; }
+  .item-desc { font-size: 14px; color: var(--muted); margin-top: 2px; }
+  .item-qty { font-size: 13px; background: rgba(247,127,0,0.15); color: var(--orange); border-radius: 6px; padding: 2px 7px; font-weight: 600; white-space: nowrap; margin-top: 4px; display: inline-block; }
   .item-emoji { font-size: 20px; }
 
   /* CONTACTS */
   .contacts-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-  .contacts-header h2 { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
-  .add-btn { background: var(--red); color: white; border: none; border-radius: 8px; padding: 8px 14px; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; }
-  .preset-label { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin: 16px 0 8px; }
+  .contacts-header h2 { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; }
+  .add-btn { background: var(--red); color: white; border: none; border-radius: 8px; padding: 8px 14px; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; }
+  .preset-label { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin: 16px 0 8px; }
   .contact-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; }
   .contact-avatar { width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, var(--red), var(--orange)); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
   .contact-avatar.preset { background: linear-gradient(135deg, #1a3a6b, #2255a4); }
   .contact-info { flex: 1; }
-  .contact-name { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; }
-  .contact-role { font-size: 12px; color: var(--muted); margin-top: 2px; }
-  .contact-number { font-size: 14px; color: var(--orange); margin-top: 4px; font-weight: 500; }
+  .contact-name { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+  .contact-role { font-size: 14px; color: var(--muted); margin-top: 2px; }
+  .contact-number { font-size: 15px; color: var(--orange); margin-top: 4px; font-weight: 500; }
   .contact-actions { display: flex; flex-direction: column; gap: 6px; }
-  .call-btn { background: var(--green); color: var(--dark); border: none; border-radius: 8px; padding: 7px 12px; font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: none; display: block; text-align: center; font-family: 'Syne', sans-serif; }
-  .del-btn { background: rgba(214,40,40,0.15); color: var(--red); border: 1px solid rgba(214,40,40,0.3); border-radius: 8px; padding: 5px 12px; font-size: 12px; cursor: pointer; }
+  .call-btn { background: var(--green); color: var(--dark); border: none; border-radius: 8px; padding: 7px 12px; font-size: 15px; font-weight: 700; cursor: pointer; text-decoration: none; display: block; text-align: center; font-family: 'Syne', sans-serif; }
+  .del-btn { background: rgba(214,40,40,0.15); color: var(--red); border: 1px solid rgba(214,40,40,0.3); border-radius: 8px; padding: 5px 12px; font-size: 14px; cursor: pointer; }
 
   /* INFO */
   .info-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 12px; }
-  .info-card h3 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 8px; }
-  .info-card p, .info-card li { font-size: 14px; color: var(--muted); line-height: 1.6; }
+  .info-card h3 { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .info-card p, .info-card li { font-size: 15px; color: var(--muted); line-height: 1.6; }
   .info-card ul { padding-left: 18px; margin-top: 6px; }
   .info-card li { margin-bottom: 4px; }
   .alert-box { background: rgba(214,40,40,0.12); border: 1px solid rgba(214,40,40,0.35); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; }
-  .alert-box span { font-size: 14px; color: #ff8080; line-height: 1.5; }
+  .alert-box span { font-size: 15px; color: #ff8080; line-height: 1.5; }
 
   /* CREDITS */
   .credits-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 22px; margin-bottom: 12px; }
   .credits-top { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
   .credits-avatar { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, var(--red), var(--orange)); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
-  .credits-name { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; }
-  .credits-role { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
-  .credits-desc { font-size: 13px; color: var(--muted); line-height: 1.6; border-top: 1px solid var(--border); padding-top: 12px; }
+  .credits-name { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; }
+  .credits-role { font-size: 14px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+  .credits-desc { font-size: 15px; color: var(--muted); line-height: 1.6; border-top: 1px solid var(--border); padding-top: 12px; }
   .sponsor-box { background: var(--card); border: 2px dashed var(--border); border-radius: 14px; padding: 22px; margin-bottom: 12px; text-align: center; }
-  .sp-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .sp-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
   .sp-empty { font-size: 28px; margin-bottom: 8px; }
-  .sp-cta { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .sp-cta { font-size: 15px; color: var(--muted); line-height: 1.6; }
   .sp-cta strong { color: var(--orange); }
-  .app-version { text-align: center; font-size: 11px; color: var(--border); padding: 16px 0 4px; }
+  .app-version { text-align: center; font-size: 13px; color: var(--border); padding: 16px 0 4px; }
   /* FIRSTAID */
   .fh-card { background:var(--card); border:1px solid var(--border); border-radius:14px; margin-bottom:10px; overflow:hidden; cursor:pointer; }
   .fh-header { display:flex; align-items:center; gap:12px; padding:14px 16px; }
-  .fh-emoji { font-size:28px; flex-shrink:0; }
-  .fh-title { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; }
-  .fh-sub { font-size:12px; color:var(--muted); margin-top:2px; }
-  .fh-arrow { margin-left:auto; color:var(--muted); font-size:16px; transition:transform 0.2s; flex-shrink:0; }
+  .fh-emoji { font-size: 28px; flex-shrink:0; }
+  .fh-title { font-family:'Syne',sans-serif; font-size: 16px; font-weight:700; }
+  .fh-sub { font-size: 14px; color:var(--muted); margin-top:2px; }
+  .fh-arrow { margin-left:auto; color:var(--muted); font-size: 17px; transition:transform 0.2s; flex-shrink:0; }
   .fh-card.open .fh-arrow { transform:rotate(180deg); }
   .fh-body { display:none; padding:0 16px 16px; border-top:1px solid var(--border); padding-top:14px; }
   .fh-card.open .fh-body { display:block; }
-  .fh-step { display:flex; gap:10px; align-items:flex-start; margin-bottom:10px; font-size:13px; line-height:1.6; }
-  .fh-num { background:var(--red); color:white; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-size:11px; font-weight:800; flex-shrink:0; margin-top:2px; }
-  .fh-tip { background:rgba(247,127,0,0.08); border:1px solid rgba(247,127,0,0.2); border-radius:8px; padding:8px 12px; font-size:12px; color:var(--orange); margin-top:8px; line-height:1.5; }
+  .fh-step { display:flex; gap:10px; align-items:flex-start; margin-bottom:10px; font-size: 15px; line-height:1.6; }
+  .fh-num { background:var(--red); color:white; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-size: 13px; font-weight:800; flex-shrink:0; margin-top:2px; }
+  .fh-tip { background:rgba(247,127,0,0.08); border:1px solid rgba(247,127,0,0.2); border-radius:8px; padding:8px 12px; font-size: 14px; color:var(--orange); margin-top:8px; line-height:1.5; }
   /* LIGHT THEME */
   body.light { --dark:#F5F5F5; --dark2:#EBEBEB; --card:#FFFFFF; --border:#D0D0D8; --text:#1A1A2E; --muted:#6B6B88; }
   body.light .fh-card { box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
@@ -268,24 +287,24 @@
   body.light .status-bar { background: #EBEBEB; border-color: #D0D0D8; }
   body.light #statusText { color: #6B6B88; }
   /* FEEDBACK STAR */
-  .fb-star { background:none; border:none; font-size:28px; cursor:pointer; padding:2px 4px; opacity:0.4; transition:opacity 0.15s,transform 0.15s; }
+  .fb-star { background:none; border:none; font-size: 28px; cursor:pointer; padding:2px 4px; opacity:0.4; transition:opacity 0.15s,transform 0.15s; }
   .fb-star.active { opacity:1; transform:scale(1.15); }
   .lang-en .no-text { display:none; }
   .lang-en .en-text { display:block !important; }
   .no-text { display:block; }
   .en-text { display:none; }
   .reset-section { margin-top: 8px; padding: 20px 0 8px; border-top: 1px solid var(--border); }
-  .reset-btn { width:100%; padding:14px; border-radius:12px; border:1px solid rgba(214,40,40,0.4); background:rgba(214,40,40,0.08); color:var(--red); font-family:'Syne',sans-serif; font-size:14px; font-weight:700; cursor:pointer; margin-bottom:10px; transition:all 0.2s; }
+  .reset-btn { width:100%; padding:14px; border-radius:12px; border:1px solid rgba(214,40,40,0.4); background:rgba(214,40,40,0.08); color:var(--red); font-family:'Syne',sans-serif; font-size: 15px; font-weight:700; cursor:pointer; margin-bottom:10px; transition:all 0.2s; }
   .reset-btn:active { background:rgba(214,40,40,0.2); }
-  .reset-btn-soft { width:100%; padding:12px; border-radius:12px; border:1px solid var(--border); background:none; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; transition:all 0.2s; }
+  .reset-btn-soft { width:100%; padding:12px; border-radius:12px; border:1px solid var(--border); background:none; color:var(--muted); font-family:'DM Sans',sans-serif; font-size: 15px; cursor:pointer; transition:all 0.2s; }
   .reset-btn-soft:active { background:var(--border); }
 
   /* SHARE MODAL */
   .share-card { background: linear-gradient(135deg, rgba(247,127,0,0.1), rgba(214,40,40,0.08)); border: 1px solid rgba(247,127,0,0.4); border-radius: 16px; padding: 20px; margin-bottom: 12px; }
-  .share-card-title { font-family:'Syne',sans-serif; font-size:15px; font-weight:800; margin-bottom:4px; color:var(--orange); }
-  .share-card-sub { font-size:13px; color:var(--muted); margin-bottom:16px; line-height:1.5; }
+  .share-card-title { font-family:'Syne',sans-serif; font-size: 16px; font-weight:800; margin-bottom:4px; color:var(--orange); }
+  .share-card-sub { font-size: 15px; color:var(--muted); margin-bottom:16px; line-height:1.5; }
   .share-btns { display:flex; flex-direction:column; gap:10px; }
-  .share-btn { width:100%; padding:13px 16px; border-radius:12px; border:none; font-family:'Syne',sans-serif; font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.2s; }
+  .share-btn { width:100%; padding:13px 16px; border-radius:12px; border:none; font-family:'Syne',sans-serif; font-size: 15px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.2s; }
   .share-btn:active { transform:scale(0.97); }
   .share-btn-qr { background: linear-gradient(135deg, var(--red), var(--orange)); color:white; }
   .share-btn-copy { background: var(--card); border: 1px solid var(--border); color: var(--text); }
@@ -294,29 +313,42 @@
   .qr-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.82); z-index:500; align-items:center; justify-content:center; padding:20px; }
   .qr-modal-overlay.open { display:flex; animation:fadeIn 0.2s ease; }
   .qr-modal { background:var(--card); border:1px solid var(--border); border-radius:24px; padding:28px 24px; width:100%; max-width:320px; text-align:center; position:relative; animation:popIn 0.35s cubic-bezier(0.34,1.56,0.64,1); }
-  .qr-modal-close { position:absolute; top:14px; right:16px; background:var(--border); border:none; color:var(--muted); width:32px; height:32px; border-radius:50%; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-  .qr-modal h3 { font-family:'Syne',sans-serif; font-size:18px; font-weight:800; margin-bottom:6px; }
-  .qr-modal p { font-size:13px; color:var(--muted); margin-bottom:18px; line-height:1.5; }
+  .qr-modal-close { position:absolute; top:14px; right:16px; background:var(--border); border:none; color:var(--muted); width:32px; height:32px; border-radius:50%; font-size: 19px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .qr-modal h3 { font-family:'Syne',sans-serif; font-size: 19px; font-weight:800; margin-bottom:6px; }
+  .qr-modal p { font-size: 15px; color:var(--muted); margin-bottom:18px; line-height:1.5; }
   #qrCanvas { border-radius:12px; background:white; padding:12px; margin-bottom:16px; }
-  .qr-url { font-size:11px; color:var(--muted); word-break:break-all; margin-bottom:16px; padding:8px 12px; background:var(--dark2); border-radius:8px; }
-  .qr-copy-btn { width:100%; padding:12px; border-radius:10px; border:none; background:linear-gradient(135deg,var(--red),var(--orange)); color:white; font-family:'Syne',sans-serif; font-size:14px; font-weight:700; cursor:pointer; }
+  .qr-url { font-size: 13px; color:var(--muted); word-break:break-all; margin-bottom:16px; padding:8px 12px; background:var(--dark2); border-radius:8px; }
+  .qr-copy-btn { width:100%; padding:12px; border-radius:10px; border:none; background:linear-gradient(135deg,var(--red),var(--orange)); color:white; font-family:'Syne',sans-serif; font-size: 15px; font-weight:700; cursor:pointer; }
 
-  .copy-toast { position:fixed; bottom:100px; left:50%; transform:translateX(-50%) translateY(10px); background:var(--green); color:var(--dark); border-radius:10px; padding:10px 20px; font-family:'Syne',sans-serif; font-size:13px; font-weight:700; z-index:600; opacity:0; transition:all 0.3s; pointer-events:none; white-space:nowrap; }
+  .copy-toast { position:fixed; bottom:100px; left:50%; transform:translateX(-50%) translateY(10px); background:var(--green); color:var(--dark); border-radius:10px; padding:10px 20px; font-family:'Syne',sans-serif; font-size: 15px; font-weight:700; z-index:600; opacity:0; transition:all 0.3s; pointer-events:none; white-space:nowrap; }
   .copy-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
   /* MODAL */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: flex-end; padding: 20px 16px; }
   .modal-overlay.open { display: flex; }
   .modal { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; width: 100%; max-width: 480px; margin: 0 auto; }
-  .modal h3 { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 16px; }
+  .modal h3 { font-family: 'Syne', sans-serif; font-size: 19px; font-weight: 800; margin-bottom: 16px; }
   .form-group { margin-bottom: 14px; }
-  .form-group label { display: block; font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .form-group input, .form-group select { width: 100%; background: var(--dark2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-size: 15px; font-family: 'DM Sans', sans-serif; outline: none; }
+  .form-group label { display: block; font-size: 14px; color: var(--muted); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-group input, .form-group select { width: 100%; background: var(--dark2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-size: 16px; font-family: 'DM Sans', sans-serif; outline: none; }
   .form-group input:focus, .form-group select:focus { border-color: var(--orange); }
   .form-group select option { background: var(--dark2); }
   .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
-  .modal-btns button { flex: 1; padding: 13px; border-radius: 10px; border: none; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .modal-btns button { flex: 1; padding: 13px; border-radius: 10px; border: none; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; }
   .btn-save { background: var(--red); color: white; } .btn-cancel { background: var(--border); color: var(--muted); }
+
+  /* ACCORDION */
+  .acc-list { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+  .acc-item { background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+  .acc-head { width:100%; background:none; border:none; padding:16px; display:flex; align-items:center; gap:12px; cursor:pointer; text-align:left; }
+  .acc-icon { font-size:22px; flex-shrink:0; }
+  .acc-title { flex:1; font-family:'Syne',sans-serif; font-size:15px; font-weight:700; color:var(--text); }
+  .acc-arrow { color:var(--muted); font-size:16px; transition:transform 0.25s; flex-shrink:0; }
+  .acc-item.open .acc-arrow { transform:rotate(180deg); color:var(--orange); }
+  .acc-item.open .acc-head { border-bottom:1px solid var(--border); }
+  .acc-body { display:none; padding:16px; }
+  .acc-item.open .acc-body { display:block; }
+  body.light .acc-item { background:#ffffff; }
 </style>
 </head>
 <body>
@@ -412,7 +444,20 @@
       </div>
     </div>
   </header>
-  <div class="status-bar"><div class="status-dot" id="statusDot"></div><span id="statusText">Status: Normal beredskap</span><span id="offlineBadge" style="display:none;margin-left:auto;background:rgba(46,204,113,0.15);color:var(--green);border:1px solid rgba(46,204,113,0.3);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;">✓ Fungerer offline</span></div>
+  <div class="status-bar" onclick="openStatusDetail()" style="cursor:pointer;">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText">Henter farevarsel…</span>
+    <span id="offlineBadge" style="display:none;margin-left:auto;background:rgba(46,204,113,0.15);color:var(--green);border:1px solid rgba(46,204,113,0.3);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;">✓ Offline</span>
+    <span id="statusArrow" style="margin-left:auto;font-size:12px;color:var(--muted);">▸ detaljer</span>
+  </div>
+  <div id="statusDetail" style="display:none;background:var(--card);border-bottom:1px solid var(--border);padding:14px 16px;font-size:13px;line-height:1.7;">
+    <div id="statusDetailBody">Laster…</div>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+      <a href="https://www.varsom.no" target="_blank" style="flex:1;min-width:100px;text-align:center;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);color:var(--blue);border-radius:8px;padding:8px;text-decoration:none;font-weight:600;">🌊 varsom.no ↗</a>
+      <a href="https://www.yr.no" target="_blank" style="flex:1;min-width:100px;text-align:center;background:rgba(247,127,0,0.1);border:1px solid rgba(247,127,0,0.3);color:var(--orange);border-radius:8px;padding:8px;text-decoration:none;font-weight:600;">🌤 yr.no ↗</a>
+      <a href="https://www.dsb.no/egenberedskap" target="_blank" style="flex:1;min-width:100px;text-align:center;background:rgba(214,40,40,0.1);border:1px solid rgba(214,40,40,0.3);color:var(--red);border-radius:8px;padding:8px;text-decoration:none;font-weight:600;">🛡 DSB ↗</a>
+    </div>
+  </div>
   <!-- PWA INSTALL BANNER -->
   <div id="pwaBanner" style="display:none;background:linear-gradient(135deg,rgba(214,40,40,0.15),rgba(247,127,0,0.15));border-bottom:1px solid rgba(247,127,0,0.3);padding:10px 16px;display:none;align-items:center;gap:10px;">
     <span style="font-size:22px;">📲</span>
@@ -578,197 +623,326 @@
 
   <!-- INFO -->
   <div id="info" class="tab">
+
     <div class="alert-box"><span>⚠️ Myndighetene anbefaler at alle husstander er forberedt på å klare seg selv i minst <strong>72 timer</strong> ved en krisesituasjon.</span></div>
-    <div class="info-card"><h3>💧 Vann</h3><p>Ha minst <strong>3 liter per person per dag</strong>. Fyll opp badekaret tidlig ved varsel om kriser.</p></div>
-    <div class="info-card"><h3>🔦 Strømbrudd</h3><ul><li>Ha lommelykt og batterier klart</li><li>Stearinlys med lighter/fyrstikker</li><li>Hold mobilbatteriet ladet</li><li>En gammeldags radioapparat fungerer uten strøm</li></ul></div>
-    <div class="info-card"><h3>🍎 Mat</h3><p>Lagre mat med lang holdbarhet: hermetikk, tørrmat, nøtter, knekkebrød. Roter lagrene dine jevnlig.</p></div>
-    <div class="info-card"><h3>📻 Informasjon</h3><ul><li>NRK P1 – offisiell kriseinformasjon</li><li>Varsom.no – natur- og hendelsesvarsel</li><li>yr.no – vær og farevarsel</li></ul></div>
-    <div class="info-card"><h3>🏃 Evakuering</h3><ul><li>Kjenn to fluktveier fra hjemmet ditt</li><li>Ha avtalt møtepunkt med familien</li><li>Grab-and-go bag klar ved dørene</li></ul></div>
 
-    <!-- TRYGGHETSPUNKTER -->
-    <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:20px 0 12px;">🏛️ Trygghetspunkter</div>
+    <!-- ACCORDION ITEMS -->
+    <div class="acc-list">
 
-    <div class="info-card" style="margin-bottom:10px;">
-      <h3 style="margin-bottom:6px;">Hva er et trygghetspunkt?</h3>
-      <p style="font-size:13px;line-height:1.6;">Kommunale samlingspunkter der du kan få <strong>informasjon, varme, vann og strøm</strong> ved større kriser eller langvarige strømbrudd. Disse er åpne for alle innbyggere.</p>
-    </div>
-
-    <div id="trygghetspunktContainer"></div>
-
-    <!-- TILFLUKTSROM -->
-    <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.8px;margin:14px 0 8px;">🛡️ Tilfluktsrom</div>
-
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;">
-      <div style="font-size:13px;line-height:1.6;margin-bottom:12px;">Tilfluktsrom er beskyttede rom som skal gi befolkningen ly ved krigshandlinger. DSB har fullstendig oversikt over alle tilfluktsrom i Norge.</div>
-      <a href="https://kart.dsb.no/share/e09d2487b99b" target="_blank" style="display:flex;align-items:center;gap:10px;background:rgba(214,40,40,0.1);border:1px solid rgba(214,40,40,0.3);border-radius:10px;padding:12px 14px;text-decoration:none;">
-        <span style="font-size:24px;">🗺️</span>
-        <div>
-          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--red);">Finn nærmeste tilfluktsrom</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px;">Åpner DSBs offisielle kart</div>
+      <!-- 1. TRYGGHETSPUNKTER & TILFLUKTSROM -->
+      <div class="acc-item" id="acc-trygghets">
+        <button class="acc-head" onclick="toggleAcc('trygghets')">
+          <span class="acc-icon">🏛️</span>
+          <span class="acc-title">Trygghetspunkter & tilfluktsrom</span>
+          <span class="acc-arrow">▾</span>
+        </button>
+        <div class="acc-body">
+          <p style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:14px;">Kommunale samlingspunkter der du kan få <strong style="color:var(--text);">informasjon, varme, vann og strøm</strong> ved større kriser. Åpne for alle innbyggere.</p>
+          <div id="trygghetspunktContainer"></div>
+          <div style="margin-top:12px;">
+            <a href="https://kart.dsb.no/share/e09d2487b99b" target="_blank" style="display:flex;align-items:center;gap:10px;background:rgba(214,40,40,0.1);border:1px solid rgba(214,40,40,0.3);border-radius:10px;padding:12px 14px;text-decoration:none;">
+              <span style="font-size:22px;">🗺️</span>
+              <div style="flex:1;">
+                <div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--red);">Finn nærmeste tilfluktsrom</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:2px;">Åpner DSBs offisielle kart</div>
+              </div>
+              <span style="color:var(--muted);">↗</span>
+            </a>
+          </div>
         </div>
-        <span style="margin-left:auto;color:var(--muted);font-size:16px;">↗</span>
-      </a>
-    </div>
-
-    <!-- ANDRE KOMMUNER -->
-    <div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:12px;padding:14px 16px;margin-bottom:8px;">
-      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--blue);margin-bottom:6px;">📍 Bor du i en annen kommune?</div>
-      <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:10px;">Søk etter trygghetspunkter på din kommunes nettside, eller ta kontakt med kommunens servicetorg.</div>
-      <a href="https://www.dsb.no/egenberedskap" target="_blank" style="display:inline-block;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:var(--blue);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;text-decoration:none;">DSB – Egenberedskap ↗</a>
-    </div>
-
-    <div class="info-card">
-      <h3>📡 Kommunikasjon uten internett</h3>
-      <p style="margin-bottom:14px;">Når strøm og mobilnett er nede, trenger du alternativer. Disse appene fungerer uten internett – via radio, Bluetooth eller lokalt nettverk:</p>
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <a href="https://meshtastic.org" target="_blank" style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;text-decoration:none;display:flex;gap:12px;align-items:flex-start;">
-          <span style="font-size:26px;flex-shrink:0;">📻</span>
-          <div>
-            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--text);">Meshtastic</div>
-            <div style="font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5;">Meldinger via LoRa-radioenheter – rekkevidde opptil 10 km uten mobilnett. Krever billig hardware (ca. 250 kr). Best for nabolag og friluftsliv.</div>
-            <div style="font-size:11px;color:var(--orange);margin-top:4px;">meshtastic.org ↗</div>
-          </div>
-        </a>
-        <a href="https://briarproject.org" target="_blank" style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;text-decoration:none;display:flex;gap:12px;align-items:flex-start;">
-          <span style="font-size:26px;flex-shrink:0;">🔒</span>
-          <div>
-            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--text);">Briar</div>
-            <div style="font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5;">Kryptert meldingsapp som kobler direkte via Bluetooth eller WiFi mellom telefoner – ingen server nødvendig. Fungerer helt offline. Android.</div>
-            <div style="font-size:11px;color:var(--orange);margin-top:4px;">briarproject.org ↗</div>
-          </div>
-        </a>
-        <a href="https://zello.com" target="_blank" style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;text-decoration:none;display:flex;gap:12px;align-items:flex-start;">
-          <span style="font-size:26px;flex-shrink:0;">🎙️</span>
-          <div>
-            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--text);">Zello</div>
-            <div style="font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5;">Walkie-talkie-app via mobil­nett eller WiFi. Brukes aktivt av redningspersonell og frivillige under katastrofer. Krever internett, men lavt båndbreddeforbruk.</div>
-            <div style="font-size:11px;color:var(--orange);margin-top:4px;">zello.com ↗</div>
-          </div>
-        </a>
       </div>
-      <div style="margin-top:12px;font-size:12px;color:var(--muted);line-height:1.6;padding:10px 12px;background:rgba(247,127,0,0.06);border-radius:8px;">
-        💡 <strong style="color:var(--text);">Tips:</strong> Last ned og test disse appene <em>før</em> krisen. Bli enige med naboer om hvilken app dere bruker – og øv!
+
+      <!-- 2. VANN -->
+      <div class="acc-item" id="acc-vann">
+        <button class="acc-head" onclick="toggleAcc('vann')">
+          <span class="acc-icon">💧</span>
+          <span class="acc-title">Vann</span>
+          <span class="acc-arrow">▾</span>
+        </button>
+        <div class="acc-body">
+          <p style="font-size:14px;line-height:1.6;">Ha minst <strong>3 liter per person per dag</strong>. For 72 timer trenger en familie på 4 minst 36 liter.</p>
+          <ul style="font-size:14px;line-height:1.9;margin-top:10px;padding-left:18px;">
+            <li>Fyll opp badekaret tidlig ved varsel om kriser</li>
+            <li>Lagre vannflasker på kjølig, mørkt sted</li>
+            <li>Vannrensingstabletter er billig backup</li>
+          </ul>
+        </div>
       </div>
-    </div>
 
-    <div style="font-family:'Syne',sans-serif; font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">📤 Del appen</div>
-
-    <div id="installCard" style="background:linear-gradient(135deg,rgba(46,204,113,0.12),rgba(46,204,113,0.05));border:1px solid rgba(46,204,113,0.35);border-radius:14px;padding:16px;margin-bottom:12px;display:flex;gap:12px;align-items:center;">
-      <span style="font-size:36px;">📲</span>
-      <div style="flex:1;">
-        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:#2ECC71;margin-bottom:3px;">Lagre som app</div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.5;" id="installCardDesc">Legg 72klar! på hjemskjermen – fungerer som en ekte app, også offline!</div>
+      <!-- 3. MAT -->
+      <div class="acc-item" id="acc-mat">
+        <button class="acc-head" onclick="toggleAcc('mat')">
+          <span class="acc-icon">🍎</span>
+          <span class="acc-title">Mat</span>
+          <span class="acc-arrow">▾</span>
+        </button>
+        <div class="acc-body">
+          <p style="font-size:14px;line-height:1.6;">Lagre mat med lang holdbarhet. Roter lagrene jevnlig – spis og erstatt.</p>
+          <ul style="font-size:14px;line-height:1.9;margin-top:10px;padding-left:18px;">
+            <li>Hermetikk (bønner, fisk, kjøtt, suppe)</li>
+            <li>Tørrmat og frysetørret mat</li>
+            <li>Nøtter, knekkebrød, havregryn</li>
+            <li>Energibarer og sjokolade</li>
+          </ul>
+        </div>
       </div>
-      <button id="installCardBtn" onclick="installPWA()" style="background:linear-gradient(135deg,#2ECC71,#27AE60);border:none;color:white;border-radius:10px;padding:10px 14px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">+ Legg til</button>
-    </div>
 
-    <!-- VARSLER CARD -->
-    <div style="background:linear-gradient(135deg,rgba(214,40,40,0.1),rgba(247,127,0,0.08));border:1px solid rgba(247,127,0,0.3);border-radius:14px;padding:16px;margin-bottom:12px;">
-      <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;">
-        <span style="font-size:32px;">🔔</span>
+      <!-- 4. STRØMBRUDD -->
+      <div class="acc-item" id="acc-strom">
+        <button class="acc-head" onclick="toggleAcc('strom')">
+          <span class="acc-icon">🔦</span>
+          <span class="acc-title">Strømbrudd</span>
+          <span class="acc-arrow">▾</span>
+        </button>
+        <div class="acc-body">
+          <ul style="font-size:14px;line-height:1.9;padding-left:18px;">
+            <li>Lommelykt og ekstra batterier</li>
+            <li>Stearinlys med lighter/fyrstikker</li>
+            <li>Powerbank til mobilen – hold den ladet</li>
+            <li>Batteriradio – NRK P1 sender alltid ved krise</li>
+            <li>Varme klær og sovepose om vinteren</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 5. EVAKUERING & GRAB BAG -->
+      <div class="acc-item" id="acc-evak">
+        <button class="acc-head" onclick="toggleAcc('evak')">
+          <span class="acc-icon">🏃</span>
+          <span class="acc-title">Evakuering & grab-bag</span>
+          <span class="acc-arrow">▾</span>
+        </button>
+        <div class="acc-body">
+          <p style="font-size:14px;line-height:1.6;margin-bottom:10px;">En <strong>grab-bag</strong> er en ryggsekk klar ved døren med det viktigste – klar til å ta med seg på 2 minutter.</p>
+          <ul style="font-size:14px;line-height:1.9;padding-left:18px;">
+            <li>Pass, ID og forsikringsdokumenter (kopier)</li>
+            <li>Medisiner og førstehjelpsutstyr</li>
+            <li>Vann og nødmat for 24 timer</li>
+            <li>Varme klær og regnjakke</li>
+            <li>Lader og powerbank</li>
+            <li>Kontanter</li>
+          </ul>
+          <div style="margin-top:12px;font-size:13px;color:var(--muted);line-height:1.6;padding:10px 12px;background:rgba(247,127,0,0.06);border-radius:8px;">
+            💡 Ha et avtalt møtepunkt med familien og kjenn to fluktveier fra hjemmet.
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. KART & NAVIGASJON -->
+      <div class="acc-item" id="acc-kart">
+        <button class="acc-head" onclick="toggleAcc('kart')">
+          <span class="acc-icon">🗺️</span>
+          <span class="acc-title">Kart & navigasjon uten nett</span>
+          <span class="acc-arrow">▾</span>
+        </button>
+        <div class="acc-body">
+          <p style="font-size:14px;line-height:1.6;margin-bottom:14px;">GPS fungerer selv uten mobilnett, men du trenger kart lastet ned på forhånd.</p>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <a href="https://maps.me" target="_blank" style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;text-decoration:none;display:flex;gap:12px;align-items:flex-start;">
+              <span style="font-size:26px;flex-shrink:0;">🗺️</span>
+              <div>
+                <div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--text);">Maps.me</div>
+                <div style="font-size:13px;color:var(--muted);margin-top:3px;line-height:1.5;">Last ned hele Norge-kartet på forhånd. Fungerer 100% offline med GPS – navigering uten mobilnett. Gratis.</div>
+                <div style="font-size:12px;color:var(--orange);margin-top:4px;">maps.me ↗</div>
+              </div>
+            </a>
+            <div style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;">
+              <span style="font-size:26px;flex-shrink:0;">📍</span>
+              <div>
+                <div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--text);">Google Maps offline</div>
+                <div style="font-size:13px;color:var(--muted);margin-top:3px;line-height:1.5;">I Google Maps: søk på et område → trykk på navnet nederst → Last ned. Fungerer offline i 30 dager.</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:12px;font-size:13px;color:var(--muted);line-height:1.6;padding:10px 12px;background:rgba(247,127,0,0.06);border-radius:8px;">
+            💡 Last ned kart <em>nå</em> – ikke når krisen allerede er et faktum!
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. KOMMUNIKASJON -->
+      <div class="acc-item" id="acc-komm">
+        <button class="acc-head" onclick="toggleAcc('komm')">
+          <span class="acc-icon">📡</span>
+          <span class="acc-title">Kommunikasjon uten internett</span>
+          <span class="acc-arrow">▾</span>
+        </button>
+        <div class="acc-body">
+          <p style="font-size:14px;line-height:1.6;margin-bottom:14px;">Når mobilnettet er nede trenger du alternativer. Last ned og test disse <em>før</em> krisen.</p>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <a href="https://meshtastic.org" target="_blank" style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;text-decoration:none;display:flex;gap:12px;align-items:flex-start;">
+              <span style="font-size:26px;flex-shrink:0;">📻</span>
+              <div>
+                <div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--text);">Meshtastic</div>
+                <div style="font-size:13px;color:var(--muted);margin-top:3px;line-height:1.5;">Meldinger via LoRa-radio – opptil 10 km uten mobilnett. Krever hardware (ca. 250 kr).</div>
+                <div style="font-size:12px;color:var(--orange);margin-top:4px;">meshtastic.org ↗</div>
+              </div>
+            </a>
+            <a href="https://briarproject.org" target="_blank" style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;text-decoration:none;display:flex;gap:12px;align-items:flex-start;">
+              <span style="font-size:26px;flex-shrink:0;">🔒</span>
+              <div>
+                <div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--text);">Briar</div>
+                <div style="font-size:13px;color:var(--muted);margin-top:3px;line-height:1.5;">Kryptert meldingsapp via Bluetooth/WiFi – ingen server. Fungerer helt offline. Android.</div>
+                <div style="font-size:12px;color:var(--orange);margin-top:4px;">briarproject.org ↗</div>
+              </div>
+            </a>
+            <a href="https://zello.com" target="_blank" style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;text-decoration:none;display:flex;gap:12px;align-items:flex-start;">
+              <span style="font-size:26px;flex-shrink:0;">🎙️</span>
+              <div>
+                <div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--text);">Zello</div>
+                <div style="font-size:13px;color:var(--muted);margin-top:3px;line-height:1.5;">Walkie-talkie via WiFi. Brukes av redningspersonell under katastrofer.</div>
+                <div style="font-size:12px;color:var(--orange);margin-top:4px;">zello.com ↗</div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. INFORMASJONSKILDER -->
+      <div class="acc-item" id="acc-info2">
+        <button class="acc-head" onclick="toggleAcc('info2')">
+          <span class="acc-icon">📻</span>
+          <span class="acc-title">Offisielle informasjonskilder</span>
+          <span class="acc-arrow">▾</span>
+        </button>
+        <div class="acc-body">
+          <ul style="font-size:14px;line-height:1.9;padding-left:18px;">
+            <li><strong>NRK P1</strong> – offisiell kriseinformasjon på radio</li>
+            <li><strong>varsom.no</strong> – natur- og hendelsesvarsel</li>
+            <li><strong>yr.no</strong> – vær og farevarsel</li>
+            <li><strong>dsb.no</strong> – Direktoratet for samfunnssikkerhet</li>
+            <li><strong>Din kommunes nettside</strong> – lokal kriseinformasjon</li>
+          </ul>
+        </div>
+      </div>
+
+    </div><!-- end acc-list -->
+
+    <!-- VARSLER & APP -->
+    <div style="margin-top:20px;">
+
+      <div id="installCard" style="background:linear-gradient(135deg,rgba(46,204,113,0.12),rgba(46,204,113,0.05));border:1px solid rgba(46,204,113,0.35);border-radius:14px;padding:16px;margin-bottom:12px;display:flex;gap:12px;align-items:center;">
+        <span style="font-size:36px;">📲</span>
         <div style="flex:1;">
-          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:4px;">Daglige beredskapsvarsler</div>
-          <div style="font-size:12px;color:var(--muted);line-height:1.5;">Få daglige tips, milepælmeldinger og månedlige påminnelser direkte på telefonen.</div>
-          <div id="notifStatus" style="font-size:12px;margin-top:6px;color:var(--muted);">Ikke aktivert</div>
+          <div style="font-family:Syne,sans-serif;font-weight:700;font-size:15px;color:#2ECC71;margin-bottom:3px;">Lagre som app</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.5;" id="installCardDesc">Legg 72klar! på hjemskjermen – fungerer som en ekte app, også offline!</div>
+        </div>
+        <button id="installCardBtn" onclick="installPWA()" style="background:linear-gradient(135deg,#2ECC71,#27AE60);border:none;color:white;border-radius:10px;padding:10px 14px;font-family:Syne,sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">+ Legg til</button>
+      </div>
+
+      <div style="background:linear-gradient(135deg,rgba(214,40,40,0.1),rgba(247,127,0,0.08));border:1px solid rgba(247,127,0,0.3);border-radius:14px;padding:16px;margin-bottom:12px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;">
+          <span style="font-size:32px;">🔔</span>
+          <div style="flex:1;">
+            <div style="font-family:Syne,sans-serif;font-weight:700;font-size:15px;margin-bottom:4px;">Daglige beredskapsvarsler</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.5;">Daglige tips, milepæler og månedlige påminnelser.</div>
+            <div id="notifStatus" style="font-size:13px;margin-top:6px;color:var(--muted);">Ikke aktivert</div>
+          </div>
+        </div>
+        <button id="notifToggleBtn" onclick="requestNotifPermission()" style="width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--red),var(--orange));color:white;font-family:Syne,sans-serif;font-size:14px;font-weight:700;cursor:pointer;">🔔 Aktiver daglige varsler</button>
+      </div>
+
+      <div class="share-card">
+        <div class="share-card-title">Del 72klar! med andre</div>
+        <div class="share-card-sub">Hjelp venner, familie og naboer å bli bedre forberedt!</div>
+        <div class="share-btns">
+          <button class="share-btn share-btn-qr" onclick="openQRModal()">📱 Vis QR-kode</button>
+          <button class="share-btn share-btn-copy" onclick="copyLink()">🔗 Kopier lenke</button>
+          <button class="share-btn share-btn-native" id="nativeShareBtn" onclick="nativeShare()" style="display:none">↗️ Del via telefon</button>
+          <button class="share-btn" style="background:rgba(46,204,113,0.12);border:1px solid rgba(46,204,113,0.35);color:var(--green);" onclick="sendNeighbourAlert()">🏘️ Send nabovarsel</button>
+          <button class="share-btn" style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.35);color:var(--blue);" onclick="recommendToMunicipality()">🏛️ Anbefal til kommunen</button>
         </div>
       </div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.6;">
-        📅 <strong style="color:var(--text);">Dag 1–7:</strong> Daglige velkomsttips<br>
-        📅 <strong style="color:var(--text);">Uke 2–4:</strong> Annenhver dag + søndagssjekk<br>
-        📅 <strong style="color:var(--text);">Måned 2+:</strong> Månedlig vedlikeholdssjekk<br>
-        🏅 <strong style="color:var(--text);">Milepæler:</strong> Varsler ved 25%, 50%, 75% og 100%
-      </div>
-      <button id="notifToggleBtn" onclick="requestNotifPermission()" style="width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--red),var(--orange));color:white;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">🔔 Aktiver daglige varsler</button>
-    </div>
 
-    <div class="share-card">
-      <div class="share-card-title">Del 72klar! med andre</div>
-      <div class="share-card-sub">Hjelp venner, familie og naboer å bli bedre forberedt. Del appen gratis!</div>
-      <div class="share-btns">
-        <button class="share-btn share-btn-qr" onclick="openQRModal()">📱 Vis QR-kode</button>
-        <button class="share-btn share-btn-copy" onclick="copyLink()">🔗 Kopier lenke</button>
-        <button class="share-btn share-btn-native" id="nativeShareBtn" onclick="nativeShare()" style="display:none">↗️ Del via telefon</button>
-        <button class="share-btn" style="background:rgba(46,204,113,0.12);border:1px solid rgba(46,204,113,0.35);color:var(--green);" onclick="sendNeighbourAlert()">🏘️ Send nabovarsel</button>
-        <button class="share-btn" style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.35);color:var(--blue);" onclick="recommendToMunicipality()">🏛️ Anbefal til kommunen</button>
-      </div>
-    </div>
-
-    <div style="margin-top:16px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:center;">
-      <span style="font-size:28px;">📅</span>
-      <div style="flex:1;">
-        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--gold);">Månedlig beredskapssjekk</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:3px;">Legg til påminnelse i kalenderen din</div>
-      </div>
-      <button onclick="downloadICS()" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.35);color:var(--gold);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;white-space:nowrap;">+ Kalender</button>
-    </div>
-
-    <div style="margin-top:24px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">💬 Tilbakemelding</div>
-
-    <div class="info-card" style="margin-bottom:12px;">
-      <h3 style="margin-bottom:10px;">Hva synes du om appen?</h3>
-      <div style="display:flex;gap:8px;margin-bottom:12px;">
-        <button class="fb-star" onclick="setRating(1)" id="star1">⭐</button>
-        <button class="fb-star" onclick="setRating(2)" id="star2">⭐</button>
-        <button class="fb-star" onclick="setRating(3)" id="star3">⭐</button>
-        <button class="fb-star" onclick="setRating(4)" id="star4">⭐</button>
-        <button class="fb-star" onclick="setRating(5)" id="star5">⭐</button>
-      </div>
-      <textarea id="fbText" placeholder="Skriv en kommentar eller forslag..." style="width:100%;background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;min-height:80px;outline:none;resize:none;"></textarea>
-      <button onclick="submitFeedback()" style="width:100%;margin-top:10px;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--red),var(--orange));color:white;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Send tilbakemelding</button>
-      <div id="fbThanks" style="display:none;margin-top:10px;text-align:center;color:var(--green);font-weight:600;font-size:13px;">✓ Takk! Tilbakemeldingen er lagret.</div>
-    </div>
-
-    <div style="margin-top:24px; font-family:'Syne',sans-serif; font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">👤 Om appen</div>
-
-    <div class="credits-card">
-      <div class="credits-top">
-        <div class="credits-avatar">👨‍🏫</div>
-        <div>
-          <div class="credits-name">Fisnik Rashica</div>
-          <div class="credits-role">Lærer · Vennesla videregående skole</div>
+      <div style="margin-top:12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:center;">
+        <span style="font-size:28px;">📅</span>
+        <div style="flex:1;">
+          <div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--gold);">Månedlig beredskapssjekk</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:3px;">Legg til påminnelse i kalenderen din</div>
         </div>
-      </div>
-      <div class="credits-desc">
-        72klar! er en idé av Fisnik Rashica – med et enkelt mål: at flest mulig vanlige folk skal kunne klare seg selv i krise i minimum 72 timer, til myndighetene får stablet seg på beina.
+        <button onclick="downloadICS()" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.35);color:var(--gold);border-radius:8px;padding:8px 12px;font-size:13px;font-weight:700;font-family:Syne,sans-serif;cursor:pointer;white-space:nowrap;">+ Kalender</button>
       </div>
     </div>
 
-    <div class="sponsor-box">
-      <div class="sp-title">🤝 Støttespillere & sponsorer</div>
-      <div class="sp-empty">🌟</div>
-      <div class="sp-cta">
-        Ingen støttespillere ennå.<br>
-        Er du eller din organisasjon interessert i å støtte 72klar!?<br><br>
-        <strong>Ta kontakt – vi ønsker deg velkommen om bord!</strong>
+    <!-- TILBAKEMELDING -->
+    <div style="margin-top:20px;">
+      <div style="font-family:Syne,sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">💬 Tilbakemelding</div>
+      <div class="info-card" style="margin-bottom:12px;">
+        <h3 style="margin-bottom:10px;">Hva synes du om appen?</h3>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <button class="fb-star" onclick="setRating(1)" id="star1">⭐</button>
+          <button class="fb-star" onclick="setRating(2)" id="star2">⭐</button>
+          <button class="fb-star" onclick="setRating(3)" id="star3">⭐</button>
+          <button class="fb-star" onclick="setRating(4)" id="star4">⭐</button>
+          <button class="fb-star" onclick="setRating(5)" id="star5">⭐</button>
+        </div>
+        <textarea id="fbText" placeholder="Skriv en kommentar eller forslag..." style="width:100%;background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;min-height:80px;outline:none;resize:none;"></textarea>
+        <button onclick="submitFeedback()" style="width:100%;margin-top:10px;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--red),var(--orange));color:white;font-family:Syne,sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Send tilbakemelding</button>
+        <div id="fbThanks" style="display:none;margin-top:10px;text-align:center;color:var(--green);font-weight:600;font-size:13px;">✓ Takk! Tilbakemeldingen er lagret.</div>
       </div>
     </div>
 
+    <!-- OM APPEN -->
+    <div style="margin-top:8px;">
+      <div style="font-family:Syne,sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">👤 Om appen</div>
+      <div class="credits-card">
+        <div class="credits-top">
+          <div class="credits-avatar">👨‍🏫</div>
+          <div>
+            <div class="credits-name">Fisnik Rashica</div>
+            <div class="credits-role">Lærer · Vennesla videregående skole</div>
+          </div>
+        </div>
+        <div class="credits-desc">72klar! er en idé av Fisnik Rashica – med et enkelt mål: at flest mulig vanlige folk skal kunne klare seg selv i krise i minimum 72 timer, til myndighetene får stablet seg på beina.</div>
+      </div>
+      <div class="sponsor-box">
+        <div class="sp-title">🤝 Støttespillere & sponsorer</div>
+        <div class="sp-empty">🌟</div>
+        <div class="sp-cta">Ingen støttespillere ennå.<br>Er du eller din organisasjon interessert i å støtte 72klar!?<br><br><strong>Ta kontakt – vi ønsker deg velkommen om bord!</strong></div>
+      </div>
+    </div>
+
+    <!-- INNSTILLINGER -->
     <div class="reset-section">
-      <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;text-align:center;">⚙️ Innstillinger</div>
+      <div style="font-family:Syne,sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;text-align:center;">⚙️ Innstillinger</div>
       <button class="reset-btn-soft" onclick="toggleTheme()" id="themeBtn">☀️ Bytt til lyst tema</button>
       <button class="reset-btn-soft" onclick="resetProfile()">👤 Endre husstandsprofil</button>
       <button class="reset-btn" onclick="resetAll()">🔄 Start appen helt på nytt</button>
     </div>
     <div class="app-version" style="cursor:pointer;" onclick="toggleChangelog()">72klar! · v1.3 · Laget for folk flest i Norge · <span style="color:var(--orange);">Hva er nytt? ▾</span></div>
     <div id="changelogBox" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:8px 0 16px;text-align:left;">
-      <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--orange);margin-bottom:8px;">v1.2 – Mars 2026</div>
+      <div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;color:var(--orange);margin-bottom:8px;">v1.3 – Mars 2026</div>
+      <ul style="font-size:12px;color:var(--muted);line-height:1.8;padding-left:16px;">
+        <li>Accordion Info-fane</li>
+        <li>Postnummer & trygghetspunkter</li>
+        <li>Push-varsler</li>
+        <li>Bunnmeny</li>
+        <li>Maps.me & offline kart</li>
+        <li>72klar.no domene</li>
+      </ul>
+      <div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;color:var(--muted);margin:10px 0 6px;">v1.2 – Februar 2026</div>
       <ul style="font-size:12px;color:var(--muted);line-height:1.8;padding-left:16px;">
         <li>Dele-knapp med QR-kode</li>
         <li>Nabovarsel-funksjon</li>
         <li>Offline-indikator</li>
         <li>Engelsk språkstøtte</li>
-        <li>Tilbakemeldingsskjema</li>
-        <li>7-dagersutfordringen</li>
-        <li>Konfetti ved merker</li>
-      </ul>
-      <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--muted);margin:10px 0 6px;">v1.0 – Januar 2026</div>
-      <ul style="font-size:12px;color:var(--muted);line-height:1.8;padding-left:16px;">
-        <li>Første versjon lansert</li>
-        <li>Dynamisk sjekkliste for husstand</li>
-        <li>Merker og gamification</li>
-        <li>Nødkontakter</li>
       </ul>
     </div>
+  </div>
+</div>
+
+<!-- ITEM MODAL -->
+<div id="itemModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:999;align-items:flex-end;justify-content:center;" onclick="closeItemModal()">
+  <div style="background:var(--dark2);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:480px;max-height:80vh;overflow-y:auto;" onclick="event.stopPropagation()">
+    <div style="text-align:center;margin-bottom:16px;">
+      <div id="imEmoji" style="font-size:48px;margin-bottom:8px;"></div>
+      <div id="imName" style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;"></div>
+      <div id="imDesc" style="font-size:15px;color:var(--muted);line-height:1.6;margin-bottom:8px;"></div>
+      <div id="imQty" style="font-size:14px;color:var(--orange);font-weight:600;"></div>
+    </div>
+    <input type="hidden" id="imId">
+    <button id="imCheckBtn" onclick="" style="width:100%;padding:14px;border-radius:12px;border:none;color:white;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:10px;"></button>
+    <button onclick="closeItemModal()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:none;color:var(--muted);font-family:'Syne',sans-serif;font-size:15px;cursor:pointer;">Lukk</button>
   </div>
 </div>
 
@@ -874,16 +1048,20 @@ const TIPS = [
 
 // BADGES
 const BADGES = [
-  { id:'first',    e:'🌱', n:'Første skritt',   d:'Hukket av første punkt',      chk:(p)=>p>=1   },
-  { id:'q25',      e:'⚡',  n:'25% klar',        d:'En kvarting på plass',         chk:(p)=>p>=25  },
-  { id:'q50',      e:'🔥', n:'Halvveis!',        d:'50% av lista klargjort',       chk:(p)=>p>=50  },
-  { id:'q75',      e:'🦾', n:'75% klar',         d:'Nesten i mål!',                chk:(p)=>p>=75  },
-  { id:'full',     e:'🛡️', n:'100% klar!',      d:'Fullt beredt i 72 timer',      chk:(p)=>p>=100 },
-  { id:'contacts', e:'📞', n:'Kontaktliste',     d:'La til en privat kontakt',     chk:(_,c)=>c>=1 },
-  { id:'weekly',   e:'📅', n:'Ukessjekk',        d:'Fullførte ukentlig sjekk',     chk:()=>!!localStorage.getItem('72t_weekly_done') },
-  { id:'water',    e:'💧', n:'Vanntanken',       d:'Vann klargjort',               chk:(_,_2,items)=>items.some(i=>i.includes('Vann & Drikke_0')) },
-  { id:'food',     e:'🥫', n:'Matlageret',       d:'Hermetikk klargjort',          chk:(_,_2,items)=>items.some(i=>i.includes('Mat_0')) },
-];
+  {id:'first',   e:'🌱',n:'Første skritt', d:'Hukket av første punkt',            pct:72,chk:(p)=>p>=1},
+  {id:'q25',     e:'⚡', n:'25% klar',      d:'En kvarting av lista på plass',     pct:54,chk:(p)=>p>=25},
+  {id:'q50',     e:'🔥',n:'Halvveis!',      d:'50% av lista klargjort',            pct:38,chk:(p)=>p>=50},
+  {id:'q75',     e:'🦾',n:'75% klar',       d:'Nesten i mål!',                    pct:21,chk:(p)=>p>=75},
+  {id:'full',    e:'🛡️',n:'100% klar!',    d:'Fullt beredt for 72 timer',         pct:12,chk:(p)=>p>=100},
+  {id:'water',   e:'💧',n:'Vanntanken',     d:'Alle vann-punkter huket av',        pct:61,chk:(_,_2,items)=>items.some(i=>i.includes('Vann & Drikke::Drikkevann'))},
+  {id:'food',    e:'🥫',n:'Matlageret',     d:'Hermetikk og tørrmat klargjort',   pct:48,chk:(_,_2,items)=>items.some(i=>i.includes('Mat::Hermetikkmat'))},
+  {id:'health',  e:'💊',n:'Helseklar',      d:'Alle helse-punkter på plass',      pct:29,chk:(_,_2,items)=>{var cats=getCats(profile.persons,new Set(profile.needs));var hc=cats.find(c=>c.name.includes('Helse'));return hc?hc.items.every(it=>items.includes(hc.name+'::'+it.name)):false;}},
+  {id:'power',   e:'🔋',n:'Strømklar',      d:'Lys og energi-punkter på plass',   pct:33,chk:(_,_2,items)=>{var cats=getCats(profile.persons,new Set(profile.needs));var pc=cats.find(c=>c.name.includes('Lys'));return pc?pc.items.every(it=>items.includes(pc.name+'::'+it.name)):false;}},
+  {id:'grabBag', e:'🎒',n:'Grab-bag klar',  d:'Beredskapssekken er pakket!',      pct:18,chk:(_,_2,items)=>{var cats=getCats(profile.persons,new Set(profile.needs));var gc=cats.find(c=>c.name.includes('Grab'));return gc?gc.items.every(it=>items.includes(gc.name+'::'+it.name)):false;}},
+  {id:'contacts',e:'📞',n:'Kontaktliste',   d:'La til en nødkontakt',              pct:44,chk:(_,c)=>c>=1},
+  {id:'weekly',  e:'📅',n:'Ukessjekk',      d:'Fullførte ukentlig sjekk',          pct:27,chk:()=>!!localStorage.getItem('72t_weekly_done')},
+  {id:'ambassador',e:'📣',n:'Ambassadør',   d:'Delte appen med andre',             pct:31,chk:()=>!!localStorage.getItem('72t_shared')},
+]
 
 // MOTIVATION MESSAGES
 function getMotMsg(p) {
@@ -897,6 +1075,62 @@ function getMotMsg(p) {
   return             {l:'🛡️ Fullt beredt!',    m:'Du er blant de best forberedte i Norge. Del appen med venner og familie – de trenger den også!'};
 }
 
+
+// ── STATUS / FAREVARSEL ──
+var statusDetailOpen = false;
+function openStatusDetail(){
+  var d=document.getElementById('statusDetail');
+  var arrow=document.getElementById('statusArrow');
+  if(!d) return;
+  statusDetailOpen=!statusDetailOpen;
+  d.style.display=statusDetailOpen?'block':'none';
+  if(arrow) arrow.textContent=statusDetailOpen?'▾ lukk':'▸ se mer';
+}
+async function fetchFarevarsel(){
+  var dot=document.getElementById('statusDot');
+  var txt=document.getElementById('statusText');
+  var body=document.getElementById('statusDetailBody');
+  if(!txt) return;
+  var lat=58.16,lon=7.99;
+  try {
+    if(navigator.geolocation){
+      await new Promise(function(res){
+        navigator.geolocation.getCurrentPosition(
+          function(pos){lat=pos.coords.latitude;lon=pos.coords.longitude;res();},
+          function(){res();},{timeout:3000});
+      });
+    }
+  } catch(e){}
+  try {
+    var url='https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current=wind_speed_10m,precipitation,weather_code&forecast_days=1&timezone=Europe%2FOslo';
+    var r=await fetch(url);
+    var d=await r.json();
+    var wind=d.current.wind_speed_10m||0;
+    var rain=d.current.precipitation||0;
+    var wcode=d.current.weather_code||0;
+    var level=0; var reasons=[];
+    if(wind>=117.7){level=Math.max(level,3);reasons.push('🌀 Orkan ('+Math.round(wind)+' km/t)');}
+    else if(wind>=88.2){level=Math.max(level,2);reasons.push('💨 Sterk storm ('+Math.round(wind)+' km/t)');}
+    else if(wind>=61.9){level=Math.max(level,1);reasons.push('💨 Sterk kuling ('+Math.round(wind)+' km/t)');}
+    if(rain>=10){level=Math.max(level,2);reasons.push('🌧 Kraftig nedbør ('+rain.toFixed(1)+' mm/t)');}
+    else if(rain>=3){level=Math.max(level,1);reasons.push('🌧 Moderat nedbør ('+rain.toFixed(1)+' mm/t)');}
+    if(wcode>=95){level=Math.max(level,2);reasons.push('⛈ Tordenvær/ekstremvær');}
+    else if(wcode>=71&&wcode<=77){level=Math.max(level,1);reasons.push('❄️ Snøfall');}
+    var colors=['#2ECC71','#F5BE41','#F97316','#D62828'];
+    var dotCls=['','yellow','orange','red'];
+    var labels=['Normal beredskap','Gult farevarsel','Oransje farevarsel','Rødt farevarsel'];
+    var descs=['Ingen aktive farevarsler i ditt område. Hold deg oppdatert på varsom.no.','Vær oppmerksom – farlige situasjoner kan oppstå. Følg med på varsom.no og yr.no.','Alvorlig situasjon. Unngå unødvendig ferdsel. Sjekk varsom.no og lokale myndigheter.','Ekstremvær! Følg instrukser fra myndighetene. Hold deg innendørs.'];
+    txt.textContent=labels[level]; txt.style.color=colors[level];
+    dot.className='status-dot'+(dotCls[level]?' '+dotCls[level]:'');
+    var det='<strong style="color:'+colors[level]+';">'+labels[level]+'</strong><br>'+'<span style="color:var(--muted);font-size:12px;">Basert på aktuelt vær · Open-Meteo</span><br><br>'+descs[level]+'<br><br>';
+    if(reasons.length) det+=reasons.map(function(x){return '<span style="color:var(--text);">'+x+'</span>';}).join('<br>')+'<br><br>';
+    det+='<span style="color:var(--muted);font-size:12px;">⚠️ For offisielle farevarsler, sjekk alltid varsom.no og yr.no</span>';
+    if(body) body.innerHTML=det;
+  } catch(e){
+    txt.textContent='Beredskap: Ukjent'; txt.style.color='';
+    if(body) body.innerHTML='Kunne ikke hente farevarsel. Sjekk <a href="https://www.varsom.no" target="_blank" style="color:var(--blue);">varsom.no</a> direkte.';
+  }
+}
 // CHECKLIST DATA
 function getCats(n, needs) {
   const w = Math.round(n*9);
@@ -912,8 +1146,8 @@ function getCats(n, needs) {
       {name:"Manuell boksåpner",desc:()=>"Fungerer uten strøm",qty:()=>"1 stk",emoji:"🔧"},
     ]},
     {name:"💊 Helse & Førstehjelp", items:[
-      {name:"Førstehjelpsskrin",desc:()=>"Bandasjer, desinfeksjon, saks, plaster",qty:()=>n>=4?"2 stk":"1 stk",emoji:"🩹"},
-      {name:"Smertestillende",desc:()=>"Paracetamol, ibuprofen",qty:()=>n+' pakker',emoji:"🩺"},
+      {name:"Førstehjelpsskrin",desc:()=>"Bør inneholde: Plaster i ulike størrelser · Sterile bandasjer og kompresser · Elastisk bandasje · Desinfeksjonsmiddel (klorheksidin eller jod) · Saks og pinsett · Engangshansker · Termometer · Aluminiumsredningsduk · Øyeskyll · Sikkerhetsnåler · Trekantbandasje til armbind",qty:()=>n>=4?"2 stk":"1 stk",emoji:"🩹"},
+      {name:"Smertestillende",desc:()=>"Ha begge typene tilgjengelig:\n\n💊 Paracetamol (f.eks. Paracet) – lindrer smerte og senker feber. Trygt for de fleste, også barn og gravide.\n\n💊 Ibuprofen (f.eks. Ibux) – virker også mot betennelse og hevelse. Ikke til barn under 6 måneder eller ved magesår.\n\nOBS: Følg alltid dosering på pakningen. Ha nok til minst 72 timer for hele husstanden.",qty:()=>n+' pakker av hver',emoji:"🩺"},
     ]},
     {name:"🔦 Lys & Energi", items:[
       {name:"Lommelykt + batterier",desc:()=>"Ladbare eller AA-batterier",qty:()=>n>=3?Math.ceil(n/2)+' stk':"1 stk",emoji:"🔦"},
@@ -926,6 +1160,14 @@ function getCats(n, needs) {
       {name:"Varme klær og regnjakke",desc:()=>"Ekstraklær i beredskapsbag",qty:()=>n+' sett',emoji:"🧥"},
       {name:"Toalettpapir",desc:()=>"Grunnleggende hygienebehov",qty:()=>n*2+' ruller',emoji:"🧻"},
       {name:"Håndsprit / desinfeksjon",desc:()=>"Viktig ved begrensede vannressurser",qty:()=>Math.ceil(n*0.5)+'L',emoji:"🧴"},
+    ]},
+    {name:"🎒 Grab-bag", items:[
+      {name:"Ryggsekk klar ved døren",desc:()=>"Klar til å ta med på 2 minutter",qty:()=>n>=3?"2 sekker":"1 sekk",emoji:"🎒"},
+      {name:"Vann og mat for 24 timer",desc:()=>"Nødrasjoner i sekken",qty:()=>n*3+'L + nødmat',emoji:"💧"},
+      {name:"Varme klær og regnjakke",desc:()=>"Ekstraklær til alle i husstanden",qty:()=>n+' sett',emoji:"🧥"},
+      {name:"Lader og powerbank (ladet)",desc:()=>"Fulladet powerbank i sekken",qty:()=>Math.ceil(n/2)+' stk',emoji:"🔋"},
+      {name:"Kontanter og ID-kopier",desc:()=>"Alltid tilgjengelig i sekken",qty:()=>"1 konvolutt per person",emoji:"💵"},
+      {name:"Medisiner og plaster",desc:()=>"Nødmedisin og mini-førstehjelpspakke",qty:()=>"1 pakke",emoji:"💊"},
     ]},
     {name:"📄 Dokumenter & Annet", items:[
       {name:"Kopier av viktige dokumenter",desc:()=>"Pass, forsikring, ID – i vanntett pose",qty:()=>n+' person'+n>1?'er':'',emoji:"📄"},
@@ -980,7 +1222,7 @@ function startApp(){
   document.getElementById('headerSub').textContent='Hei, '+p.name+'! Klar for 72 timer.';
   const nl=[];if(needs.has('baby'))nl.push('baby');if(needs.has('eldre'))nl.push('eldre');if(needs.has('hund'))nl.push('kjæledyr');if(needs.has('medisin'))nl.push('medisiner');
   document.getElementById('householdSummary').textContent='📊 '+n+' person'+n>1?'er':''+' · '+Math.round(n*9)+'L vann · '+n*3+' porsjoner/dag'+(nl.length?' · '+nl.join(', ') :'');
-  renderDailyTip(); renderWeeklyReminder(); renderChecklist(); renderContacts(); renderMotivation(); show7DayBanner(); renderTrygghetspunkter();
+  renderDailyTip(); renderWeeklyReminder(); renderChecklist(); fetchFarevarsel();  renderContacts(); renderMotivation(); show7DayBanner(); renderTrygghetspunkter();
 }
 function _goToOnboarding(){
   document.getElementById('app').style.display='none';
@@ -1059,11 +1301,21 @@ function renderMotivation(){
   renderBadges();
 }
 function renderBadges(){
-  const g=document.getElementById('badgesGrid');g.innerHTML='';
+  const g=document.getElementById('badgesGrid');
+  if(!g) return;
+  g.innerHTML='';
   BADGES.forEach(b=>{
     const earned=earnedBadges.includes(b.id);
-    const c=document.createElement('div');c.className='badge-card'+(earned?' earned':'');
-    c.innerHTML='<div class="badge-emoji">'+b.e+'</div><div class="badge-name">'+b.n+'</div><div class="badge-desc">'+b.d+'</div>';
+    const c=document.createElement('div');
+    c.className='badge-card'+(earned?' earned':'');
+    c.innerHTML=
+      '<div class="badge-emoji">'+b.e+'</div>'+
+      '<div class="badge-name">'+b.n+'</div>'+
+      '<div class="badge-desc">'+b.d+'</div>'+
+      (earned
+        ? '<div class="badge-stat">🏆 '+b.pct+'% av brukere</div>'
+        : '<div class="badge-stat badge-stat-lock">🔒 Ikke opptjent</div>'
+      );
     g.appendChild(c);
   });
 }
@@ -1196,23 +1448,135 @@ function launchConfetti(){
 
 // CHECKLIST
 function renderChecklist(){
-  const n=profile.persons,needs=new Set(profile.needs),cats=getCats(n,needs);
-  const con=document.getElementById('checklistContainer');con.innerHTML='';
-  let tot=0,chk=0;
-  cats.forEach(cat=>{
-    const div=document.createElement('div');div.className='category';div.innerHTML='<div class="category-title">'+cat.name+'</div>';
-    cat.items.forEach((item,i)=>{
-      const id=cat.name+'_'+i,isC=checkedItems.includes(id);tot++;if(isC)chk++;
-      const el=document.createElement('div');el.className='checklist-item'+(isC?' checked':'');
-      el.innerHTML='<div class="checkbox">'+(isC?'✓':'')+'</div><div class="item-info"><div class="item-name">'+item.name+'</div><div class="item-desc">'+item.desc()+'</div><div class="item-qty">'+item.qty()+'</div></div><div class="item-emoji">'+item.emoji+'</div>';
-      el.onclick=()=>toggleItem(id);div.appendChild(el);
-    });
-    con.appendChild(div);
+  var cont = document.getElementById('checklistContainer');
+  if(!cont) return;
+  // Remember which accordions are open before re-render
+  var openCats = {};
+  cont.querySelectorAll('.cat-accordion').forEach(function(el){
+    if(el.classList.contains('open')) openCats[el.id] = true;
   });
-  const pct=tot?Math.round((chk/tot)*100):0;
-  document.getElementById('progressFill').style.width=pct+'%';
-  document.getElementById('progressPct').textContent=pct+'%';
-  document.getElementById('progressText').textContent=chk+' av '+tot;
+  var n = profile.persons;
+  var needs = new Set(profile.needs);
+  var cats = getCats(n, needs);
+  cont.innerHTML = '';
+  cats.forEach(function(cat, ci){
+    var catId = 'cat-'+ci;
+    var catItems = cat.items;
+    var doneCount = catItems.filter(function(it){ return checkedItems.includes(cat.name+'::'+it.name); }).length;
+    var allDone = doneCount === catItems.length;
+
+    var wrapper = document.createElement('div');
+    var wasOpen = (Object.keys(openCats).length > 0) ? !!openCats[catId] : (ci===0);
+    wrapper.className = 'cat-accordion' + (wasOpen?' open':'');
+    wrapper.id = catId;
+
+    var head = document.createElement('button');
+    head.className = 'cat-head';
+    head.innerHTML = '<span class="cat-head-title">'+cat.name+'</span>'
+      + '<span class="cat-head-meta">'+doneCount+'/'+catItems.length+'</span>'
+      + '<span class="cat-head-arrow">▾</span>';
+    head.onclick = function(){ wrapper.classList.toggle('open'); };
+
+    var body = document.createElement('div');
+    body.className = 'cat-body';
+
+    catItems.forEach(function(item){
+      var id = cat.name+'::'+item.name;
+      var isC = checkedItems.includes(id);
+
+      var el = document.createElement('div');
+      el.className = 'checklist-item' + (isC?' checked':'');
+
+      // Checkbox – clicking this toggles the item
+      var cb = document.createElement('div');
+      cb.className = 'checkbox';
+      cb.innerHTML = isC ? '✓' : '';
+      cb.onclick = function(e){
+        e.stopPropagation();
+        toggleItem(id);
+      };
+
+      // Item info – clicking this opens popup
+      var info = document.createElement('div');
+      info.className = 'item-info';
+      info.style.flex = '1';
+      info.style.cursor = 'pointer';
+      info.innerHTML = '<div class="item-name">'+item.name+'</div>';
+      info.onclick = function(e){
+        e.stopPropagation();
+        openItemModal(item, id, isC);
+      };
+
+      // Emoji
+      var emoji = document.createElement('div');
+      emoji.className = 'item-emoji';
+      emoji.style.cursor = 'pointer';
+      emoji.textContent = item.emoji;
+      emoji.onclick = function(e){
+        e.stopPropagation();
+        openItemModal(item, id, isC);
+      };
+
+      el.appendChild(cb);
+      el.appendChild(info);
+      el.appendChild(emoji);
+      body.appendChild(el);
+    });
+
+    wrapper.appendChild(head);
+    wrapper.appendChild(body);
+    cont.appendChild(wrapper);
+  });
+
+  // Update progress
+  var total = 0, done = 0;
+  cats.forEach(function(cat){
+    cat.items.forEach(function(it){
+      total++;
+      if(checkedItems.includes(cat.name+'::'+it.name)) done++;
+    });
+  });
+  var pct = total>0 ? Math.round(done/total*100) : 0;
+  var fill = document.getElementById('progressFill');
+  var pctEl = document.getElementById('progressPct');
+  var summary = document.getElementById('progressSummary');
+  if(fill) fill.style.width = pct+'%';
+  if(pctEl) pctEl.textContent = pct+'%';
+  if(summary) summary.textContent = done+' av '+total+' punkter fullført';
+  updateChecklistDate();
+  setTimeout(function(){
+    var f = document.getElementById('progressFill');
+    if(f){ var p=parseInt(f.style.width)||0; updateSocialShare(p); sendMilestoneNotif(p); }
+  },200);
+}
+
+function openItemModal(item, id, isC){
+  var overlay = document.getElementById('itemModalOverlay');
+  var emojiEl = document.getElementById('imEmoji');
+  var nameEl = document.getElementById('imName');
+  var descEl = document.getElementById('imDesc');
+  var qtyEl = document.getElementById('imQty');
+  var checkBtn = document.getElementById('imCheckBtn');
+  if(!overlay) return;
+  emojiEl.textContent = item.emoji;
+  nameEl.textContent = item.name;
+  var rawDesc = item.desc ? item.desc() : '';
+  descEl.innerHTML = rawDesc.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>').replace(/· /g,'<span style="color:var(--orange)">·</span> ');
+  qtyEl.textContent = item.qty ? 'Anbefalt mengde: ' + item.qty() : '';
+  var checked = checkedItems.includes(id);
+  checkBtn.textContent = checked ? '✓ Allerede haket av' : '✅ Hak av';
+  checkBtn.style.background = checked ? 'rgba(46,204,113,0.2)' : 'linear-gradient(135deg,var(--green),#27AE60)';
+  checkBtn.style.color = checked ? 'var(--green)' : 'white';
+  checkBtn.onclick = function(){
+    toggleItem(id);
+    closeItemModal();
+  };
+  overlay.style.display = 'flex';
+  document.getElementById('imId').value = id;
+}
+function closeItemModal(){
+  var overlay = document.getElementById('itemModalOverlay');
+  if(overlay) overlay.style.display = 'none';
 }
 function toggleItem(id){
   markChecklistUpdated();
@@ -1256,6 +1620,7 @@ function closeQRModal(){
 }
 
 function copyLink(){
+  localStorage.setItem('72t_shared','1'); checkBadges();
   navigator.clipboard.writeText(APP_URL).then(()=>{
     const t=document.getElementById('copyToast');
     t.classList.add('show');
@@ -1273,6 +1638,7 @@ function copyLink(){
 }
 
 function nativeShare(){
+  localStorage.setItem('72t_shared','1'); checkBadges();
   navigator.share({title:'72klar!',text:'Bli klar for 72 timer – gratis norsk beredskapsapp!',url:APP_URL});
 }
 
@@ -1638,6 +2004,12 @@ function openPostnrEdit(){
   }
 }
 
+
+function toggleAcc(id){
+  var el = document.getElementById('acc-'+id);
+  if(!el) return;
+  el.classList.toggle('open');
+}
 // ── PUNKT 6: CHANGELOG ──
 function toggleChangelog(){
   const box = document.getElementById('changelogBox');
@@ -1827,6 +2199,7 @@ function downloadICS(){
 applyTheme();
 document.addEventListener('DOMContentLoaded', function() {
   applyTheme();
+  fetchFarevarsel();
   if(profile){
     startApp();
     updateChecklistDate();
