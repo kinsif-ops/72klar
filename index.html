@@ -476,7 +476,12 @@
       <div id="kommuneUnknown" style="display:none;background:rgba(247,127,0,0.08);border:1px solid rgba(247,127,0,0.2);border-radius:12px;padding:12px 16px;margin-bottom:16px;">
         <div style="font-size:13px;color:var(--orange);">⚠️ Ukjent postnummer – sjekk at du har tastet riktig (4 siffer).</div>
       </div>
-      <button class="ob-btn" onclick="finishOnboarding()">🛡️ Start 72klar!</button>
+      <div id="obInstallBtn2" style="display:none;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.25);border-radius:14px;padding:14px 16px;margin-bottom:12px;text-align:center;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px;">📲 Installer 72klar! som app</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Fungerer offline – alltid tilgjengelig, selv uten nett</div>
+        <button onclick="triggerPWAInstall()" style="background:linear-gradient(135deg,var(--blue),#6366f1);border:none;color:white;border-radius:10px;padding:10px 20px;font-family:Syne,sans-serif;font-size:13px;font-weight:700;cursor:pointer;width:100%;">📲 Legg til på hjemskjerm</button>
+      </div>
+      <button class="ob-btn" id="finishBtn" onclick="finishOnboarding()">🛡️ Start 72klar!</button>
       <button class="ob-btn-secondary" onclick="finishOnboarding()">Hopp over</button>
     </div>
 
@@ -534,7 +539,7 @@
 
   <!-- MOTIVASJON -->
   <div id="motivasjon" class="tab active">
-    <div class="mot-hero">
+    <div id="motivationContainer"><div class="mot-hero">
       <div class="mot-readiness-ring">
         <svg class="ring-svg" width="110" height="110" viewBox="0 0 110 110">
           <circle class="ring-bg" cx="55" cy="55" r="46"/>
@@ -577,14 +582,14 @@
 
     <div class="badges-section-title">🏅 Dine merker</div>
     <div class="badges-grid" id="badgesGrid"></div>
-  </div>
+  </div></div>
 
   <!-- SJEKKLISTE -->
   <div id="sjekkliste" class="tab">
     <div class="progress-card">
       <div class="progress-top"><div class="progress-title">Beredskapsstatus</div><div class="progress-pct" id="progressPct">0%</div></div>
       <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-      <div class="progress-label"><span id="progressText">0 av 0</span> gjenstander klargjort</div>
+      <div class="progress-label"><span id="progressText">0 av 0</span> – <span id="progressSummary"></span> gjenstander klargjort</div>
       <div class="household-summary" id="householdSummary"></div>
       <div id="checklistLastUpdated" style="font-size:11px;color:var(--muted);margin-top:6px;text-align:right;"></div>
     </div>
@@ -1112,7 +1117,7 @@
       <button class="reset-btn-soft" onclick="resetProfile()">👤 Endre husstandsprofil</button>
       <button class="reset-btn" onclick="resetAll()">🔄 Start appen helt på nytt</button>
     </div>
-    <div class="app-version" style="cursor:pointer;" onclick="toggleChangelog()">72klar! · v1.4 · Laget for folk flest i Norge · <span style="color:var(--orange);">Hva er nytt? ▾</span></div>
+    <div class="app-version" style="cursor:pointer;" onclick="toggleChangelog()">72klar! · v1.5 · Laget for folk flest i Norge · <span style="color:var(--orange);">Hva er nytt? ▾</span></div>
     <div id="changelogBox" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:8px 0 16px;text-align:left;">
       <div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;color:var(--orange);margin-bottom:8px;">v1.4 – Mars 2026</div>
       <ul style="font-size:12px;color:var(--muted);line-height:1.8;padding-left:16px;">
@@ -1281,9 +1286,9 @@ const BADGES = [
   {id:'full',    e:'🛡️',n:'100% klar!',    d:'Fullt beredt for 72 timer',         pct:12,chk:(p)=>p>=100},
   {id:'water',   e:'💧',n:'Vanntanken',     d:'Alle vann-punkter huket av',        pct:61,chk:(_,_2,items)=>items.some(i=>i.includes('Vann & Drikke::Drikkevann'))},
   {id:'food',    e:'🥫',n:'Matlageret',     d:'Hermetikk og tørrmat klargjort',   pct:48,chk:(_,_2,items)=>items.some(i=>i.includes('Mat::Hermetikkmat'))},
-  {id:'health',  e:'💊',n:'Helseklar',      d:'Alle helse-punkter på plass',      pct:29,chk:(_,_2,items)=>{var cats=getCats(profile.persons,new Set(profile.needs));var hc=cats.find(c=>c.name.includes('Helse'));return hc?hc.items.every(it=>items.includes(hc.name+'::'+it.name)):false;}},
-  {id:'power',   e:'🔋',n:'Strømklar',      d:'Lys og energi-punkter på plass',   pct:33,chk:(_,_2,items)=>{var cats=getCats(profile.persons,new Set(profile.needs));var pc=cats.find(c=>c.name.includes('Lys'));return pc?pc.items.every(it=>items.includes(pc.name+'::'+it.name)):false;}},
-  {id:'grabBag', e:'🎒',n:'Grab-bag klar',  d:'Beredskapssekken er pakket!',      pct:18,chk:(_,_2,items)=>{var cats=getCats(profile.persons,new Set(profile.needs));var gc=cats.find(c=>c.name.includes('Grab'));return gc?gc.items.every(it=>items.includes(gc.name+'::'+it.name)):false;}},
+  {id:'health',  e:'💊',n:'Helseklar',      d:'Alle helse-punkter på plass',      pct:29,chk:(_,_2,items)=>{var cats=getCats(profile.persons, new Set(profile.needs), currentLang);var hc=cats.find(c=>c.name.includes('Helse'));return hc?hc.items.every(it=>items.includes(hc.name+'::'+it.name)):false;}},
+  {id:'power',   e:'🔋',n:'Strømklar',      d:'Lys og energi-punkter på plass',   pct:33,chk:(_,_2,items)=>{var cats=getCats(profile.persons, new Set(profile.needs), currentLang);var pc=cats.find(c=>c.name.includes('Lys'));return pc?pc.items.every(it=>items.includes(pc.name+'::'+it.name)):false;}},
+  {id:'grabBag', e:'🎒',n:'Grab-bag klar',  d:'Beredskapssekken er pakket!',      pct:18,chk:(_,_2,items)=>{var cats=getCats(profile.persons, new Set(profile.needs), currentLang);var gc=cats.find(c=>c.name.includes('Grab'));return gc?gc.items.every(it=>items.includes(gc.name+'::'+it.name)):false;}},
   {id:'contacts',e:'📞',n:'Kontaktliste',   d:'La til en nødkontakt',              pct:44,chk:(_,c)=>c>=1},
   {id:'weekly',  e:'📅',n:'Ukessjekk',      d:'Fullførte ukentlig sjekk',          pct:27,chk:()=>!!localStorage.getItem('72t_weekly_done')},
   {id:'ambassador',e:'📣',n:'Ambassadør',   d:'Delte appen med andre',             pct:31,chk:()=>!!localStorage.getItem('72t_shared')},
@@ -1438,6 +1443,20 @@ function downloadShareCard(){
   a.click();
   localStorage.setItem('72t_shared','1'); checkBadges();
 }
+
+// Clear daily notification tracking at midnight
+function scheduleNotifDayClear(){
+  var now = new Date();
+  var midnight = new Date(now);
+  midnight.setHours(24,0,5,0); // 00:00:05 next day
+  var msUntilMidnight = midnight.getTime() - now.getTime();
+  setTimeout(function(){
+    localStorage.removeItem('72k_notif_today');
+    scheduleNotifDayClear(); // reschedule for next midnight
+  }, msUntilMidnight);
+}
+scheduleNotifDayClear();
+
 // ── STATUS / FAREVARSEL ──
 var statusDetailOpen = false;
 function openStatusDetail(){
@@ -1494,53 +1513,55 @@ async function fetchFarevarsel(){
   }
 }
 // CHECKLIST DATA
-function getCats(n, needs) {
+function getCats(n, needs, lang) {
+  const no = !lang || lang === 'no';
+  const T = (noStr, enStr) => no ? noStr : enStr;
   const w = Math.round(n*9);
   const cats = [
-    {name:"💧 Vann & Drikke", items:[
-      {name:"Drikkevann",desc:()=>'Minst '+w+'L totalt (3L × '+n+' person'+n>1?'er':''+' × 3 dager)',qty:()=>w+' liter',emoji:"💧"},
-      {name:"Vannrensingstabletter",desc:()=>"For rensing av usikkert vann",qty:()=>"1 pakke",emoji:"🧪"},
+    {name:T("💧 Vann & Drikke","💧 Water & Drinks"), items:[
+      {name:T("Drikkevann","Drinking water"),desc:()=>'Minst '+w+'L totalt (3L × '+n+' person'+n>1?'er':''+' × 3 dager)',qty:()=>w+' liter',emoji:"💧"},
+      {name:T("Vannrensingstabletter","Water purification tablets"),desc:()=>"For rensing av usikkert vann",qty:()=>"1 pakke",emoji:"🧪"},
     ]},
-    {name:"🍎 Mat", items:[
-      {name:"Hermetikkmat",desc:()=>'Nok til '+n+' person'+n>1?'er':''+' i 3 dager',qty:()=>n*3+' bokser/pakker',emoji:"🥫"},
-      {name:"Knekkebrød / tørrmat",desc:()=>"Lang holdbarhet, enkelt å spise",qty:()=>Math.ceil(n*1.5)+' pakker',emoji:"🍞"},
-      {name:"Nøtter og tørket frukt",desc:()=>"Energirikt nødnæring",qty:()=>Math.ceil(n*0.5)+' kg',emoji:"🥜"},
-      {name:"Manuell boksåpner",desc:()=>"Fungerer uten strøm",qty:()=>"1 stk",emoji:"🔧"},
+    {name:T("🍎 Mat","🍎 Food"), items:[
+      {name:T("Hermetikkmat","Canned food"),desc:()=>'Nok til '+n+' person'+n>1?'er':''+' i 3 dager',qty:()=>n*3+' bokser/pakker',emoji:"🥫"},
+      {name:T("Knekkebrød / tørrmat","Crackers / dry food"),desc:()=>"Lang holdbarhet, enkelt å spise",qty:()=>Math.ceil(n*1.5)+' pakker',emoji:"🍞"},
+      {name:T("Nøtter og tørket frukt","Nuts and dried fruit"),desc:()=>"Energirikt nødnæring",qty:()=>Math.ceil(n*0.5)+' kg',emoji:"🥜"},
+      {name:T("Manuell boksåpner","Manual can opener"),desc:()=>"Fungerer uten strøm",qty:()=>"1 stk",emoji:"🔧"},
     ]},
-    {name:"💊 Helse & Førstehjelp", items:[
-      {name:"Førstehjelpsskrin",desc:()=>"Bør inneholde: Plaster i ulike størrelser · Sterile bandasjer og kompresser · Elastisk bandasje · Desinfeksjonsmiddel (klorheksidin eller jod) · Saks og pinsett · Engangshansker · Termometer · Aluminiumsredningsduk · Øyeskyll · Sikkerhetsnåler · Trekantbandasje til armbind",qty:()=>n>=4?"2 stk":"1 stk",emoji:"🩹"},
-      {name:"Smertestillende",desc:()=>"Ha begge typene tilgjengelig:\n\n💊 Paracetamol (f.eks. Paracet) – lindrer smerte og senker feber. Trygt for de fleste, også barn og gravide.\n\n💊 Ibuprofen (f.eks. Ibux) – virker også mot betennelse og hevelse. Ikke til barn under 6 måneder eller ved magesår.\n\nOBS: Følg alltid dosering på pakningen. Ha nok til minst 72 timer for hele husstanden.",qty:()=>n+' pakker av hver',emoji:"🩺"},
+    {name:T("💊 Helse & Førstehjelp","💊 Health & First Aid"), items:[
+      {name:T("Førstehjelpsskrin","First aid kit"),desc:()=>"Bør inneholde: Plaster i ulike størrelser · Sterile bandasjer og kompresser · Elastisk bandasje · Desinfeksjonsmiddel (klorheksidin eller jod) · Saks og pinsett · Engangshansker · Termometer · Aluminiumsredningsduk · Øyeskyll · Sikkerhetsnåler · Trekantbandasje til armbind",qty:()=>n>=4?"2 stk":"1 stk",emoji:"🩹"},
+      {name:T("Smertestillende","Pain relief"),desc:()=>"Ha begge typene tilgjengelig:\n\n💊 Paracetamol (f.eks. Paracet) – lindrer smerte og senker feber. Trygt for de fleste, også barn og gravide.\n\n💊 Ibuprofen (f.eks. Ibux) – virker også mot betennelse og hevelse. Ikke til barn under 6 måneder eller ved magesår.\n\nOBS: Følg alltid dosering på pakningen. Ha nok til minst 72 timer for hele husstanden.",qty:()=>n+' pakker av hver',emoji:"🩺"},
     ]},
-    {name:"🔦 Lys & Energi", items:[
-      {name:"Lommelykt + batterier",desc:()=>"Ladbare eller AA-batterier",qty:()=>n>=3?Math.ceil(n/2)+' stk':"1 stk",emoji:"🔦"},
-      {name:"Stearinlys + lighter",desc:()=>"Varme og lys ved strømbrudd",qty:()=>n*3+' lys',emoji:"🕯️"},
-      {name:"Powerbank (ladet)",desc:()=>"For å holde mobilen i live",qty:()=>n>=3?Math.ceil(n/2)+' stk':"1 stk",emoji:"🔋"},
-      {name:"Radio med batterier",desc:()=>"Nød-kringkasting uten nett",qty:()=>"1 stk",emoji:"📻"},
+    {name:T("🔦 Lys & Energi","🔦 Light & Energy"), items:[
+      {name:T("Lommelykt + batterier","Torch + batteries"),desc:()=>"Ladbare eller AA-batterier",qty:()=>n>=3?Math.ceil(n/2)+' stk':"1 stk",emoji:"🔦"},
+      {name:T("Stearinlys + lighter","Candles + lighter"),desc:()=>"Varme og lys ved strømbrudd",qty:()=>n*3+' lys',emoji:"🕯️"},
+      {name:T("Powerbank (ladet)","Powerbank (charged)"),desc:()=>"For å holde mobilen i live",qty:()=>n>=3?Math.ceil(n/2)+' stk':"1 stk",emoji:"🔋"},
+      {name:T("Radio med batterier","Battery radio"),desc:()=>"Nød-kringkasting uten nett",qty:()=>"1 stk",emoji:"📻"},
     ]},
-    {name:"🏠 Varme & Hygiene", items:[
-      {name:"Varme tepper / sovepose",desc:()=>"Viktig ved strømbrudd om vinteren",qty:()=>n+' stk',emoji:"🛏️"},
-      {name:"Varme klær og regnjakke",desc:()=>"Ekstraklær i beredskapsbag",qty:()=>n+' sett',emoji:"🧥"},
-      {name:"Toalettpapir",desc:()=>"Grunnleggende hygienebehov",qty:()=>n*2+' ruller',emoji:"🧻"},
-      {name:"Håndsprit / desinfeksjon",desc:()=>"Viktig ved begrensede vannressurser",qty:()=>Math.ceil(n*0.5)+'L',emoji:"🧴"},
+    {name:T("🏠 Varme & Hygiene","🏠 Warmth & Hygiene"), items:[
+      {name:T("Varme tepper / sovepose","Warm blankets / sleeping bag"),desc:()=>"Viktig ved strømbrudd om vinteren",qty:()=>n+' stk',emoji:"🛏️"},
+      {name:T("Varme klær og regnjakke","Warm clothes and rain jacket"),desc:()=>"Ekstraklær i beredskapsbag",qty:()=>n+' sett',emoji:"🧥"},
+      {name:T("Toalettpapir","Toilet paper"),desc:()=>"Grunnleggende hygienebehov",qty:()=>n*2+' ruller',emoji:"🧻"},
+      {name:T("Håndsprit / desinfeksjon","Hand sanitiser / disinfectant"),desc:()=>"Viktig ved begrensede vannressurser",qty:()=>Math.ceil(n*0.5)+'L',emoji:"🧴"},
     ]},
-    {name:"🎒 Grab-bag", items:[
-      {name:"Ryggsekk klar ved døren",desc:()=>"Klar til å ta med på 2 minutter",qty:()=>n>=3?"2 sekker":"1 sekk",emoji:"🎒"},
-      {name:"Vann og mat for 24 timer",desc:()=>"Nødrasjoner i sekken",qty:()=>n*3+'L + nødmat',emoji:"💧"},
-      {name:"Varme klær og regnjakke",desc:()=>"Ekstraklær til alle i husstanden",qty:()=>n+' sett',emoji:"🧥"},
-      {name:"Lader og powerbank (ladet)",desc:()=>"Fulladet powerbank i sekken",qty:()=>Math.ceil(n/2)+' stk',emoji:"🔋"},
-      {name:"Kontanter og ID-kopier",desc:()=>"Alltid tilgjengelig i sekken",qty:()=>"1 konvolutt per person",emoji:"💵"},
-      {name:"Medisiner og plaster",desc:()=>"Nødmedisin og mini-førstehjelpspakke",qty:()=>"1 pakke",emoji:"💊"},
+    {name:T("🎒 Grab-bag","🎒 Grab-bag"), items:[
+      {name:T("Ryggsekk klar ved døren","Backpack ready at the door"),desc:()=>"Klar til å ta med på 2 minutter",qty:()=>n>=3?"2 sekker":"1 sekk",emoji:"🎒"},
+      {name:T("Vann og mat for 24 timer","Water and food for 24 hours"),desc:()=>"Nødrasjoner i sekken",qty:()=>n*3+'L + nødmat',emoji:"💧"},
+      {name:T("Varme klær og regnjakke","Warm clothes and rain jacket"),desc:()=>"Ekstraklær til alle i husstanden",qty:()=>n+' sett',emoji:"🧥"},
+      {name:T("Lader og powerbank (ladet)","Charger and powerbank (charged)"),desc:()=>"Fulladet powerbank i sekken",qty:()=>Math.ceil(n/2)+' stk',emoji:"🔋"},
+      {name:T("Kontanter og ID-kopier","Cash and ID copies"),desc:()=>"Alltid tilgjengelig i sekken",qty:()=>"1 konvolutt per person",emoji:"💵"},
+      {name:T("Medisiner og plaster","Medication and plasters"),desc:()=>"Nødmedisin og mini-førstehjelpspakke",qty:()=>"1 pakke",emoji:"💊"},
     ]},
-    {name:"📄 Dokumenter & Annet", items:[
-      {name:"Kopier av viktige dokumenter",desc:()=>"Pass, forsikring, ID – i vanntett pose",qty:()=>n+' person'+n>1?'er':'',emoji:"📄"},
-      {name:"Kontanter (noe)",desc:()=>"Kortautomater fungerer ikke alltid",qty:()=>'ca. '+n*500+' kr',emoji:"💵"},
-      {name:"Kart over lokalmiljøet",desc:()=>"Fysisk kart, GPS virker ikke alltid",qty:()=>"1 stk",emoji:"🗺️"},
+    {name:T("📄 Dokumenter & Annet","📄 Documents & Other"), items:[
+      {name:T("Kopier av viktige dokumenter","Copies of important documents"),desc:()=>"Pass, forsikring, ID – i vanntett pose",qty:()=>n+' person'+n>1?'er':'',emoji:"📄"},
+      {name:T("Kontanter (noe)","Cash (some)"),desc:()=>"Kortautomater fungerer ikke alltid",qty:()=>'ca. '+n*500+' kr',emoji:"💵"},
+      {name:T("Kart over lokalmiljøet","Map of local area"),desc:()=>"Fysisk kart, GPS virker ikke alltid",qty:()=>"1 stk",emoji:"🗺️"},
     ]},
   ];
-  if(needs.has('medisin')) cats[2].items.splice(1,0,{name:"Faste medisiner (14 dager)",desc:()=>"Ekstra forsyning av reseptbelagte medisiner",qty:()=>"14 dagers forsyning",emoji:"💊"});
-  if(needs.has('baby'))    cats.push({name:"👶 Baby & Småbarn",items:[{name:"Bleier",desc:()=>"Nok for 3+ dager",qty:()=>"1 pakke (stor)",emoji:"🧷"},{name:"Barnemat / morsmelkerstatning",desc:()=>"3 dagers forsyning",qty:()=>"3+ dagers forsyning",emoji:"🍼"},{name:"Våtservietter",desc:()=>"Til stell uten rennende vann",qty:()=>"2 pakker",emoji:"🌿"},{name:"Varme babyklær",desc:()=>"Ekstra lag ved strømbrudd",qty:()=>"2 sett",emoji:"🧦"}]});
-  if(needs.has('eldre'))   cats.push({name:"🧓 Eldre i husstanden",items:[{name:"Ekstra varme tepper",desc:()=>"Eldre er mer sårbare for kulde",qty:()=>"2 ekstra",emoji:"🛏️"},{name:"Lett tilgjengelig mat",desc:()=>"Myk mat, enkelt å tilberede",qty:()=>"3 dagers forsyning",emoji:"🥣"},{name:"Nødliste med helseinfo",desc:()=>"Medisiner, allergier, lege-kontakt",qty:()=>"1 stk (laminert)",emoji:"📋"}]});
-  if(needs.has('hund'))    cats.push({name:"🐾 Kjæledyr",items:[{name:"Kjæledyrmat (3 dager)",desc:()=>"Tørrfôr med lang holdbarhet",qty:()=>"3 dagers forsyning",emoji:"🐕"},{name:"Vann til kjæledyr",desc:()=>"3L per dag per stort dyr",qty:()=>"9+ liter",emoji:"💧"},{name:"Bur / transportkasse",desc:()=>"For evakuering med dyr",qty:()=>"1 stk",emoji:"🏠"}]});
+  if(needs.has('medisin')) cats[2].items.splice(1,0,{name:T("Faste medisiner (14 dager)","Regular medication (14 days)"),desc:()=>"Ekstra forsyning av reseptbelagte medisiner",qty:()=>"14 dagers forsyning",emoji:"💊"});
+  if(needs.has('baby'))    cats.push({name:T("👶 Baby & Småbarn","👶 Baby & Toddler"),items:[{name:T("Bleier","Nappies"),desc:()=>"Nok for 3+ dager",qty:()=>"1 pakke (stor)",emoji:"🧷"},{name:T("Barnemat / morsmelkerstatning","Baby food / formula"),desc:()=>"3 dagers forsyning",qty:()=>"3+ dagers forsyning",emoji:"🍼"},{name:T("Våtservietter","Wet wipes"),desc:()=>"Til stell uten rennende vann",qty:()=>"2 pakker",emoji:"🌿"},{name:T("Varme babyklær","Warm baby clothes"),desc:()=>"Ekstra lag ved strømbrudd",qty:()=>"2 sett",emoji:"🧦"}]});
+  if(needs.has('eldre'))   cats.push({name:T("🧓 Eldre i husstanden","🧓 Elderly in household"),items:[{name:T("Ekstra varme tepper","Extra warm blankets"),desc:()=>"Eldre er mer sårbare for kulde",qty:()=>"2 ekstra",emoji:"🛏️"},{name:T("Lett tilgjengelig mat","Easy-access food"),desc:()=>"Myk mat, enkelt å tilberede",qty:()=>"3 dagers forsyning",emoji:"🥣"},{name:T("Nødliste med helseinfo","Emergency health info list"),desc:()=>"Medisiner, allergier, lege-kontakt",qty:()=>"1 stk (laminert)",emoji:"📋"}]});
+  if(needs.has('hund'))    cats.push({name:T("🐾 Kjæledyr","🐾 Pets"),items:[{name:T("Kjæledyrmat (3 dager)","Pet food (3 days)"),desc:()=>"Tørrfôr med lang holdbarhet",qty:()=>"3 dagers forsyning",emoji:"🐕"},{name:T("Vann til kjæledyr","Water for pets"),desc:()=>"3L per dag per stort dyr",qty:()=>"9+ liter",emoji:"💧"},{name:T("Bur / transportkasse","Cage / carrier"),desc:()=>"For evakuering med dyr",qty:()=>"1 stk",emoji:"🏠"}]});
   return cats;
 }
 
@@ -1642,7 +1663,7 @@ function markWeeklyDone(){localStorage.setItem('72t_weekly_done',Date.now().toSt
 
 // MOTIVATION
 function getPct(){
-  const cats=getCats(profile.persons,new Set(profile.needs));
+  const cats=getCats(profile.persons, new Set(profile.needs), currentLang);
   let t=0,c=0;cats.forEach(cat=>cat.items.forEach((_,i)=>{t++;if(checkedItems.includes(cat.name+'_'+i))c++;}));
   return t?Math.round((c/t)*100):0;
 }
@@ -2141,8 +2162,8 @@ const TRANSLATIONS = {
   shareSub: { no: 'Hjelp venner, familie og naboer å bli bedre forberedt!', en: 'Help friends, family and neighbours get prepared!' },
   // Info accordion titles
   infoTitles: {
-    no: ['Trygghetspunkter & tilfluktsrom','Vann','Mat','Strømbrudd','Evakuering & grab-bag','Kart & navigasjon uten nett','Kommunikasjon uten internett','Offisielle informasjonskilder'],
-    en: ['Safe points & shelters','Water','Food','Power outage','Evacuation & grab-bag','Maps & navigation offline','Communication without internet','Official information sources'],
+    no: ['Trygghetspunkter & tilfluktsrom','Vann','Mat','Strømbrudd','Evakuering & grab-bag','Kart & navigasjon uten nett','Kommunikasjon uten internett','Offisielle informasjonskilder','Psykologisk førstehjelp'],
+    en: ['Safe points & shelters','Water','Food','Power outage','Evacuation & grab-bag','Maps & navigation offline','Communication without internet','Official information sources','Psychological first aid'],
   },
   // Onboarding
   ob: {
@@ -2164,9 +2185,7 @@ function applyLang(){
   // Nav
   const navBtns = document.querySelectorAll('nav button');
   const labels = T.nav[currentLang];
-  navBtns.forEach((b,i) => { if(labels[i]) b.innerHTML = labels[i].replace(' ','<br>').replace(/([^<br>]+)<br>([^<br>]+)/, '<span class="nav-icon">$1</span><span class="nav-label">$2</span>'); });
-  // Actually just update text nodes safely:
-  navBtns.forEach((b,i) => {
+    navBtns.forEach((b,i) => {
     if(!labels[i]) return;
     const icon = b.querySelector('.nav-icon');
     const label = b.querySelector('.nav-label');
@@ -2242,7 +2261,8 @@ function applyLang(){
     if(finBtn) finBtn.textContent = ob.finish;
   }
 
-  // Checklist re-render preserves Norwegian item names (data-driven), no need to retranslate
+  // Re-render checklist so category/item names update
+  if(profile) renderChecklist();
   updateOnlineStatus();
 }
 
@@ -2427,9 +2447,7 @@ function updateNotifUI(){
 }
 
 // Init notifications if previously enabled
-if(localStorage.getItem('72k_notif') === '1' && Notification.permission === 'granted'){
-  scheduleAllNotifications();
-}
+// Notifications re-scheduled only on explicit user opt-in (not on every page load)
 
 
 // ══════════════════════════════════════════════════════
