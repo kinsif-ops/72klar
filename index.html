@@ -1146,7 +1146,16 @@
     </div>
     <div class="app-version" style="cursor:pointer;" onclick="toggleChangelog()">72klar! · v1.8 · Laget for folk flest i Norge · <span style="color:var(--orange);">Hva er nytt? ▾</span></div>
     <div id="changelogBox" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:8px 0 16px;text-align:left;">
-      <div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;color:var(--orange);margin-bottom:8px;">v1.4 – Mars 2026</div>
+      <div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;color:var(--orange);margin-bottom:8px;">v1.8 – Mars 2026</div>
+      <ul style="font-size:12px;color:var(--muted);line-height:1.8;padding-left:16px;">
+        <li>Haptic feedback ved avhuking</li>
+        <li>Animert checkmark med pop-effekt</li>
+        <li>Milepælsfeiring ved 25/50/75/100%</li>
+        <li>Swipe mellom faner på mobil</li>
+        <li>Tab-overgang og modal slide-up</li>
+        <li>Avhukede punkter viser gjennomstrek</li>
+      </ul>
+      <div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;color:var(--muted);margin:10px 0 6px;">v1.4 – Mars 2026</div>
       <ul style="font-size:12px;color:var(--muted);line-height:1.8;padding-left:16px;">
         <li>Accordion-sjekkliste med popup-info</li>
         <li>Grab-bag kategori</li>
@@ -1346,6 +1355,10 @@ function getMotMsg(p) {
 
 // ── MILESTONE CELEBRATION ──
 var _lastMilestone = 0;
+function initMilestoneTracker(){
+  // Don't show milestones for already-achieved progress on load
+  if(profile) _lastMilestone = getPct();
+}
 function showMilestoneToast(pct){
   var milestones = [25,50,75,100];
   var hit = milestones.filter(m => pct >= m && m > _lastMilestone);
@@ -1642,11 +1655,11 @@ function getCats(n, needs, lang) {
   const w = Math.round(n*9);
   const cats = [
     {name:T("💧 Vann & Drikke","💧 Water & Drinks"), items:[
-      {name:T("Drikkevann","Drinking water"),desc:()=>'Minst '+w+'L totalt (3L × '+n+' person'+n>1?'er':''+' × 3 dager)',qty:()=>w+' liter',emoji:"💧"},
+      {name:T("Drikkevann","Drinking water"),desc:()=>'Minst '+w+'L totalt (3L × '+n+' person'+(n>1?'er':'')+' × 3 dager)',qty:()=>w+' liter',emoji:"💧"},
       {name:T("Vannrensingstabletter","Water purification tablets"),desc:()=>"For rensing av usikkert vann",qty:()=>"1 pakke",emoji:"🧪"},
     ]},
     {name:T("🍎 Mat","🍎 Food"), items:[
-      {name:T("Hermetikkmat","Canned food"),desc:()=>'Nok til '+n+' person'+n>1?'er':''+' i 3 dager',qty:()=>n*3+' bokser/pakker',emoji:"🥫"},
+      {name:T("Hermetikkmat","Canned food"),desc:()=>'Nok til '+n+' person'+(n>1?'er':'')+' i 3 dager',qty:()=>n*3+' bokser/pakker',emoji:"🥫"},
       {name:T("Knekkebrød / tørrmat","Crackers / dry food"),desc:()=>"Lang holdbarhet, enkelt å spise",qty:()=>Math.ceil(n*1.5)+' pakker',emoji:"🍞"},
       {name:T("Nøtter og tørket frukt","Nuts and dried fruit"),desc:()=>"Energirikt nødnæring",qty:()=>Math.ceil(n*0.5)+' kg',emoji:"🥜"},
       {name:T("Manuell boksåpner","Manual can opener"),desc:()=>"Fungerer uten strøm",qty:()=>"1 stk",emoji:"🔧"},
@@ -1676,7 +1689,7 @@ function getCats(n, needs, lang) {
       {name:T("Medisiner og plaster","Medication and plasters"),desc:()=>"Nødmedisin og mini-førstehjelpspakke",qty:()=>"1 pakke",emoji:"💊"},
     ]},
     {name:T("📄 Dokumenter & Annet","📄 Documents & Other"), items:[
-      {name:T("Kopier av viktige dokumenter","Copies of important documents"),desc:()=>"Pass, forsikring, ID – i vanntett pose",qty:()=>n+' person'+n>1?'er':'',emoji:"📄"},
+      {name:T("Kopier av viktige dokumenter","Copies of important documents"),desc:()=>"Pass, forsikring, ID – i vanntett pose",qty:()=>n+' person'+(n>1?'er':''),emoji:"📄"},
       {name:T("Kontanter (noe)","Cash (some)"),desc:()=>"Kortautomater fungerer ikke alltid",qty:()=>'ca. '+n*500+' kr',emoji:"💵"},
       {name:T("Kart over lokalmiljøet","Map of local area"),desc:()=>"Fysisk kart, GPS virker ikke alltid",qty:()=>"1 stk",emoji:"🗺️"},
     ]},
@@ -1724,11 +1737,11 @@ function startApp(){
   document.getElementById('app').style.display='block';
   const p=profile,n=p.persons,needs=new Set(p.needs);
   const ems=['','🧍','👫','👨‍👩‍👦','👨‍👩‍👧‍👦','🏘️'];
-  document.getElementById('householdBadge').textContent=n<=5?ems[n]:'🏘️'+' '+n+' person'+n>1?'er':'';
+  document.getElementById('householdBadge').textContent=n<=5?ems[n]:'🏘️'+' '+n+' person'+(n>1?'er':'');
   document.getElementById('headerSub').textContent='Hei, '+p.name+'! Klar for 72 timer.';
   const nl=[];if(needs.has('baby'))nl.push('baby');if(needs.has('eldre'))nl.push('eldre');if(needs.has('hund'))nl.push('kjæledyr');if(needs.has('medisin'))nl.push('medisiner');
-  document.getElementById('householdSummary').textContent='📊 '+n+' person'+n>1?'er':''+' · '+Math.round(n*9)+'L vann · '+n*3+' porsjoner/dag'+(nl.length?' · '+nl.join(', ') :'');
-  renderDailyTip(); renderWeeklyReminder(); renderChecklist(); fetchFarevarsel(); showNewFeaturesBanner(); recordActivity(); renderContacts(); renderMotivation(); checkInactivityReminder(); show7DayBanner(); renderTrygghetspunkter(); showWelcomeBack();
+  document.getElementById('householdSummary').textContent='📊 '+n+' person'+(n>1?'er':'')+' · '+Math.round(n*9)+'L vann · '+n*3+' porsjoner/dag'+(nl.length?' · '+nl.join(', ') :'');
+  renderDailyTip(); renderWeeklyReminder(); renderChecklist(); fetchFarevarsel(); showNewFeaturesBanner(); recordActivity(); renderContacts(); renderMotivation(); checkInactivityReminder(); show7DayBanner(); renderTrygghetspunkter(); showWelcomeBack(); initMilestoneTracker();
 }
 function _goToOnboarding(){
   document.getElementById('app').style.display='none';
@@ -1756,7 +1769,10 @@ function resetProfile(){
 }
 function resetAll(){
   if(!confirm('Start helt på nytt?\nDette sletter ALLE data:\n• Husstandsprofil\n• Alle avkrysninger\n• Kontakter\n• Merker\n\nBruk dette for å vise appen til noen nye.'))return;
-  ['72t_profile','72t_checked','72t_contacts','72t_badges','72t_weekly_done','72t_7day','72t_7day_shown']
+  ['72t_profile','72t_checked','72t_contacts','72t_badges','72t_weekly_done',
+       '72t_7day','72t_7day_shown','72t_shared','72t_last_activity','72t_features_seen',
+       '72t_last_visit','72t_last_check','72k_notif','72k_notif_start','72k_notif_shown','72k_notif_today',
+       '72k_mile_25','72k_mile_50','72k_mile_75','72k_mile_100']
     .forEach(k=>localStorage.removeItem(k));
   profile=null; checkedItems=[]; contacts=[]; earnedBadges=[];
   window._show7Day=false;
@@ -1765,8 +1781,10 @@ function resetAll(){
 
 // DAILY TIP
 function renderDailyTip(){
+  if(!TIPS||!TIPS.length) return;
   const day=Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/86400000);
   const tip=TIPS[day%TIPS.length];
+  if(!tip) return;
   document.getElementById('dailyTipText').textContent=tip.t;
   document.getElementById('dailyTipSource').textContent='— Kilde: '+tip.s;
 }
@@ -2010,8 +2028,14 @@ function renderChecklist(){
   var sortedCats = cats.slice().sort(function(a, b) {
     var aKey = catKeyMap[a.name] || a.name;
     var bKey = catKeyMap[b.name] || b.name;
-    var aDone = a.items.every(function(it){ return checkedItems.includes(aKey+'::'+it.name) || checkedItems.includes(a.name+'::'+it.name); });
-    var bDone = b.items.every(function(it){ return checkedItems.includes(bKey+'::'+it.name) || checkedItems.includes(b.name+'::'+it.name); });
+    var aDone = a.items.every(function(it){ 
+      var k = itemKeyMap[a.name+'::'+it.name] || aKey+'::'+it.name; 
+      return checkedItems.includes(k); 
+    });
+    var bDone = b.items.every(function(it){ 
+      var k = itemKeyMap[b.name+'::'+it.name] || bKey+'::'+it.name; 
+      return checkedItems.includes(k); 
+    });
     return (aDone ? 1 : 0) - (bDone ? 1 : 0);
   });
 
@@ -2853,6 +2877,7 @@ function updateInstallCard(installed){
     if(btn){ btn.textContent='Hvordan?'; btn.onclick=function(){ showToastMsg('Safari: trykk Del-knappen nederst → Legg til på Hjem-skjerm'); }; }
   }
 }
+function triggerPWAInstall(){ installPWA(); }
 function installPWA(){
   if(pwaPrompt){
     pwaPrompt.prompt();
@@ -3083,6 +3108,46 @@ document.addEventListener('DOMContentLoaded', function() {
     if(ob) ob.style.display = 'flex';
   }
 });
+
+// ── SWIPE BETWEEN TABS ──
+(function(){
+  var TABS = ['motivasjon','sjekkliste','kontakter','info','forstehjel'];
+  var startX = 0, startY = 0, isDragging = false;
+  document.addEventListener('DOMContentLoaded', function(){
+    var mainEl = document.getElementById('app');
+    if(!mainEl) return;
+
+    mainEl.addEventListener('touchstart', function(e){
+      if(e.target.closest('[style*="overflow"]') || 
+         e.target.closest('.acc-body') || 
+         e.target.closest('#itemModalOverlay') ||
+         e.target.closest('#shareScoreOverlay')) return;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      isDragging = true;
+    }, {passive:true});
+
+    mainEl.addEventListener('touchend', function(e){
+      if(!isDragging) return;
+      isDragging = false;
+      var dx = e.changedTouches[0].clientX - startX;
+      var dy = e.changedTouches[0].clientY - startY;
+      if(Math.abs(dx) < 55 || Math.abs(dy) > Math.abs(dx) * 0.65) return;
+      var activeTab = document.querySelector('.tab.active');
+      if(!activeTab) return;
+      var cur = TABS.indexOf(activeTab.id);
+      if(cur === -1) return;
+      var next = dx < 0 ? cur + 1 : cur - 1;
+      if(next < 0 || next >= TABS.length) return;
+      var navBtns = document.querySelectorAll('nav button');
+      if(navBtns[next]){
+        navBtns[next].click();
+        if(navigator.vibrate) navigator.vibrate(6);
+      }
+    }, {passive:true});
+  });
+})();
+
 </script>
 
 <!-- Google Analytics -->
