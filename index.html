@@ -1130,7 +1130,7 @@
       <button class="reset-btn-soft" onclick="resetProfile()">👤 Endre husstandsprofil</button>
       <button class="reset-btn" onclick="resetAll()">🔄 Start appen helt på nytt</button>
     </div>
-    <div class="app-version" style="cursor:pointer;" onclick="toggleChangelog()">72klar! · v1.6 · Laget for folk flest i Norge · <span style="color:var(--orange);">Hva er nytt? ▾</span></div>
+    <div class="app-version" style="cursor:pointer;" onclick="toggleChangelog()">72klar! · v1.7 · Laget for folk flest i Norge · <span style="color:var(--orange);">Hva er nytt? ▾</span></div>
     <div id="changelogBox" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:8px 0 16px;text-align:left;">
       <div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;color:var(--orange);margin-bottom:8px;">v1.4 – Mars 2026</div>
       <ul style="font-size:12px;color:var(--muted);line-height:1.8;padding-left:16px;">
@@ -1299,9 +1299,9 @@ const BADGES = [
   {id:'full',    e:'🛡️',n:'100% klar!',    d:'Fullt beredt for 72 timer',         pct:12,chk:(p)=>p>=100},
   {id:'water',   e:'💧',n:'Vanntanken',     d:'Alle vann-punkter huket av',        pct:61,chk:(_,_2,items)=>items.some(i=>i.includes('Vann & Drikke::Drikkevann'))},
   {id:'food',    e:'🥫',n:'Matlageret',     d:'Hermetikk og tørrmat klargjort',   pct:48,chk:(_,_2,items)=>items.some(i=>i.includes('Mat::Hermetikkmat'))},
-  {id:'health',  e:'💊',n:'Helseklar',      d:'Alle helse-punkter på plass',      pct:29,chk:(_,_2,items)=>{var cats=getCats(profile.persons, new Set(profile.needs), currentLang);var hc=cats.find(c=>c.name.includes('Helse'));return hc?hc.items.every(it=>items.includes(hc.name+'::'+it.name)):false;}},
-  {id:'power',   e:'🔋',n:'Strømklar',      d:'Lys og energi-punkter på plass',   pct:33,chk:(_,_2,items)=>{var cats=getCats(profile.persons, new Set(profile.needs), currentLang);var pc=cats.find(c=>c.name.includes('Lys'));return pc?pc.items.every(it=>items.includes(pc.name+'::'+it.name)):false;}},
-  {id:'grabBag', e:'🎒',n:'Grab-bag klar',  d:'Beredskapssekken er pakket!',      pct:18,chk:(_,_2,items)=>{var cats=getCats(profile.persons, new Set(profile.needs), currentLang);var gc=cats.find(c=>c.name.includes('Grab'));return gc?gc.items.every(it=>items.includes(gc.name+'::'+it.name)):false;}},
+  {id:'health',  e:'💊',n:'Helseklar',      d:'Alle helse-punkter på plass',      pct:29,chk:(_,_2,items)=>{var cats=getCats(profile.persons, new Set(profile.needs), 'no');var hc=cats.find(c=>c.name.includes('Helse'));return hc?hc.items.every(it=>items.includes(hc.name+'::'+it.name)):false;}},
+  {id:'power',   e:'🔋',n:'Strømklar',      d:'Lys og energi-punkter på plass',   pct:33,chk:(_,_2,items)=>{var cats=getCats(profile.persons, new Set(profile.needs), 'no');var pc=cats.find(c=>c.name.includes('Lys'));return pc?pc.items.every(it=>items.includes(pc.name+'::'+it.name)):false;}},
+  {id:'grabBag', e:'🎒',n:'Grab-bag klar',  d:'Beredskapssekken er pakket!',      pct:18,chk:(_,_2,items)=>{var cats=getCats(profile.persons, new Set(profile.needs), 'no');var gc=cats.find(c=>c.name.includes('Grab'));return gc?gc.items.every(it=>items.includes(gc.name+'::'+it.name)):false;}},
   {id:'contacts',e:'📞',n:'Kontaktliste',   d:'La til en nødkontakt',              pct:44,chk:(_,c)=>c>=1},
   {id:'weekly',  e:'📅',n:'Ukessjekk',      d:'Fullførte ukentlig sjekk',          pct:27,chk:()=>!!localStorage.getItem('72t_weekly_done')},
   {id:'ambassador',e:'📣',n:'Ambassadør',   d:'Delte appen med andre',             pct:31,chk:()=>!!localStorage.getItem('72t_shared')},
@@ -1740,8 +1740,13 @@ function markWeeklyDone(){localStorage.setItem('72t_weekly_done',Date.now().toSt
 
 // MOTIVATION
 function getPct(){
-  const cats=getCats(profile.persons, new Set(profile.needs), currentLang);
-  let t=0,c=0;cats.forEach(cat=>cat.items.forEach((_,i)=>{t++;if(checkedItems.includes(cat.name+'_'+i))c++;}));
+  // Always use 'no' language for keys so stored data is language-independent
+  const cats=getCats(profile.persons, new Set(profile.needs), 'no');
+  let t=0,c=0;
+  cats.forEach(cat=>cat.items.forEach(it=>{
+    t++;
+    if(checkedItems.includes(cat.name+'::'+it.name)) c++;
+  }));
   return t?Math.round((c/t)*100):0;
 }
 function renderMotivation(){
@@ -1757,6 +1762,11 @@ function renderMotivation(){
   if(card){
     const accepted=localStorage.getItem('72t_7day')&&JSON.parse(localStorage.getItem('72t_7day')).accepted;
     card.style.display=(pct>=100&&!accepted)?'block':'none';
+  }
+  // Sync app icon badge (Chrome/Android only - iOS not supported)
+  if('setAppBadge' in navigator){
+    if(pct>=100) navigator.clearAppBadge().catch(()=>{});
+    else navigator.setAppBadge(pct).catch(()=>{});
   }
   renderBadges();
 }
@@ -1860,7 +1870,7 @@ function showNewFeaturesBanner(){
   btn.textContent = 'Kom i gang! 🚀';
   btn.style.cssText = 'background:linear-gradient(135deg,var(--red),var(--orange));border:none;color:white;border-radius:8px;padding:8px 16px;font-family:Syne,sans-serif;font-size:13px;font-weight:700;cursor:pointer;';
   btn.onclick = function(){ banner.remove(); localStorage.setItem('72t_features_seen','1'); };
-  banner.innerHTML = '<div style="font-family:Syne,sans-serif;font-weight:800;font-size:15px;margin-bottom:6px;">👋 Velkommen til 72klar! v1.4</div>'
+  banner.innerHTML = '<div style="font-family:Syne,sans-serif;font-weight:800;font-size:15px;margin-bottom:6px;">👋 Velkommen til 72klar! v1.7</div>'
     + '<div style="font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:12px;">Her er hva du kan gjøre:<br>'
     + '🎒 <strong style="color:var(--text);">Sjekkliste</strong> – inkl. grab-bag og popup med tips<br>'
     + '🏛️ <strong style="color:var(--text);">Info</strong> – trygghetspunkter i din kommune<br>'
@@ -1936,13 +1946,26 @@ function renderChecklist(){
   });
   var n = profile.persons;
   var needs = new Set(profile.needs);
-  var cats = getCats(n, needs);
+  var keyCats = getCats(n, needs, 'no'); // always 'no' for storage keys
+  var cats = getCats(n, needs, currentLang); // for display
   cont.innerHTML = '';
 
   // Sort categories: incomplete first, fully done last
+  // Build a map from display cat name -> key cat name
+  var catKeyMap = {};
+  cats.forEach(function(cat, i){ catKeyMap[cat.name] = keyCats[i] ? keyCats[i].name : cat.name; });
+  var itemKeyMap = {};
+  cats.forEach(function(cat, ci){
+    cat.items.forEach(function(item, ii){
+      itemKeyMap[cat.name+'::'+item.name] = (keyCats[ci]&&keyCats[ci].items[ii]) ? keyCats[ci].name+'::'+keyCats[ci].items[ii].name : cat.name+'::'+item.name;
+    });
+  });
+
   var sortedCats = cats.slice().sort(function(a, b) {
-    var aDone = a.items.every(function(it){ return checkedItems.includes(a.name+'::'+it.name); });
-    var bDone = b.items.every(function(it){ return checkedItems.includes(b.name+'::'+it.name); });
+    var aKey = catKeyMap[a.name] || a.name;
+    var bKey = catKeyMap[b.name] || b.name;
+    var aDone = a.items.every(function(it){ return checkedItems.includes(aKey+'::'+it.name) || checkedItems.includes(a.name+'::'+it.name); });
+    var bDone = b.items.every(function(it){ return checkedItems.includes(bKey+'::'+it.name) || checkedItems.includes(b.name+'::'+it.name); });
     return (aDone ? 1 : 0) - (bDone ? 1 : 0);
   });
 
@@ -1996,7 +2019,7 @@ function renderChecklist(){
     });
 
     visibleItems.forEach(function(item){
-      var id = cat.name+'::'+item.name;
+      var id = itemKeyMap[cat.name+'::'+item.name] || (catKeyMap[cat.name]||cat.name)+'::'+item.name;
       var isC = checkedItems.includes(id);
 
       var el = document.createElement('div');
@@ -2045,7 +2068,7 @@ function renderChecklist(){
 
   // Update progress
   var total = 0, done = 0;
-  cats.forEach(function(cat){
+  keyCats.forEach(function(cat){
     cat.items.forEach(function(it){
       total++;
       if(checkedItems.includes(cat.name+'::'+it.name)) done++;
@@ -2360,7 +2383,7 @@ function setRating(n){
 function submitFeedback(){
   const txt = document.getElementById('fbText').value.trim();
   if(!fbRating){ alert('Velg antall stjerner først'); return; }
-  const fb = { rating: fbRating, comment: txt, date: new Date().toLocaleDateString('no-NO'), version: 'v1.2' };
+  const fb = { rating: fbRating, comment: txt, date: new Date().toLocaleDateString('no-NO'), version: 'v1.7' };
   const all = JSON.parse(localStorage.getItem('72t_feedback') || '[]');
   all.push(fb);
   localStorage.setItem('72t_feedback', JSON.stringify(all));
