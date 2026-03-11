@@ -2280,8 +2280,22 @@ function renderTrygghetspunkter(){
   var postnr = profile ? profile.postnr : '';
   var k = getKommune(postnr);
   var h = '';
+  var VERIFIED = ['Kristiansand'];
   if(k && k.trygghetspunkter.length > 0){
-    h += '<div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">📍 '+k.navn+' kommune</div>';
+    var verified = VERIFIED.indexOf(k.navn) !== -1;
+    h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">';
+    h += '<div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.8px;">📍 '+k.navn+' kommune</div>';
+    if(verified){
+      h += '<div style="font-size:11px;background:rgba(46,204,113,0.15);color:#2ECC71;border:1px solid rgba(46,204,113,0.3);border-radius:6px;padding:2px 8px;font-weight:700;">✓ Bekreftet</div>';
+    } else {
+      h += '<div style="font-size:11px;background:rgba(245,158,11,0.15);color:#F5BE41;border:1px solid rgba(245,158,11,0.3);border-radius:6px;padding:2px 8px;font-weight:700;">⚠️ Ikke bekreftet</div>';
+    }
+    h += '</div>';
+    if(!verified){
+      h += '<div style="background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:10px;">';
+      h += '⚠️ Disse adressene er <strong style="color:var(--text);">ikke offisielt bekreftet</strong> av kommunen som trygghetspunkter. Sjekk kommunens nettside for offisiell informasjon.';
+      h += '</div>';
+    }
     h += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">';
     k.trygghetspunkter.forEach(function(p){
       h += '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;">';
