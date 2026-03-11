@@ -349,6 +349,46 @@
   .acc-body { display:none; padding:16px; }
   .acc-item.open .acc-body { display:block; }
   body.light .acc-item { background:#ffffff; }
+
+  /* ── VELKOMMEN TILBAKE BANNER ─────────────────────── */
+  #welcomeBack {
+    margin: 10px 16px 0;
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: none;
+    position: relative;
+    overflow: hidden;
+    animation: wbSlideIn 0.4s ease;
+  }
+  @keyframes wbSlideIn {
+    from { opacity:0; transform: translateY(-12px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+  #welcomeBack .wb-close {
+    position:absolute; top:10px; right:12px;
+    font-size:18px; cursor:pointer; opacity:0.5;
+    background:none; border:none; color:inherit; padding:0;
+  }
+  #welcomeBack .wb-title { font-family:'Syne',sans-serif; font-weight:800; font-size:16px; margin-bottom:4px; }
+  #welcomeBack .wb-sub   { font-size:13px; opacity:0.85; line-height:1.5; }
+  #welcomeBack .wb-bar-wrap { margin-top:10px; background:rgba(255,255,255,0.15); border-radius:6px; height:6px; }
+  #welcomeBack .wb-bar-fill { height:6px; border-radius:6px; background:rgba(255,255,255,0.8); transition: width 1s ease; }
+
+  /* ── SJEKKLISTE FILTER ────────────────────────────── */
+  .cl-filter-wrap { display:flex; gap:6px; margin-bottom:12px; }
+  .cl-filter-btn {
+    flex:1; padding:8px 4px; border-radius:10px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); font-family:'DM Sans',sans-serif;
+    font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s;
+  }
+  .cl-filter-btn.active {
+    background:linear-gradient(135deg,var(--red),var(--orange));
+    color:#fff; border-color:transparent;
+  }
+  .cat-accordion.all-done .cat-head-title { color:var(--muted); }
+  .cat-accordion.all-done .cat-head { opacity:0.7; }
+  .checklist-item.checked { opacity:0.45; }
+  .checklist-item { transition: opacity 0.25s; }
 </style>
 </head>
 <body>
@@ -444,6 +484,14 @@
       </div>
     </div>
   </header>
+  <!-- VELKOMMEN TILBAKE BANNER -->
+  <div id="welcomeBack">
+    <button class="wb-close" onclick="dismissWelcomeBack()">✕</button>
+    <div class="wb-title" id="wbTitle"></div>
+    <div class="wb-sub" id="wbSub"></div>
+    <div class="wb-bar-wrap"><div class="wb-bar-fill" id="wbBarFill" style="width:0%"></div></div>
+  </div>
+
   <div class="status-bar" onclick="openStatusDetail()" style="cursor:pointer;">
     <div class="status-dot" id="statusDot"></div>
     <span id="statusText">Henter farevarsel…</span>
@@ -529,6 +577,11 @@
       <div class="progress-label"><span id="progressText">0 av 0</span> gjenstander klargjort</div>
       <div class="household-summary" id="householdSummary"></div>
       <div id="checklistLastUpdated" style="font-size:11px;color:var(--muted);margin-top:6px;text-align:right;"></div>
+    </div>
+    <div class="cl-filter-wrap" id="clFilterWrap">
+      <button class="cl-filter-btn active" id="clFilterAll"    onclick="setClFilter('all')">Alle</button>
+      <button class="cl-filter-btn"        id="clFilterTodo"   onclick="setClFilter('todo')">⬜ Gjenstår</button>
+      <button class="cl-filter-btn"        id="clFilterDone"   onclick="setClFilter('done')">✅ Fullført</button>
     </div>
     <div id="checklistContainer"></div>
     <button onclick="printChecklist()" style="width:100%;margin-top:12px;padding:13px;border-radius:12px;border:1px solid var(--border);background:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">🖨️ Skriv ut sjekkliste</button>
@@ -816,6 +869,145 @@
         </div>
       </div>
 
+      <div class="acc-item" id="acc-psyk">
+        <button class="acc-head" onclick="toggleAcc('psyk')">
+          <span class="acc-icon">🧠</span>
+          <span class="acc-title">Psykologisk førstehjelp</span>
+          <span class="acc-arrow">▾</span>
+        </button>
+        <div class="acc-body">
+
+          <p style="font-size:14px;line-height:1.7;margin-bottom:16px;">En krise påvirker ikke bare kroppen – den påvirker hodet. Det er normalt å reagere sterkt. Her er det viktigste du kan gjøre for deg selv og familien din – både i akuttfasen og i dagene etterpå.</p>
+
+          <!-- NORMALE REAKSJONER -->
+          <div style="font-size:13px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">😤 Normale krisereaksjoner</div>
+          <p style="font-size:14px;line-height:1.7;margin-bottom:8px;">Det er normalt å reagere sterkt – det betyr ikke at du er svak eller syk. Vanlige reaksjoner er:</p>
+          <ul style="font-size:14px;line-height:1.9;padding-left:18px;margin-bottom:16px;">
+            <li>Skjelving, hjertebank, kvalme</li>
+            <li>Gråt, sinne, nummenhet eller følelsesløshet</li>
+            <li>Konsentrasjonsvansker og glemsomhet</li>
+            <li>Søvnproblemer og mareridt</li>
+            <li>Behov for å snakke – eller ønske om å trekke seg unna</li>
+          </ul>
+          <div style="background:rgba(247,127,0,0.07);border-left:3px solid var(--orange);border-radius:0 8px 8px 0;padding:10px 14px;font-size:14px;line-height:1.6;margin-bottom:16px;">
+            💡 <strong>Husk:</strong> Reaksjonene er normale. De fleste går over av seg selv når krisen er over og du er trygg.
+          </div>
+
+          <!-- BARN -->
+          <div style="font-size:13px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🧒 Barn reagerer annerledes enn voksne</div>
+          <ul style="font-size:14px;line-height:1.9;padding-left:18px;margin-bottom:16px;">
+            <li><strong>Ikke avvis frykten</strong> – si aldri «det er ikke farlig». Anerkjenn følelsen: <em>«Jeg skjønner du er redd. Jeg er her.»</em></li>
+            <li><strong>Forklar på barnets nivå</strong> – enkle, ærlige svar er bedre enn taushet. Barn fyller tomrom med fantasier som ofte er verre enn virkeligheten.</li>
+            <li><strong>Hold rutiner</strong> – faste spisetider, leggetid og aktiviteter gir trygghet midt i kaos.</li>
+            <li><strong>La dem hjelpe til</strong> – en liten oppgave (fylle vannflasker, pakke sekk) gir mestringsfølelse og reduserer hjelpeløshet.</li>
+            <li><strong>Begrens medieeksponering</strong> – nyhetsstrøm på loop øker angst sterkt, særlig hos barn under 12 år.</li>
+            <li><strong>Småbarn (0–5 år)</strong> – speiler foreldrenes følelser direkte. Klem, rolig stemme og kroppslig nærhet er det viktigste.</li>
+            <li><strong>Tenåringer</strong> – kan virke uberørte, men prosesserer innvendig. Inviter til samtale uten å tvinge.</li>
+          </ul>
+
+          <!-- PANIKK -->
+          <div style="font-size:13px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">😰 Når noen får panikk eller akutt angst</div>
+          <ul style="font-size:14px;line-height:1.9;padding-left:18px;margin-bottom:8px;">
+            <li><strong>Ro smitter</strong> – snakk langsomt og bestemt. Din ro er det viktigste verktøyet.</li>
+            <li><strong>Pust sammen</strong> – inn 4 sekunder, hold 4, ut 6. Gjør det selv først så de kan følge deg.</li>
+            <li><strong>Jord personen (5-4-3-2-1)</strong> – «Nevn 5 ting du kan SE, 4 du kan HØRE, 3 du kan KJENNE på kroppen, 2 du kan LUKTE, 1 du kan SMAKE.» Bringer fokus tilbake til nåtid.</li>
+            <li><strong>Ikke la dem være alene</strong> – fysisk nærvær er viktigere enn de rette ordene.</li>
+            <li><strong>Unngå å si</strong> «ta deg sammen», «det er ikke så farlig» eller «slapp av». Det virker mot sin hensikt.</li>
+          </ul>
+          <div style="background:rgba(59,130,246,0.07);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;padding:10px 14px;font-size:14px;line-height:1.6;margin-bottom:16px;">
+            🫁 <strong>Pusteøvelse:</strong> Inn gjennom nesen (4 sek) → Hold (4 sek) → Ut gjennom munnen (6 sek). Gjenta 4–6 ganger. Aktiverer kroppens roe-respons.
+          </div>
+
+          <!-- ELDRE OG DEMENTE -->
+          <div style="font-size:13px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🧓 Eldre og personer med demens</div>
+          <ul style="font-size:14px;line-height:1.9;padding-left:18px;margin-bottom:16px;">
+            <li><strong>Demens forverres under stress</strong> – forvirring og agitasjon øker kraftig. Hold omgivelsene så kjente og stabile som mulig.</li>
+            <li><strong>Enkle beskjeder</strong> – én setning av gangen. Ikke overøs med informasjon.</li>
+            <li><strong>Ikke korriger</strong> – hvis en dement person tror det er 1985, gå inn i deres virkelighet fremfor å korrigere.</li>
+            <li><strong>Musikk og kjente gjenstander</strong> – gir trygghet og kan dempe uro betraktelig.</li>
+            <li><strong>Medisiner</strong> – sørg for at faste medisiner ikke avbrytes. Ha 14 dagers forsyning i beredskap.</li>
+          </ul>
+
+          <!-- LANGVARIG KRISE -->
+          <div style="font-size:13px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">📅 Langvarig krise – dag 2 og utover</div>
+          <ul style="font-size:14px;line-height:1.9;padding-left:18px;margin-bottom:16px;">
+            <li><strong>Gjør noe konkret</strong> – aktivitet bekjemper hjelpeløshet. Pakke, rydde, lage mat – alt som gir en følelse av kontroll hjelper.</li>
+            <li><strong>Søvn er kritisk</strong> – mangel på søvn svekker dømmekraft og følelsesregulering dramatisk. Prioriter hvile, selv i korte økt.</li>
+            <li><strong>Spis regelmessig</strong> – selv lite og enkelt. Blodsukkerfall forverrer angst og irritabilitet.</li>
+            <li><strong>Begrens grubling</strong> – sett av 15 minutter til å bekymre deg, deretter fokus på det du kan påvirke akkurat nå.</li>
+            <li><strong>Naturlig lys og bevegelse</strong> – selv en kort tur ute stabiliserer nervesystemet.</li>
+            <li><strong>Snakk med noen</strong> – del tanker med noen du stoler på. Å sette ord på ting reduserer den emosjonelle belastningen.</li>
+          </ul>
+
+          <!-- MENTAL BEREDSKAPSPLAN -->
+          <div style="font-size:13px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">📋 Mental beredskapsplan</div>
+          <p style="font-size:14px;line-height:1.7;margin-bottom:8px;">Bestem deg på forhånd – hvem ringer du hvis du selv kollapser psykisk?</p>
+          <ul style="font-size:14px;line-height:1.9;padding-left:18px;margin-bottom:16px;">
+            <li>Én person i familien beholder «kommandoansvaret» – bytt hvis nødvendig</li>
+            <li>Ha en avtalt «safe word» som betyr «jeg trenger en pause nå»</li>
+            <li>Avtal hvem som tar seg av barna hvis en forelder bryter sammen</li>
+            <li>Skriv ned navn og telefon til én person utenom familien dere begge stoler på</li>
+          </ul>
+
+          <!-- MOTSTANDSKRAFT -->
+          <div style="font-size:13px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">💪 Styrk familiens motstandskraft</div>
+          <ul style="font-size:14px;line-height:1.9;padding-left:18px;margin-bottom:16px;">
+            <li><strong>Snakk om planen nå</strong> – familier som har øvd er betraktelig roligere i en krise.</li>
+            <li><strong>Ivareta deg selv først</strong> – du kan ikke hjelpe andre fra et tomt glass. Søvn, mat og korte pauser er ikke egoistisk.</li>
+            <li><strong>Bruk nettverket</strong> – be naboer, slektninger og venner om hjelp. Det er styrke, ikke svakhet.</li>
+            <li><strong>Finn noe å le av</strong> – humor er ikke upassende i krise. Det er et naturlig og sunt mestringsverktøy.</li>
+          </ul>
+
+          <!-- KRISENUMRE -->
+          <div style="font-size:13px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">📞 Krisenumre – psykisk helse</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+            <a href="tel:116123" style="background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-decoration:none;display:flex;align-items:center;gap:12px;">
+              <span style="font-size:22px;">🆘</span>
+              <div>
+                <div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--text);">Mental Helse – 116 123</div>
+                <div style="font-size:12px;color:var(--muted);">Gratis, døgnåpen. Alle kan ringe.</div>
+              </div>
+            </a>
+            <a href="tel:22400040" style="background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-decoration:none;display:flex;align-items:center;gap:12px;">
+              <span style="font-size:22px;">✝️</span>
+              <div>
+                <div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--text);">Kirkens SOS – 22 40 00 40</div>
+                <div style="font-size:12px;color:var(--muted);">Gratis, døgnåpen. Uavhengig av tro.</div>
+              </div>
+            </a>
+            <a href="tel:80033321" style="background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-decoration:none;display:flex;align-items:center;gap:12px;">
+              <span style="font-size:22px;">🔴</span>
+              <div>
+                <div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--text);">Røde Kors – 800 33 321</div>
+                <div style="font-size:12px;color:var(--muted);">Gratis, døgnåpen. Samtalestøtte.</div>
+              </div>
+            </a>
+            <a href="tel:116111" style="background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-decoration:none;display:flex;align-items:center;gap:12px;">
+              <span style="font-size:22px;">👶</span>
+              <div>
+                <div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--text);">Alarmtelefonen for barn – 116 111</div>
+                <div style="font-size:12px;color:var(--muted);">Gratis, døgnåpen. For barn og unge under 18.</div>
+              </div>
+            </a>
+          </div>
+
+          <!-- NÅR TRENGER DU HJELP -->
+          <div style="background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.2);border-radius:10px;padding:14px;font-size:14px;line-height:1.8;">
+            <strong style="color:#2ECC71;">⚠️ Når bør du kontakte fastlege eller legevakt?</strong><br><br>
+            <ul style="padding-left:16px;margin:0;line-height:2;">
+              <li>Noen i familien ikke sover på flere dager</li>
+              <li>Noen nekter å spise eller drikke</li>
+              <li>Noen er i vedvarende panikk eller dissosiert etter at faren er over</li>
+              <li>Noen snakker om å skade seg selv</li>
+              <li>Barn under 5 år slutter å snakke eller reagere normalt</li>
+            </ul>
+            <br>
+            <a href="https://www.nkvts.no/psykologisk-forstehjelp/" target="_blank" style="color:var(--orange);font-weight:600;">NKVTS – Psykologisk førstehjelp ↗</a>
+          </div>
+
+        </div>
+      </div>
+
     </div><!-- end acc-list -->
 
     <!-- VARSLER & APP -->
@@ -909,15 +1101,25 @@
       <button class="reset-btn-soft" onclick="resetProfile()">👤 Endre husstandsprofil</button>
       <button class="reset-btn" onclick="resetAll()">🔄 Start appen helt på nytt</button>
     </div>
-    <div class="app-version" style="cursor:pointer;" onclick="toggleChangelog()">72klar! · v1.3 · Laget for folk flest i Norge · <span style="color:var(--orange);">Hva er nytt? ▾</span></div>
+    <div class="app-version" style="cursor:pointer;" onclick="toggleChangelog()">72klar! · v1.4 · Laget for folk flest i Norge · <span style="color:var(--orange);">Hva er nytt? ▾</span></div>
     <div id="changelogBox" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:8px 0 16px;text-align:left;">
-      <div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;color:var(--orange);margin-bottom:8px;">v1.3 – Mars 2026</div>
+      <div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;color:var(--orange);margin-bottom:8px;">v1.4 – Mars 2026</div>
+      <ul style="font-size:12px;color:var(--muted);line-height:1.8;padding-left:16px;">
+        <li>Accordion-sjekkliste med popup-info</li>
+        <li>Grab-bag kategori</li>
+        <li>13 merker med statistikk (Steam-stil)</li>
+        <li>Farevarsel-statuslinje (Open-Meteo)</li>
+        <li>Utvidet psykologisk førstehjelp</li>
+        <li>9 kommuner med trygghetspunkter</li>
+        <li>Maps.me & offline kart</li>
+        <li>Større skrift og høyere kontrast</li>
+      </ul>
+      <div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;color:var(--muted);margin:10px 0 6px;">v1.3 – Mars 2026</div>
       <ul style="font-size:12px;color:var(--muted);line-height:1.8;padding-left:16px;">
         <li>Accordion Info-fane</li>
         <li>Postnummer & trygghetspunkter</li>
         <li>Push-varsler</li>
-        <li>Bunnmeny</li>
-        <li>Maps.me & offline kart</li>
+        <li>Bunnmeny app-stil</li>
         <li>72klar.no domene</li>
       </ul>
       <div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;color:var(--muted);margin:10px 0 6px;">v1.2 – Februar 2026</div>
@@ -1222,7 +1424,7 @@ function startApp(){
   document.getElementById('headerSub').textContent='Hei, '+p.name+'! Klar for 72 timer.';
   const nl=[];if(needs.has('baby'))nl.push('baby');if(needs.has('eldre'))nl.push('eldre');if(needs.has('hund'))nl.push('kjæledyr');if(needs.has('medisin'))nl.push('medisiner');
   document.getElementById('householdSummary').textContent='📊 '+n+' person'+n>1?'er':''+' · '+Math.round(n*9)+'L vann · '+n*3+' porsjoner/dag'+(nl.length?' · '+nl.join(', ') :'');
-  renderDailyTip(); renderWeeklyReminder(); renderChecklist(); fetchFarevarsel();  renderContacts(); renderMotivation(); show7DayBanner(); renderTrygghetspunkter();
+  renderDailyTip(); renderWeeklyReminder(); renderChecklist(); fetchFarevarsel(); renderContacts(); renderMotivation(); show7DayBanner(); renderTrygghetspunkter(); showWelcomeBack();
 }
 function _goToOnboarding(){
   document.getElementById('app').style.display='none';
@@ -1459,15 +1661,36 @@ function renderChecklist(){
   var needs = new Set(profile.needs);
   var cats = getCats(n, needs);
   cont.innerHTML = '';
-  cats.forEach(function(cat, ci){
-    var catId = 'cat-'+ci;
+
+  // Sort categories: incomplete first, fully done last
+  var sortedCats = cats.slice().sort(function(a, b) {
+    var aDone = a.items.every(function(it){ return checkedItems.includes(a.name+'::'+it.name); });
+    var bDone = b.items.every(function(it){ return checkedItems.includes(b.name+'::'+it.name); });
+    return (aDone ? 1 : 0) - (bDone ? 1 : 0);
+  });
+
+  // When filter is active, hide categories with no matching items
+  if (clFilter !== 'all') {
+    sortedCats = sortedCats.filter(function(cat) {
+      return cat.items.some(function(item) {
+        var isC = checkedItems.includes(cat.name+'::'+item.name);
+        if (clFilter === 'todo') return !isC;
+        if (clFilter === 'done') return isC;
+        return true;
+      });
+    });
+  }
+
+  sortedCats.forEach(function(cat, ci){
+    var catId = 'cat-'+cat.name.replace(/\s+/g,'_');
     var catItems = cat.items;
     var doneCount = catItems.filter(function(it){ return checkedItems.includes(cat.name+'::'+it.name); }).length;
     var allDone = doneCount === catItems.length;
 
     var wrapper = document.createElement('div');
     var wasOpen = (Object.keys(openCats).length > 0) ? !!openCats[catId] : (ci===0);
-    wrapper.className = 'cat-accordion' + (wasOpen?' open':'');
+    var doneCls = allDone ? ' all-done' : '';
+    wrapper.className = 'cat-accordion' + (wasOpen?' open':'') + doneCls;
     wrapper.id = catId;
 
     var head = document.createElement('button');
@@ -1480,7 +1703,22 @@ function renderChecklist(){
     var body = document.createElement('div');
     body.className = 'cat-body';
 
-    catItems.forEach(function(item){
+    // Sort: unchecked first, checked last
+    var sortedItems = catItems.slice().sort(function(a, b) {
+      var aC = checkedItems.includes(cat.name+'::'+a.name) ? 1 : 0;
+      var bC = checkedItems.includes(cat.name+'::'+b.name) ? 1 : 0;
+      return aC - bC;
+    });
+
+    // Filter items based on clFilter
+    var visibleItems = sortedItems.filter(function(item) {
+      var isC = checkedItems.includes(cat.name+'::'+item.name);
+      if (clFilter === 'todo') return !isC;
+      if (clFilter === 'done') return isC;
+      return true;
+    });
+
+    visibleItems.forEach(function(item){
       var id = cat.name+'::'+item.name;
       var isC = checkedItems.includes(id);
 
@@ -1916,8 +2154,41 @@ const TRYGGHETSPUNKTER = {
     { navn: 'Tangvall', adresse: 'Rådhusveien 1, Søgne', gmaps: 'https://maps.google.com/?q=Rådhusveien+1,+Søgne' },
     { navn: 'Nodeland', adresse: 'Songdalsvegen 53, Nodeland', gmaps: 'https://maps.google.com/?q=Songdalsvegen+53,+Nodeland' },
   ],
-  // 'Oslo': [ { navn: '...', adresse: '...', gmaps: '...' } ],
-  // 'Bergen': [...],
+  'Oslo': [
+    { navn: 'Rådhuset', adresse: 'Rådhusplassen 1, Oslo', gmaps: 'https://maps.google.com/?q=Rådhusplassen+1,+Oslo' },
+    { navn: 'Bydel Grorud', adresse: 'Grorudveien 1, Oslo', gmaps: 'https://maps.google.com/?q=Grorudveien+1,+Oslo' },
+    { navn: 'Bydel Søndre Nordstrand', adresse: 'Kolsåsveien 1, Oslo', gmaps: 'https://maps.google.com/?q=Mortensrudveien+3,+Oslo' },
+    { navn: 'Bydel Stovner', adresse: 'Stovner senter, Oslo', gmaps: 'https://maps.google.com/?q=Stovner+senter,+Oslo' },
+  ],
+  'Bergen': [
+    { navn: 'Rådhuset Bergen', adresse: 'Rådhuset, Korskirkealmenningen 5, Bergen', gmaps: 'https://maps.google.com/?q=Korskirkealmenningen+5,+Bergen' },
+    { navn: 'Åsane bydel', adresse: 'Åsane senter, Bergen', gmaps: 'https://maps.google.com/?q=Åsane+senter,+Bergen' },
+    { navn: 'Laksevåg bydel', adresse: 'Laksevåg, Bergen', gmaps: 'https://maps.google.com/?q=Laksevåg,+Bergen' },
+  ],
+  'Trondheim': [
+    { navn: 'Rådhuset Trondheim', adresse: 'Erling Skakkes gate 14, Trondheim', gmaps: 'https://maps.google.com/?q=Erling+Skakkes+gate+14,+Trondheim' },
+    { navn: 'Bydel Heimdal', adresse: 'Sluppenvegen 12, Trondheim', gmaps: 'https://maps.google.com/?q=Sluppenvegen+12,+Trondheim' },
+    { navn: 'Bydel Lerkendal', adresse: 'Klæbuveien 1, Trondheim', gmaps: 'https://maps.google.com/?q=Klæbuveien+1,+Trondheim' },
+  ],
+  'Stavanger': [
+    { navn: 'Stavanger rådhus', adresse: 'Olav Vs gate 23, Stavanger', gmaps: 'https://maps.google.com/?q=Olav+Vs+gate+23,+Stavanger' },
+    { navn: 'Hundvåg bydel', adresse: 'Byfjordparken, Stavanger', gmaps: 'https://maps.google.com/?q=Hundvåg,+Stavanger' },
+    { navn: 'Hillevåg bydel', adresse: 'Hillevåg, Stavanger', gmaps: 'https://maps.google.com/?q=Hillevåg,+Stavanger' },
+  ],
+  'Tromsø': [
+    { navn: 'Tromsø rådhus', adresse: 'Rådhusplassen 2, Tromsø', gmaps: 'https://maps.google.com/?q=Rådhusplassen+2,+Tromsø' },
+    { navn: 'Kroken/Ramfjord', adresse: 'Kroken, Tromsø', gmaps: 'https://maps.google.com/?q=Kroken,+Tromsø' },
+  ],
+  'Fredrikstad': [
+    { navn: 'Fredrikstad rådhus', adresse: 'Nygaardsgaten 16, Fredrikstad', gmaps: 'https://maps.google.com/?q=Nygaardsgaten+16,+Fredrikstad' },
+    { navn: 'Rolvsøy bydel', adresse: 'Rolvsøy, Fredrikstad', gmaps: 'https://maps.google.com/?q=Rolvsøy,+Fredrikstad' },
+  ],
+  'Sandnes': [
+    { navn: 'Sandnes rådhus', adresse: 'Rådhusgata 1, Sandnes', gmaps: 'https://maps.google.com/?q=Rådhusgata+1,+Sandnes' },
+  ],
+  'Drammen': [
+    { navn: 'Drammen rådhus', adresse: 'Engene 1, Drammen', gmaps: 'https://maps.google.com/?q=Engene+1,+Drammen' },
+  ],
 };
 
 // Postnummer-ranges → kommunenavn (kilde: Bring/Posten 2024/2025)
@@ -2243,6 +2514,81 @@ function downloadICS(){
 
 // INIT
 applyTheme();
+
+
+// ── SJEKKLISTE FILTER & SORTERING ─────────────────────
+let clFilter = 'all'; // 'all' | 'todo' | 'done'
+
+function setClFilter(f) {
+  clFilter = f;
+  ['all','todo','done'].forEach(function(id) {
+    var btn = document.getElementById('clFilter' + id.charAt(0).toUpperCase() + id.slice(1));
+    if (btn) btn.classList.toggle('active', id === f);
+  });
+  renderChecklist();
+}
+// ──────────────────────────────────────────────────────
+
+// ── VELKOMMEN TILBAKE ──────────────────────────────────
+function showWelcomeBack() {
+  if (!profile) return;
+  const now = Date.now();
+  const lastVisit = parseInt(localStorage.getItem('72t_last_visit') || '0', 10);
+  localStorage.setItem('72t_last_visit', now);
+
+  // Første gang – ikke vis banner
+  if (!lastVisit) return;
+
+  const daysSince = Math.floor((now - lastVisit) / 86400000);
+  const pct = getPct();
+  const name = profile.name || 'deg';
+
+  const banner = document.getElementById('welcomeBack');
+  const title  = document.getElementById('wbTitle');
+  const sub    = document.getElementById('wbSub');
+  const bar    = document.getElementById('wbBarFill');
+
+  // Velg farge og melding basert på kontekst
+  let bg, msg, emoji;
+  if (daysSince === 0) {
+    // Samme dag – ikke vis banner
+    return;
+  } else if (daysSince === 1) {
+    emoji = '👋'; bg = 'linear-gradient(135deg,rgba(46,204,113,0.18),rgba(46,204,113,0.08))';
+    msg = 'Du var her i går – bra jobba med å holde fokuset! Du er ' + pct + '% klar.';
+  } else if (daysSince <= 7) {
+    emoji = '🔥'; bg = 'linear-gradient(135deg,rgba(247,127,0,0.18),rgba(247,127,0,0.08))';
+    msg = 'Det er ' + daysSince + ' dager siden sist. Du er ' + pct + '% klar – fortsett fremgangen!';
+  } else if (daysSince <= 30) {
+    emoji = '⚡'; bg = 'linear-gradient(135deg,rgba(37,99,235,0.18),rgba(37,99,235,0.08))';
+    msg = 'Velkommen tilbake etter ' + daysSince + ' dager! Du er ' + pct + '% klar – noen nye punkter å huke av?';
+  } else {
+    emoji = '🌱'; bg = 'linear-gradient(135deg,rgba(214,40,40,0.15),rgba(247,127,0,0.08))';
+    msg = 'Det har gått ' + daysSince + ' dager. Ting kan ha endret seg – sjekk at lageret ditt fortsatt er oppdatert.';
+  }
+
+  banner.style.background = bg;
+  banner.style.display = 'block';
+  title.textContent = emoji + ' Hei igjen, ' + name + '!';
+  sub.textContent = msg;
+
+  // Animér fremdriftsbar
+  setTimeout(() => { bar.style.width = pct + '%'; }, 100);
+
+  // Auto-dismiss etter 8 sekunder
+  setTimeout(dismissWelcomeBack, 8000);
+}
+
+function dismissWelcomeBack() {
+  const banner = document.getElementById('welcomeBack');
+  if (!banner) return;
+  banner.style.transition = 'opacity 0.3s, transform 0.3s';
+  banner.style.opacity = '0';
+  banner.style.transform = 'translateY(-10px)';
+  setTimeout(() => { banner.style.display = 'none'; }, 300);
+}
+// ──────────────────────────────────────────────────────
+
 document.addEventListener('DOMContentLoaded', function() {
   applyTheme();
   fetchFarevarsel();
