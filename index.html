@@ -2345,27 +2345,48 @@ function requestNotifPermission(){
 function scheduleAllNotifications(){
   if(!('serviceWorker' in navigator)) return;
   navigator.serviceWorker.ready.then(reg => {
-    const start = parseInt(localStorage.getItem('72k_notif_start') || Date.now().toString());
+    const startTime = parseInt(localStorage.getItem('72k_notif_start') || Date.now().toString());
+    // Track which notifications have already been shown
+    const shown = JSON.parse(localStorage.getItem('72k_notif_shown') || '[]');
+    const now = Date.now();
+    const todayKey = new Date().toISOString().slice(0,10); // YYYY-MM-DD
+
     NOTIF_SCHEDULE.forEach((notif, idx) => {
-      const fireTime = new Date(start);
+      // Skip if already shown
+      if(shown.includes(idx)) return;
+
+      const fireTime = new Date(startTime);
       fireTime.setDate(fireTime.getDate() + notif.day);
       fireTime.setHours(notif.hour, 0, 0, 0);
-      const delay = fireTime.getTime() - Date.now();
-      if(delay > 0){
+      const delay = fireTime.getTime() - now;
+
+      // Only fire if: delay is in the future (schedule for later)
+      // OR: it's the right day today and not yet shown today
+      const fireKey = idx + '-' + fireTime.toISOString().slice(0,10);
+      const shownToday = JSON.parse(localStorage.getItem('72k_notif_today') || '[]');
+
+      if(delay > 0 && delay < 24*60*60*1000){
+        // Due today – schedule with setTimeout
         const body = notif.body || NOTIF_TIPS[notif.tipIndex % NOTIF_TIPS.length];
         setTimeout(() => {
-          if(Notification.permission === 'granted'){
+          if(Notification.permission === 'granted' && !shownToday.includes(fireKey)){
             reg.showNotification(notif.title, {
               body: body,
               icon: 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23D62828%22/><text y=%22.9em%22 font-size=%2275%22 x=%2212%22>&#x1F6E1;&#xFE0F;</text></svg>',
-              badge: 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x1F6E1;</text></svg>',
               tag: '72klar-notif-' + idx,
-              renotify: true,
+              renotify: false,
               data: { url: './' }
             });
+            // Mark as shown today
+            shownToday.push(fireKey);
+            localStorage.setItem('72k_notif_today', JSON.stringify(shownToday));
+            // Mark as permanently shown
+            shown.push(idx);
+            localStorage.setItem('72k_notif_shown', JSON.stringify(shown));
           }
         }, delay);
       }
+      // Past notifications: skip silently (already missed)
     });
   });
 }
