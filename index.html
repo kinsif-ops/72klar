@@ -395,7 +395,17 @@
 
 <!-- ONBOARDING -->
 <div id="onboarding" style="display:none;flex-direction:column;min-height:100vh;">
-  <div class="ob-hero"><h1>72klar!</h1><p>Klar til å klare deg selv<br>– i 72 timer</p></div>
+  <div class="ob-hero">
+    <h1>72klar!</h1>
+    <p>Klar til å klare deg selv – i 72 timer</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px;">
+      <div style="background:rgba(255,255,255,0.12);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;">✅ Personlig sjekkliste</div>
+      <div style="background:rgba(255,255,255,0.12);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;">🎒 Grab-bag guide</div>
+      <div style="background:rgba(255,255,255,0.12);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;">🏛️ Trygghetspunkter</div>
+      <div style="background:rgba(255,255,255,0.12);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;">🧠 Psyk. førstehjelp</div>
+      <div style="background:rgba(255,255,255,0.12);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;">🏅 Merker & fremgang</div>
+    </div>
+  </div>
   <div class="ob-steps">
     <div class="ob-step-indicator">
       <div class="ob-dot done" id="dot0"></div>
@@ -407,7 +417,7 @@
     <!-- STEG 0: Navn -->
     <div class="ob-step active" id="step0">
       <div class="ob-step-title">Hva heter du?</div>
-      <div class="ob-step-sub">Vi personaliserer appen for deg og husstanden din.</div>
+      <div class="ob-step-sub">Vi tilpasser sjekkliste, mengder og tips til deg og husstanden din.</div>
       <div class="name-input-wrap">
         <label>Ditt navn</label>
         <input type="text" id="inputName" placeholder="Skriv navn her..." autocomplete="given-name">
@@ -437,7 +447,7 @@
     <!-- STEG 2: Spesielle hensyn -->
     <div class="ob-step" id="step2">
       <div class="ob-step-title">Spesielle hensyn?</div>
-      <div class="ob-step-sub">Vi legger til ekstra punkter i sjekklisten.</div>
+      <div class="ob-step-sub">Vi legger til ekstra punkter i sjekklisten – baby, eldre, hund og medisin.</div>
       <div class="needs-grid">
         <div class="needs-option" onclick="toggleNeed('baby',this)"><div class="needs-icon">👶</div><div class="needs-text"><strong>Baby / småbarn</strong><span>Under 3 år – bleier, barnemat</span></div><div class="needs-check" id="need-baby"></div></div>
         <div class="needs-option" onclick="toggleNeed('eldre',this)"><div class="needs-icon">🧓</div><div class="needs-text"><strong>Eldre i husstanden</strong><span>Over 70 – ekstra varme</span></div><div class="needs-check" id="need-eldre"></div></div>
@@ -451,7 +461,7 @@
     <!-- STEG 3: Postnummer -->
     <div class="ob-step" id="step3">
       <div class="ob-step-title">Hvor bor du?</div>
-      <div class="ob-step-sub">Vi finner nærmeste trygghetspunkt i din kommune.</div>
+      <div class="ob-step-sub">Vi finner nærmeste trygghetspunkt – kommunalt samlingssted med vann, varme og strøm ved krise.</div>
       <div class="name-input-wrap" style="margin-bottom:16px;">
         <label>Postnummer</label>
         <input type="text" id="inputPostnr" placeholder="F.eks. 4630" maxlength="4" inputmode="numeric" autocomplete="postal-code"
@@ -1038,7 +1048,8 @@
         <div class="share-card-title">Del 72klar! med andre</div>
         <div class="share-card-sub">Hjelp venner, familie og naboer å bli bedre forberedt!</div>
         <div class="share-btns">
-          <button class="share-btn share-btn-qr" onclick="openQRModal()">📱 Vis QR-kode</button>
+          <button class="share-btn" style="background:linear-gradient(135deg,rgba(214,40,40,0.2),rgba(247,127,0,0.2));border:1px solid rgba(247,127,0,0.5);color:var(--orange);font-size:14px;" onclick="openShareScore()">🏆 Del mitt resultat</button>
+          <button class="share-btn share-btn-qr" onclick="openQRModal()">📱 QR-kode</button>
           <button class="share-btn share-btn-copy" onclick="copyLink()">🔗 Kopier lenke</button>
           <button class="share-btn share-btn-native" id="nativeShareBtn" onclick="nativeShare()" style="display:none">↗️ Del via telefon</button>
           <button class="share-btn" style="background:rgba(46,204,113,0.12);border:1px solid rgba(46,204,113,0.35);color:var(--green);" onclick="sendNeighbourAlert()">🏘️ Send nabovarsel</button>
@@ -1145,6 +1156,19 @@
     <input type="hidden" id="imId">
     <button id="imCheckBtn" onclick="" style="width:100%;padding:14px;border-radius:12px;border:none;color:white;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:10px;"></button>
     <button onclick="closeItemModal()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:none;color:var(--muted);font-family:'Syne',sans-serif;font-size:15px;cursor:pointer;">Lukk</button>
+  </div>
+</div>
+
+<!-- SHARE SCORE MODAL -->
+<div id="shareScoreOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;align-items:center;justify-content:center;padding:20px;" onclick="closeShareScore()">
+  <div style="background:#1C1C28;border:1px solid #2A2A3A;border-radius:20px;padding:24px 20px;width:100%;max-width:360px;" onclick="event.stopPropagation()">
+    <div style="text-align:center;margin-bottom:16px;font-family:Syne,sans-serif;font-size:14px;font-weight:700;color:#A0A0B8;text-transform:uppercase;letter-spacing:1px;">Del ditt resultat</div>
+    <canvas id="shareScoreCanvas" width="320" height="200" style="width:100%;border-radius:14px;display:block;margin-bottom:16px;"></canvas>
+    <div style="display:flex;gap:8px;">
+      <button onclick="downloadShareCard()" style="flex:1;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#D62828,#F77F00);color:white;font-family:Syne,sans-serif;font-size:14px;font-weight:700;cursor:pointer;">💾 Last ned</button>
+      <button onclick="nativeShareScore()" id="nativeShareScoreBtn" style="flex:1;padding:13px;border-radius:12px;border:none;background:rgba(59,130,246,0.2);border:1px solid rgba(59,130,246,0.4);color:#3B82F6;font-family:Syne,sans-serif;font-size:14px;font-weight:700;cursor:pointer;">↗️ Del</button>
+    </div>
+    <button onclick="closeShareScore()" style="width:100%;margin-top:8px;padding:11px;border-radius:12px;border:1px solid #2A2A3A;background:none;color:#A0A0B8;font-family:Syne,sans-serif;font-size:13px;cursor:pointer;">Lukk</button>
   </div>
 </div>
 
@@ -1278,6 +1302,142 @@ function getMotMsg(p) {
 }
 
 
+
+// ── SHARE SCORE CARD ──
+function openShareScore(){
+  localStorage.setItem('72t_shared','1'); checkBadges();
+  var overlay = document.getElementById('shareScoreOverlay');
+  if(!overlay) return;
+  overlay.style.display = 'flex';
+  renderShareCard();
+}
+function closeShareScore(){
+  var overlay = document.getElementById('shareScoreOverlay');
+  if(overlay) overlay.style.display = 'none';
+}
+function renderShareCard(){
+  var canvas = document.getElementById('shareScoreCanvas');
+  if(!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var W = 320, H = 200;
+  canvas.width = W; canvas.height = H;
+
+  // Background gradient
+  var bg = ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#0A0A0F');
+  bg.addColorStop(1,'#1C1C28');
+  ctx.fillStyle = bg;
+  ctx.roundRect(0,0,W,H,16);
+  ctx.fill();
+
+  // Orange/red accent bar top
+  var bar = ctx.createLinearGradient(0,0,W,0);
+  bar.addColorStop(0,'#D62828');
+  bar.addColorStop(1,'#F77F00');
+  ctx.fillStyle = bar;
+  ctx.roundRect(0,0,W,5,0);
+  ctx.fill();
+
+  // Shield emoji
+  ctx.font = '36px serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('🛡️', 20, 58);
+
+  // App name
+  ctx.fillStyle = '#F5F5FA';
+  ctx.font = 'bold 20px sans-serif';
+  ctx.fillText('72klar!', 64, 44);
+
+  // Tagline
+  ctx.fillStyle = '#A0A0B8';
+  ctx.font = '12px sans-serif';
+  ctx.fillText('Norsk beredskapsapp', 64, 62);
+
+  // Get progress
+  var fill = document.getElementById('progressFill');
+  var pct = fill ? parseInt(fill.style.width) || 0 : 0;
+  var name = profile ? profile.name : '';
+
+  // Big percentage
+  var grad = ctx.createLinearGradient(0,80,0,140);
+  grad.addColorStop(0,'#F77F00');
+  grad.addColorStop(1,'#D62828');
+  ctx.fillStyle = grad;
+  ctx.font = 'bold 64px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText(pct+'%', 20, 145);
+
+  // Label
+  ctx.fillStyle = '#F5F5FA';
+  ctx.font = 'bold 15px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('klar for 72 timer', 20, 168);
+
+  if(name){
+    ctx.fillStyle = '#A0A0B8';
+    ctx.font = '12px sans-serif';
+    ctx.fillText(name + ' er ' + pct + '% forberedt', 20, 188);
+  }
+
+  // Progress bar
+  var barY = 155, barH = 6, barW = W - 40;
+  ctx.fillStyle = '#2A2A3A';
+  ctx.roundRect(20, barY, barW, barH, 3);
+  ctx.fill();
+  var fillGrad = ctx.createLinearGradient(20,0,20+barW,0);
+  fillGrad.addColorStop(0,'#D62828');
+  fillGrad.addColorStop(1,'#F77F00');
+  ctx.fillStyle = fillGrad;
+  ctx.roundRect(20, barY, barW * (pct/100), barH, 3);
+  ctx.fill();
+
+  // CTA right side
+  ctx.fillStyle = '#A0A0B8';
+  ctx.font = '11px sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText('Er du klar?', W-20, 120);
+  ctx.fillStyle = '#F77F00';
+  ctx.font = 'bold 12px sans-serif';
+  ctx.fillText('72klar.no', W-20, 137);
+
+  // Earned badges count
+  var badgeCount = earnedBadges ? earnedBadges.length : 0;
+  if(badgeCount > 0){
+    ctx.fillStyle = '#F5BE41';
+    ctx.font = 'bold 12px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText('🏅 '+badgeCount+' merker opptjent', W-20, 160);
+  }
+}
+async function nativeShareScore(){
+  localStorage.setItem('72t_shared','1'); checkBadges();
+  var canvas = document.getElementById('shareScoreCanvas');
+  if(!canvas) return;
+  try {
+    var blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+    var file = new File([blob], '72klar-score.png', {type:'image/png'});
+    var pct = parseInt(document.getElementById('progressFill')?.style.width)||0;
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({
+        title: '72klar! – '+pct+'% forberedt',
+        text: 'Jeg er '+pct+'% klar for 72 timer 🛡️ Er du? 72klar.no',
+        files: [file]
+      });
+    } else {
+      // Fallback: share URL only
+      navigator.share({title:'72klar!', text:'Jeg er '+pct+'% klar for 72 timer 🛡️ Er du? 72klar.no', url: APP_URL});
+    }
+  } catch(e){ console.log('Share cancelled'); }
+}
+function downloadShareCard(){
+  var canvas = document.getElementById('shareScoreCanvas');
+  if(!canvas) return;
+  var a = document.createElement('a');
+  a.download = '72klar-score.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+  localStorage.setItem('72t_shared','1'); checkBadges();
+}
 // ── STATUS / FAREVARSEL ──
 var statusDetailOpen = false;
 function openStatusDetail(){
@@ -1424,7 +1584,7 @@ function startApp(){
   document.getElementById('headerSub').textContent='Hei, '+p.name+'! Klar for 72 timer.';
   const nl=[];if(needs.has('baby'))nl.push('baby');if(needs.has('eldre'))nl.push('eldre');if(needs.has('hund'))nl.push('kjæledyr');if(needs.has('medisin'))nl.push('medisiner');
   document.getElementById('householdSummary').textContent='📊 '+n+' person'+n>1?'er':''+' · '+Math.round(n*9)+'L vann · '+n*3+' porsjoner/dag'+(nl.length?' · '+nl.join(', ') :'');
-  renderDailyTip(); renderWeeklyReminder(); renderChecklist(); fetchFarevarsel(); renderContacts(); renderMotivation(); show7DayBanner(); renderTrygghetspunkter(); showWelcomeBack();
+  renderDailyTip(); renderWeeklyReminder(); renderChecklist(); fetchFarevarsel(); showNewFeaturesBanner(); renderContacts(); renderMotivation(); show7DayBanner(); renderTrygghetspunkter(); showWelcomeBack();
 }
 function _goToOnboarding(){
   document.getElementById('app').style.display='none';
@@ -1594,6 +1754,25 @@ function closeChallengeModal(){
   // Don't permanently suppress – just close. Only accept7DayChallenge sets the flag.
   document.getElementById('challengeModalOverlay').classList.remove('open');
 }
+function showNewFeaturesBanner(){
+  if(localStorage.getItem('72t_features_seen')) return;
+  var banner = document.createElement('div');
+  banner.style.cssText = 'background:linear-gradient(135deg,rgba(247,127,0,0.12),rgba(214,40,40,0.08));border:1px solid rgba(247,127,0,0.3);border-radius:14px;padding:16px;margin-bottom:12px;';
+  var btn = document.createElement('button');
+  btn.textContent = 'Kom i gang! 🚀';
+  btn.style.cssText = 'background:linear-gradient(135deg,var(--red),var(--orange));border:none;color:white;border-radius:8px;padding:8px 16px;font-family:Syne,sans-serif;font-size:13px;font-weight:700;cursor:pointer;';
+  btn.onclick = function(){ banner.remove(); localStorage.setItem('72t_features_seen','1'); };
+  banner.innerHTML = '<div style="font-family:Syne,sans-serif;font-weight:800;font-size:15px;margin-bottom:6px;">👋 Velkommen til 72klar! v1.4</div>'
+    + '<div style="font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:12px;">Her er hva du kan gjøre:<br>'
+    + '🎒 <strong style="color:var(--text);">Sjekkliste</strong> – inkl. grab-bag og popup med tips<br>'
+    + '🏛️ <strong style="color:var(--text);">Info</strong> – trygghetspunkter i din kommune<br>'
+    + '🧠 <strong style="color:var(--text);">1.hjelp</strong> – psykologisk førstehjelp og krisenumre<br>'
+    + '🏅 <strong style="color:var(--text);">Merker</strong> – tjen 13 merker mens du forbereder deg</div>';
+  banner.appendChild(btn);
+  var cont = document.getElementById('motivationContainer');
+  if(cont) cont.insertBefore(banner, cont.firstChild);
+}
+
 function show7DayBanner(){
   const existing=document.getElementById('sevenDayBanner');
   if(existing||!localStorage.getItem('72t_7day'))return;
@@ -1943,10 +2122,33 @@ setTimeout(updateOnlineStatus, 500);
 // ── PUNKT 4: SPRÅK-TOGGLE ──
 let currentLang = localStorage.getItem('72t_lang') || 'no';
 const TRANSLATIONS = {
-  nav: { no: ['🏅 Fremgang','✅ Sjekkliste','📞 Kontakter','ℹ️ Info'], en: ['🏅 Progress','✅ Checklist','📞 Contacts','ℹ️ Info'] },
+  nav: { no: ['🏅 Fremgang','✅ Sjekkliste','📞 Kontakter','ℹ️ Info','🚑 1.hjelp'], en: ['🏅 Progress','✅ Checklist','📞 Contacts','ℹ️ Info','🚑 First Aid'] },
   headerSub: { no: null, en: 'Ready for 72 hours of self-sufficiency' },
-  statusText: { no: 'Status: Normal beredskap', en: 'Status: Normal preparedness' },
-  motLabel: { no: null, en: null }, // dynamic
+  statusText: { no: 'Henter farevarsel…', en: 'Fetching alert status…' },
+  motLabel: { no: null, en: null },
+  // Checklist categories
+  catNames: {
+    no: ['💧 Vann & Drikke','🍎 Mat','💊 Helse & Førstehjelp','🔦 Lys & Energi','🏠 Varme & Hygiene','📄 Dokumenter & Annet','🎒 Grab-bag'],
+    en: ['💧 Water & Drinks','🍎 Food','💊 Health & First Aid','🔦 Light & Energy','🏠 Warmth & Hygiene','📄 Documents & Other','🎒 Grab-bag'],
+  },
+  // Badges
+  badgeNames: {
+    no: ['Første skritt','25% klar','Halvveis!','75% klar','100% klar!','Vanntanken','Matlageret','Helseklar','Strømklar','Grab-bag klar','Kontaktliste','Ukessjekk','Ambassadør'],
+    en: ['First step','25% ready','Halfway!','75% ready','100% ready!','Water tank','Food supply','Health ready','Power ready','Grab-bag ready','Contact list','Weekly check','Ambassador'],
+  },
+  // Share card
+  shareTitle: { no: 'Del 72klar! med andre', en: 'Share 72klar! with others' },
+  shareSub: { no: 'Hjelp venner, familie og naboer å bli bedre forberedt!', en: 'Help friends, family and neighbours get prepared!' },
+  // Info accordion titles
+  infoTitles: {
+    no: ['Trygghetspunkter & tilfluktsrom','Vann','Mat','Strømbrudd','Evakuering & grab-bag','Kart & navigasjon uten nett','Kommunikasjon uten internett','Offisielle informasjonskilder'],
+    en: ['Safe points & shelters','Water','Food','Power outage','Evacuation & grab-bag','Maps & navigation offline','Communication without internet','Official information sources'],
+  },
+  // Onboarding
+  ob: {
+    no: { step0t:'Hva heter du?', step0s:'Vi personaliserer appen for deg.', step1t:'Hvor mange er dere?', step2t:'Spesielle behov?', step3t:'Hvor bor du?', step3s:'Vi finner nærmeste trygghetspunkt.', btn:'Fortsett →', finish:'Kom i gang! 🚀' },
+    en: { step0t:"What's your name?", step0s:'We personalise the app for you.', step1t:'How many in your household?', step2t:'Any special needs?', step3t:'Where do you live?', step3s:'We find your nearest safe point.', btn:'Continue →', finish:"Let's go! 🚀" },
+  },
 };
 function toggleLang(){
   currentLang = currentLang === 'no' ? 'en' : 'no';
@@ -1954,26 +2156,94 @@ function toggleLang(){
   applyLang();
 }
 function applyLang(){
+  const en = currentLang === 'en';
+  const T = TRANSLATIONS;
   const btn = document.getElementById('langToggle');
-  if(!btn) return;
-  btn.textContent = currentLang === 'no' ? '🌐 EN' : '🌐 NO';
-  // Nav buttons
+  if(btn) btn.textContent = en ? '🌐 NO' : '🌐 EN';
+
+  // Nav
   const navBtns = document.querySelectorAll('nav button');
-  const labels = TRANSLATIONS.nav[currentLang];
-  navBtns.forEach((b,i) => { if(labels[i]) b.textContent = labels[i]; });
-  // Status text
-  const stEl = document.getElementById('statusText');
-  if(stEl) stEl.textContent = TRANSLATIONS.statusText[currentLang];
-  // Offline badge
-  updateOnlineStatus();
-  // Header sub (only if profile loaded)
+  const labels = T.nav[currentLang];
+  navBtns.forEach((b,i) => { if(labels[i]) b.innerHTML = labels[i].replace(' ','<br>').replace(/([^<br>]+)<br>([^<br>]+)/, '<span class="nav-icon">$1</span><span class="nav-label">$2</span>'); });
+  // Actually just update text nodes safely:
+  navBtns.forEach((b,i) => {
+    if(!labels[i]) return;
+    const icon = b.querySelector('.nav-icon');
+    const label = b.querySelector('.nav-label');
+    const parts = labels[i].split(' ');
+    if(icon && label && parts.length >= 2){
+      icon.textContent = parts[0];
+      label.textContent = parts.slice(1).join(' ');
+    }
+  });
+
+  // Header sub
   if(profile){
     const hSub = document.getElementById('headerSub');
-    if(currentLang === 'en' && hSub) hSub.textContent = 'Hi, '+profile.name+'! Ready for 72 hours.';
+    if(hSub) hSub.textContent = en ? 'Hi, '+profile.name+'! Ready for 72 hours.' : 'Hei, '+profile.name+'! Klar for 72 timer.';
   }
-  // Checklist title
+
+  // Progress title
   const pTitle = document.querySelector('.progress-title');
-  if(pTitle) pTitle.textContent = currentLang === 'en' ? 'Preparedness status' : 'Beredskapsstatus';
+  if(pTitle) pTitle.textContent = en ? 'Preparedness status' : 'Beredskapsstatus';
+
+  // Share card
+  const sTitle = document.querySelector('.share-card-title');
+  const sSub = document.querySelector('.share-card-sub');
+  if(sTitle) sTitle.textContent = T.shareTitle[currentLang];
+  if(sSub) sSub.textContent = T.shareSub[currentLang];
+
+  // Info accordion titles
+  const accTitles = document.querySelectorAll('.acc-title');
+  const infoTitles = T.infoTitles[currentLang];
+  if(infoTitles){
+    let infoIdx = 0;
+    accTitles.forEach(t => {
+      // Only update info accordion (not førstehjelp)
+      const item = t.closest('.acc-item');
+      if(item && item.id && item.id.startsWith('acc-') && !item.id.startsWith('acc-fh') && infoIdx < infoTitles.length){
+        // Check if it's in the info tab
+        if(t.closest('#info')) {
+          t.textContent = infoTitles[infoIdx++];
+        }
+      }
+    });
+  }
+
+  // Badges
+  const badgeCards = document.querySelectorAll('.badge-card');
+  const bNames = T.badgeNames[currentLang];
+  if(bNames) badgeCards.forEach((c,i) => {
+    if(i < bNames.length){
+      const nameEl = c.querySelector('.badge-name');
+      if(nameEl) nameEl.textContent = bNames[i];
+    }
+  });
+
+  // Onboarding
+  const ob = T.ob[currentLang];
+  if(ob){
+    const s0t = document.querySelector('#step0 .ob-step-title');
+    const s0s = document.querySelector('#step0 .ob-step-sub');
+    const s1t = document.querySelector('#step1 .ob-step-title');
+    const s2t = document.querySelector('#step2 .ob-step-title');
+    const s3t = document.querySelector('#step3 .ob-step-title');
+    const s3s = document.querySelector('#step3 .ob-step-sub');
+    if(s0t) s0t.textContent = ob.step0t;
+    if(s0s) s0s.textContent = ob.step0s;
+    if(s1t) s1t.textContent = ob.step1t;
+    if(s2t) s2t.textContent = ob.step2t;
+    if(s3t) s3t.textContent = ob.step3t;
+    if(s3s) s3s.textContent = ob.step3s;
+    document.querySelectorAll('.ob-btn').forEach(b => {
+      if(!b.id || b.id !== 'finishBtn') b.textContent = ob.btn;
+    });
+    const finBtn = document.getElementById('finishBtn');
+    if(finBtn) finBtn.textContent = ob.finish;
+  }
+
+  // Checklist re-render preserves Norwegian item names (data-driven), no need to retranslate
+  updateOnlineStatus();
 }
 
 // ── PUNKT 5: TILBAKEMELDING ──
