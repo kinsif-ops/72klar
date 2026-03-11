@@ -567,15 +567,28 @@
       <div class="tip-source" id="dailyTipSource"></div>
     </div>
 
-    <div class="challenge-card" id="challengeCard" onclick="openChallengeModal()">
-      <div class="challenge-card-top">
-        <div class="challenge-card-emoji">🗓️</div>
-        <div>
-          <div class="challenge-card-title">7-dagersutfordringen venter!</div>
-          <div class="challenge-card-sub">Du er 100% klar for 72 timer. Klar for neste nivå?</div>
+    <div class="challenge-card" id="challengeCard">
+      <div style="text-align:center;padding:4px 0 12px;">
+        <div style="font-size:48px;margin-bottom:6px;">🥇</div>
+        <div style="font-family:Syne,sans-serif;font-size:20px;font-weight:900;margin-bottom:6px;">Du er 100% klar!</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px;">Fantastisk jobba! De fleste norske husstander er ikke der du er nå.<br>Hjelp noen du bryr deg om å bli like godt forberedt.</div>
+        <div style="font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Utfordre 3 venner eller familie:</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
+          <button onclick="shareChallenge('whatsapp')" style="display:flex;align-items:center;gap:10px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.35);border-radius:12px;padding:12px 16px;cursor:pointer;text-align:left;">
+            <span style="font-size:22px;">💬</span>
+            <div><div style="font-family:Syne,sans-serif;font-weight:700;font-size:13px;color:#25D366;">Del på WhatsApp</div><div style="font-size:11px;color:var(--muted);">Send til familie og venner</div></div>
+          </button>
+          <button onclick="shareChallenge('sms')" style="display:flex;align-items:center;gap:10px;background:rgba(59,130,246,0.10);border:1px solid rgba(59,130,246,0.3);border-radius:12px;padding:12px 16px;cursor:pointer;text-align:left;">
+            <span style="font-size:22px;">📱</span>
+            <div><div style="font-family:Syne,sans-serif;font-weight:700;font-size:13px;color:var(--blue);">Send SMS</div><div style="font-size:11px;color:var(--muted);">Til de uten WhatsApp</div></div>
+          </button>
+          <button onclick="shareChallenge('facebook')" style="display:flex;align-items:center;gap:10px;background:rgba(24,119,242,0.10);border:1px solid rgba(24,119,242,0.3);border-radius:12px;padding:12px 16px;cursor:pointer;text-align:left;">
+            <span style="font-size:22px;">👥</span>
+            <div><div style="font-family:Syne,sans-serif;font-weight:700;font-size:13px;color:#1877F2;">Del på Facebook</div><div style="font-size:11px;color:var(--muted);">Nå naboer og bekjente</div></div>
+          </button>
         </div>
+        <button onclick="openChallengeModal()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline;">Eller ta 7-dagersutfordringen →</button>
       </div>
-      <button class="challenge-card-btn">Se utfordringen →</button>
     </div>
 
     <div class="weekly-reminder" id="weeklyReminderBox"></div>
@@ -1117,7 +1130,7 @@
       <button class="reset-btn-soft" onclick="resetProfile()">👤 Endre husstandsprofil</button>
       <button class="reset-btn" onclick="resetAll()">🔄 Start appen helt på nytt</button>
     </div>
-    <div class="app-version" style="cursor:pointer;" onclick="toggleChangelog()">72klar! · v1.5 · Laget for folk flest i Norge · <span style="color:var(--orange);">Hva er nytt? ▾</span></div>
+    <div class="app-version" style="cursor:pointer;" onclick="toggleChangelog()">72klar! · v1.6 · Laget for folk flest i Norge · <span style="color:var(--orange);">Hva er nytt? ▾</span></div>
     <div id="changelogBox" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:8px 0 16px;text-align:left;">
       <div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;color:var(--orange);margin-bottom:8px;">v1.4 – Mars 2026</div>
       <ul style="font-size:12px;color:var(--muted);line-height:1.8;padding-left:16px;">
@@ -1307,6 +1320,70 @@ function getMotMsg(p) {
 }
 
 
+
+
+
+// ── INAKTIVITETS-VARSEL ──
+function checkInactivityReminder(){
+  if(Notification.permission !== 'granted') return;
+  if(!profile) return;
+  var lastActivity = parseInt(localStorage.getItem('72t_last_activity') || '0');
+  var now = Date.now();
+  var daysSince = (now - lastActivity) / (1000 * 60 * 60 * 24);
+  // If 7+ days since last activity, schedule a reminder for next time they open
+  if(lastActivity > 0 && daysSince >= 7){
+    var pct = 0;
+    try {
+      var cats = getCats(profile.persons, new Set(profile.needs), 'no');
+      var total=0, done=0;
+      cats.forEach(function(cat){ cat.items.forEach(function(it){ total++; if(checkedItems.includes(cat.name+'::'+it.name)) done++; }); });
+      pct = total > 0 ? Math.round(done/total*100) : 0;
+    } catch(e){}
+    var remaining = 100 - pct;
+    if(pct < 100 && remaining > 0){
+      navigator.serviceWorker.ready.then(function(reg){
+        var msgs = [
+          { t: '👋 ' + (profile.name||'Hei') + ', husker du 72klar?', b: 'Du er ' + pct + '% klar – bare ' + remaining + '% gjenstår. Det tar under 5 min å komme videre!' },
+          { t: '🛡️ Din beredskap venter', b: 'Du var ' + pct + '% klar sist du sjekket. Ferdigstill sjekklisten mens du husker det!' },
+          { t: '⚡ ' + remaining + '% gjenstår', b: 'Du er nesten der! Fullfør sjekklisten i 72klar og bli trygg for 72 timer.' },
+        ];
+        var pick = msgs[Math.floor(Math.random() * msgs.length)];
+        reg.showNotification(pick.t, {
+          body: pick.b,
+          icon: 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23D62828%22/><text y=%22.9em%22 font-size=%2275%22 x=%2212%22>&#x1F6E1;&#xFE0F;</text></svg>',
+          tag: '72klar-inaktiv',
+          renotify: true,
+          data: { url: './' }
+        });
+      });
+    }
+    // Reset activity timer after showing reminder
+    localStorage.setItem('72t_last_activity', now.toString());
+  }
+}
+function recordActivity(){
+  localStorage.setItem('72t_last_activity', Date.now().toString());
+}
+
+// ── VIRAL SHARE CHALLENGE ──
+function shareChallenge(platform){
+  localStorage.setItem('72t_shared','1'); checkBadges();
+  var pct = parseInt(document.getElementById('progressFill')?.style.width) || 100;
+  var name = profile ? profile.name : '';
+  var msg = (name ? name + ' er ' + pct + '% klar for 72 timer 🛡️ ' : 'Jeg er ' + pct + '% klar for 72 timer 🛡️ ')
+    + 'Er du og familien din forberedt på strømbrudd eller krise? '
+    + 'Sjekk gratis norsk beredskapsapp: ' + APP_URL;
+  var enc = encodeURIComponent(msg);
+
+  if(platform === 'whatsapp'){
+    window.open('https://wa.me/?text=' + enc, '_blank');
+  } else if(platform === 'sms'){
+    window.location.href = 'sms:?body=' + enc;
+  } else if(platform === 'facebook'){
+    window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(APP_URL) + '&quote=' + enc, '_blank');
+  }
+  showToastMsg('🙌 Takk for at du sprer beredskap!');
+}
 
 // ── SHARE SCORE CARD ──
 function openShareScore(){
@@ -1605,7 +1682,7 @@ function startApp(){
   document.getElementById('headerSub').textContent='Hei, '+p.name+'! Klar for 72 timer.';
   const nl=[];if(needs.has('baby'))nl.push('baby');if(needs.has('eldre'))nl.push('eldre');if(needs.has('hund'))nl.push('kjæledyr');if(needs.has('medisin'))nl.push('medisiner');
   document.getElementById('householdSummary').textContent='📊 '+n+' person'+n>1?'er':''+' · '+Math.round(n*9)+'L vann · '+n*3+' porsjoner/dag'+(nl.length?' · '+nl.join(', ') :'');
-  renderDailyTip(); renderWeeklyReminder(); renderChecklist(); fetchFarevarsel(); showNewFeaturesBanner(); renderContacts(); renderMotivation(); show7DayBanner(); renderTrygghetspunkter(); showWelcomeBack();
+  renderDailyTip(); renderWeeklyReminder(); renderChecklist(); fetchFarevarsel(); showNewFeaturesBanner(); recordActivity(); renderContacts(); renderMotivation(); checkInactivityReminder(); show7DayBanner(); renderTrygghetspunkter(); showWelcomeBack();
 }
 function _goToOnboarding(){
   document.getElementById('app').style.display='none';
@@ -1982,6 +2059,11 @@ function renderChecklist(){
   if(pctEl) pctEl.textContent = pct+'%';
   if(summary) summary.textContent = done+' av '+total+' punkter fullført';
   updateChecklistDate();
+  // App icon badge (PWA – viser % på ikonet)
+  if('setAppBadge' in navigator){
+    if(pct >= 100){ navigator.clearAppBadge(); }
+    else { navigator.setAppBadge(pct).catch(()=>{}); }
+  }
   setTimeout(function(){
     var f = document.getElementById('progressFill');
     if(f){ var p=parseInt(f.style.width)||0; updateSocialShare(p); sendMilestoneNotif(p); }
