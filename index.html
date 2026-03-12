@@ -208,7 +208,7 @@
   .category-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 10px; padding-left: 4px; }
   .checklist-item { background: var(--dark2); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 6px; display: flex; align-items: center; gap: 14px; transition: all 0.2s; cursor:default; }
   .checklist-item:active { transform: scale(0.98); }
-  .checklist-item.checklist-item.checked { border-color: rgba(46,204,113,0.35); background: rgba(46,204,113,0.06); transition: opacity 0.25s; }
+  .checklist-item.checked { border-color: rgba(46,204,113,0.35); background: rgba(46,204,113,0.06); transition: opacity 0.25s; }
   .checkbox { width: 32px; height: 32px; border-radius: 8px; border: 2.5px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; font-size: 18px; cursor:pointer; -webkit-tap-highlight-color: transparent; }
   @keyframes checkPop { 0%{transform:scale(1)} 40%{transform:scale(1.35)} 70%{transform:scale(0.9)} 100%{transform:scale(1)} }
   @keyframes checkmarkDraw { 0%{opacity:0;transform:scale(0.3) rotate(-10deg)} 60%{transform:scale(1.2) rotate(3deg)} 100%{opacity:1;transform:scale(1) rotate(0deg)} }
@@ -353,7 +353,7 @@
   .copy-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
   /* MODAL */
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: flex-end; padding: 20px 16px; }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: flex-end; padding: 20px 16px; }
   .modal-overlay.open { display: flex; }
   .modal { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; width: 100%; max-width: 480px; margin: 0 auto; }
   .modal h3 { font-family: 'Syne', sans-serif; font-size: 19px; font-weight: 800; margin-bottom: 16px; }
@@ -423,7 +423,8 @@
 
 <!-- ONBOARDING -->
 <div id="onboarding" style="display:none;flex-direction:column;min-height:100vh;">
-  <div class="ob-hero">
+  <div class="ob-hero" style="position:relative;">
+    <div id="obLangToggle" onclick="toggleLang()" style="position:absolute;top:12px;right:16px;background:rgba(255,255,255,0.18);border-radius:8px;padding:5px 10px;font-size:13px;font-weight:700;cursor:pointer;color:white;">🌐 EN</div>
     <h1>72klar!</h1>
     <p><span id="appTagline">Klar til å klare deg selv – i 72 timer</span></p>
     <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px;">
@@ -550,7 +551,7 @@
     </div>
   </div>
   <!-- PWA INSTALL BANNER -->
-  <div id="pwaBanner" style="display:none;background:linear-gradient(135deg,rgba(214,40,40,0.15),rgba(247,127,0,0.15));border-bottom:1px solid rgba(247,127,0,0.3);padding:10px 16px;display:none;align-items:center;gap:10px;">
+  <div id="pwaBanner" style="display:none;background:linear-gradient(135deg,rgba(214,40,40,0.15),rgba(247,127,0,0.15));border-bottom:1px solid rgba(247,127,0,0.3);padding:10px 16px;align-items:center;gap:10px;">
     <span style="font-size:22px;">📲</span>
     <div style="flex:1;font-size:13px;line-height:1.4;"><strong id="installCardTitle">Legg til på hjemskjermen</strong><br><span id="installCardSub" style="color:var(--muted);font-size:12px;">Bruk som ekte app – offline!</span></div>
     <button onclick="installPWA()" style="background:linear-gradient(135deg,var(--red),var(--orange));border:none;color:white;border-radius:8px;padding:7px 12px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">Installer</button>
@@ -640,15 +641,15 @@
   <div id="kontakter" role="tabpanel" class="tab">
     <div class="contacts-header"><h2 id="contactsH2">Nødkontakter</h2><button id="contactsAddBtn" class="add-btn" onclick="openModal()">+ Legg til</button></div>
     <div id="presetLabelEmergency" class="preset-label">🚨 Nødnumre</div>
-    <div class="contact-card"><div class="contact-avatar preset">🚒</div><div class="contact-info"><div class="contact-name">Brannvesen</div><div id="emergRole110" class="contact-role">Brann, redning</div><div class="contact-number">110</div></div><div class="contact-actions"><a id="callBtn110" href="tel:110" class="call-btn">Ring</a></div></div>
-    <div class="contact-card"><div class="contact-avatar preset">🚑</div><div class="contact-info"><div class="contact-name">Ambulanse</div><div id="emergRole113" class="contact-role">Medisinsk nød</div><div class="contact-number">113</div></div><div class="contact-actions"><a id="callBtn113" href="tel:113" class="call-btn">Ring</a></div></div>
-    <div class="contact-card"><div class="contact-avatar preset">👮</div><div class="contact-info"><div class="contact-name">Politi</div><div id="emergRole112" class="contact-role">Kriminalitet, orden</div><div class="contact-number">112</div></div><div class="contact-actions"><a id="callBtn112" href="tel:112" class="call-btn">Ring</a></div></div>
-    <div class="contact-card"><div class="contact-avatar preset">☢️</div><div class="contact-info"><div class="contact-name">Sivilforsvaret</div><div id="emergRole02800" class="contact-role">Katastrofer, evakuering</div><div class="contact-number">02800</div></div><div class="contact-actions"><a id="callBtn02800" href="tel:02800" class="call-btn">Ring</a></div></div>
+    <div class="contact-card"><div class="contact-avatar preset">🚒</div><div class="contact-info"><div class="contact-name" id="emergName110">Brannvesen</div><div id="emergRole110" class="contact-role">Brann, redning</div><div class="contact-number">110</div></div><div class="contact-actions"><a id="callBtn110" href="tel:110" class="call-btn">Ring</a></div></div>
+    <div class="contact-card"><div class="contact-avatar preset">🚑</div><div class="contact-info"><div class="contact-name" id="emergName113">Ambulanse</div><div id="emergRole113" class="contact-role">Medisinsk nød</div><div class="contact-number">113</div></div><div class="contact-actions"><a id="callBtn113" href="tel:113" class="call-btn">Ring</a></div></div>
+    <div class="contact-card"><div class="contact-avatar preset">👮</div><div class="contact-info"><div class="contact-name" id="emergName112">Politi</div><div id="emergRole112" class="contact-role">Kriminalitet, orden</div><div class="contact-number">112</div></div><div class="contact-actions"><a id="callBtn112" href="tel:112" class="call-btn">Ring</a></div></div>
+    <div class="contact-card"><div class="contact-avatar preset">☢️</div><div class="contact-info"><div class="contact-name" id="emergName02800">Sivilforsvaret</div><div id="emergRole02800" class="contact-role">Katastrofer, evakuering</div><div class="contact-number">02800</div></div><div class="contact-actions"><a id="callBtn02800" href="tel:02800" class="call-btn">Ring</a></div></div>
     <div id="crisisLabel" class="preset-label">🆘 Krisehjelp (psykisk)</div>
-    <div class="contact-card"><div class="contact-avatar" style="background:linear-gradient(135deg,#7C3AED,#A855F7);">🆘</div><div class="contact-info"><div class="contact-name">Mental Helse</div><div id="crisisRole116123" class="contact-role">Gratis, døgnåpen. Alle kan ringe.</div><div class="contact-number">116 123</div></div><div class="contact-actions"><a href="tel:116123" class="call-btn" id="callBtnMH">Ring</a></div></div>
+    <div class="contact-card"><div class="contact-avatar" style="background:linear-gradient(135deg,#7C3AED,#A855F7);">🆘</div><div class="contact-info"><div class="contact-name" id="crisisName116123">Mental Helse</div><div id="crisisRole116123" class="contact-role">Gratis, døgnåpen. Alle kan ringe.</div><div class="contact-number">116 123</div></div><div class="contact-actions"><a href="tel:116123" class="call-btn" id="callBtnMH">Ring</a></div></div>
     <div class="contact-card"><div class="contact-avatar" style="background:linear-gradient(135deg,#7C3AED,#A855F7);">✝️</div><div class="contact-info"><div class="contact-name">Kirkens SOS</div><div id="crisisRoleKSOS" class="contact-role">Gratis, døgnåpen. Uavhengig av tro.</div><div class="contact-number">22 40 00 40</div></div><div class="contact-actions"><a href="tel:22400040" class="call-btn" id="callBtnKSOS">Ring</a></div></div>
-    <div class="contact-card"><div class="contact-avatar" style="background:linear-gradient(135deg,#7C3AED,#A855F7);">🔴</div><div class="contact-info"><div class="contact-name">Røde Kors</div><div id="crisisRoleRK" class="contact-role">Gratis, døgnåpen. Samtalestøtte.</div><div class="contact-number">800 33 321</div></div><div class="contact-actions"><a href="tel:80033321" class="call-btn" id="callBtnRK">Ring</a></div></div>
-    <div class="contact-card"><div class="contact-avatar" style="background:linear-gradient(135deg,#7C3AED,#A855F7);">👶</div><div class="contact-info"><div class="contact-name">Alarmtelefonen for barn</div><div id="crisisRoleBarn" class="contact-role">Gratis, døgnåpen. Under 18 år.</div><div class="contact-number">116 111</div></div><div class="contact-actions"><a href="tel:116111" class="call-btn" id="callBtnBarn">Ring</a></div></div>
+    <div class="contact-card"><div class="contact-avatar" style="background:linear-gradient(135deg,#7C3AED,#A855F7);">🔴</div><div class="contact-info"><div class="contact-name" id="crisisNameRK">Røde Kors</div><div id="crisisRoleRK" class="contact-role">Gratis, døgnåpen. Samtalestøtte.</div><div class="contact-number">800 33 321</div></div><div class="contact-actions"><a href="tel:80033321" class="call-btn" id="callBtnRK">Ring</a></div></div>
+    <div class="contact-card"><div class="contact-avatar" style="background:linear-gradient(135deg,#7C3AED,#A855F7);">👶</div><div class="contact-info"><div class="contact-name" id="crisisNameBarn">Alarmtelefonen for barn</div><div id="crisisRoleBarn" class="contact-role">Gratis, døgnåpen. Under 18 år.</div><div class="contact-number">116 111</div></div><div class="contact-actions"><a href="tel:116111" class="call-btn" id="callBtnBarn">Ring</a></div></div>
     <div id="privateLabel" class="preset-label" style="display:none">👤 Mine kontakter</div>
     <div id="privateContacts"></div>
   </div>
@@ -659,7 +660,7 @@
       ⚠️ <strong style="color:var(--text);">Viktig:</strong> Ring 113 ved livstruende situasjoner. Disse stegene er kun veiledning til hjelp ankommer.
     </div>
 
-    <div class="fh-card" id="fhc-hlr" onclick="toggleFH(this)">
+    <div class="fh-card" id="fhc-hlr" tabindex="0" role="button" onclick="toggleFH(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleFH(this);}">
       <div class="fh-header"><span class="fh-emoji">❤️</span><div><div class="fh-title" id="fht-hlr">Hjertestans (HLR)</div><div class="fh-sub" id="fhs-hlr">Bevisstløs og puster ikke normalt</div></div><span class="fh-arrow">▾</span></div>
       <div class="fh-body" id="fhb-hlr">
         <div class="fh-step"><div class="fh-num">1</div><div>Ring 113 umiddelbart – sett telefonen på høyttaler</div></div>
@@ -671,7 +672,7 @@
       </div>
     </div>
 
-    <div class="fh-card" id="fhc-kvelning" onclick="toggleFH(this)">
+    <div class="fh-card" id="fhc-kvelning" tabindex="0" role="button" onclick="toggleFH(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleFH(this);}">
       <div class="fh-header"><span class="fh-emoji">😮</span><div><div class="fh-title" id="fht-kvelning">Kvelning / fremmedlegeme</div><div class="fh-sub" id="fhs-kvelning">Personen kan ikke puste, snakke eller hoste</div></div><span class="fh-arrow">▾</span></div>
       <div class="fh-body" id="fhb-kvelning">
         <div class="fh-step"><div class="fh-num">1</div><div>Oppfordre til kraftig hosting hvis mulig</div></div>
@@ -683,7 +684,7 @@
       </div>
     </div>
 
-    <div class="fh-card" id="fhc-blodning" onclick="toggleFH(this)">
+    <div class="fh-card" id="fhc-blodning" tabindex="0" role="button" onclick="toggleFH(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleFH(this);}">
       <div class="fh-header"><span class="fh-emoji">🩸</span><div><div class="fh-title" id="fht-blodning">Kraftig blødning</div><div class="fh-sub" id="fhs-blodning">Store sår med mye blødning</div></div><span class="fh-arrow">▾</span></div>
       <div class="fh-body" id="fhb-blodning">
         <div class="fh-step"><div class="fh-num">1</div><div>Ring 113 ved livstruende blødning</div></div>
@@ -695,7 +696,7 @@
       </div>
     </div>
 
-    <div class="fh-card" id="fhc-brannskade" onclick="toggleFH(this)">
+    <div class="fh-card" id="fhc-brannskade" tabindex="0" role="button" onclick="toggleFH(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleFH(this);}">
       <div class="fh-header"><span class="fh-emoji">🔥</span><div><div class="fh-title" id="fht-brannskade">Brannskade</div><div class="fh-sub" id="fhs-brannskade">Forbrenning fra varme, kjemikalier eller strøm</div></div><span class="fh-arrow">▾</span></div>
       <div class="fh-body" id="fhb-brannskade">
         <div class="fh-step"><div class="fh-num">1</div><div>Fjern kilden og sikre stedet</div></div>
@@ -707,11 +708,11 @@
       </div>
     </div>
 
-    <div class="fh-card" id="fhc-hypotermi" onclick="toggleFH(this)">
+    <div class="fh-card" id="fhc-hypotermi" tabindex="0" role="button" onclick="toggleFH(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleFH(this);}">
       <div class="fh-header"><span class="fh-emoji">🥶</span><div><div class="fh-title" id="fht-hypotermi">Hypotermi (nedkjøling)</div><div class="fh-sub" id="fhs-hypotermi">Kroppstemperatur under 35°C</div></div><span class="fh-arrow">▾</span></div>
       <div class="fh-body" id="fhb-hypotermi">
         <div class="fh-step"><div class="fh-num">1</div><div>Flytt personen til ly for vind og kulde</div></div>
-        <div class="fh-step"><div class="fh-num">2</div><div>Fjern våte klær forsiktig – bruk klipser om tilgjengelig</div></div>
+        <div class="fh-step"><div class="fh-num">2</div><div>Fjern våte klær forsiktig – bruk saks om tilgjengelig</div></div>
         <div class="fh-step"><div class="fh-num">3</div><div>Pakk inn i tepper, sovepose eller metallfolie (romtemperatur)</div></div>
         <div class="fh-step"><div class="fh-num">4</div><div>Gi varm, søt drikke kun om personen er ved bevissthet og kan svelge</div></div>
         <div class="fh-step"><div class="fh-num">5</div><div>Ring 113 – ikke gni eller massér huden da det kan forverre tilstanden</div></div>
@@ -727,7 +728,7 @@
       <div style="flex:1;height:1px;background:var(--border);"></div>
     </div>
 
-    <div class="fh-card" id="fhc-panikk" onclick="toggleFH(this)">
+    <div class="fh-card" id="fhc-panikk" tabindex="0" role="button" onclick="toggleFH(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleFH(this);}">
       <div class="fh-header"><span class="fh-emoji">😰</span><div><div class="fh-title" id="fht-panikk">Panikk & akutt angst</div><div class="fh-sub" id="fhs-panikk">Noen er i akutt panikk eller angstanfall</div></div><span class="fh-arrow">▾</span></div>
       <div class="fh-body" id="fhb-panikk">
         <div class="fh-step"><div class="fh-num">1</div><div><strong>Ro smitter</strong> – snakk langsomt og bestemt. Din ro er det viktigste verktøyet.</div></div>
@@ -739,7 +740,7 @@
       </div>
     </div>
 
-    <div class="fh-card" id="fhc-barn" onclick="toggleFH(this)">
+    <div class="fh-card" id="fhc-barn" tabindex="0" role="button" onclick="toggleFH(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleFH(this);}">
       <div class="fh-header"><span class="fh-emoji">🧒</span><div><div class="fh-title" id="fht-barn">Barn i krise</div><div class="fh-sub" id="fhs-barn">Hvordan hjelpe barn som er redde eller urolige</div></div><span class="fh-arrow">▾</span></div>
       <div class="fh-body" id="fhb-barn">
         <div class="fh-step"><div class="fh-num">1</div><div><strong>Ikke avvis frykten</strong> – si aldri «det er ikke farlig». Anerkjenn: «Jeg skjønner du er redd. Jeg er her.»</div></div>
@@ -751,7 +752,7 @@
       </div>
     </div>
 
-    <div class="fh-card" id="fhc-eldre" onclick="toggleFH(this)">
+    <div class="fh-card" id="fhc-eldre" tabindex="0" role="button" onclick="toggleFH(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleFH(this);}">
       <div class="fh-header"><span class="fh-emoji">🧓</span><div><div class="fh-title" id="fht-eldre">Eldre & demens i krise</div><div class="fh-sub" id="fhs-eldre">Spesielle hensyn for eldre og demente</div></div><span class="fh-arrow">▾</span></div>
       <div class="fh-body" id="fhb-eldre">
         <div class="fh-step"><div class="fh-num">1</div><div><strong>Demens forverres under stress</strong> – hold omgivelsene så kjente og stabile som mulig.</div></div>
@@ -763,7 +764,7 @@
       </div>
     </div>
 
-    <div class="fh-card" id="fhc-langvarig" onclick="toggleFH(this)">
+    <div class="fh-card" id="fhc-langvarig" tabindex="0" role="button" onclick="toggleFH(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleFH(this);}">
       <div class="fh-header"><span class="fh-emoji">📅</span><div><div class="fh-title" id="fht-langvarig">Langvarig krise (dag 2+)</div><div class="fh-sub" id="fhs-langvarig">Ta vare på deg selv og familien over tid</div></div><span class="fh-arrow">▾</span></div>
       <div class="fh-body" id="fhb-langvarig">
         <div class="fh-step"><div class="fh-num">1</div><div><strong>Gjør noe konkret</strong> – aktivitet bekjemper hjelpeløshet. Alt som gir kontroll hjelper.</div></div>
@@ -779,15 +780,15 @@
       <strong style="color:#2ECC71;" id="fhWhenHelp">⚠️ Når bør du kontakte fastlege eller legevakt?</strong><br>
       <span style="font-size:13px;color:var(--muted);" id="fhWhenHelpList">Noen sover ikke på flere dager · Nekter å spise/drikke · Vedvarende panikk etter faren er over · Snakker om å skade seg selv · Barn under 5 slutter å snakke/reagere normalt</span>
       <br><br>
-      <a href="https://www.nkvts.no/psykologisk-forstehjelp/" target="_blank" rel="noopener noreferrer" style="color:var(--orange);font-weight:600;">NKVTS – Psykologisk førstehjelp ↗</a>
+      <a id="fhLinkNKVTS" href="https://www.nkvts.no/psykologisk-forstehjelp/" target="_blank" rel="noopener noreferrer" style="color:var(--orange);font-weight:600;">NKVTS – Psykologisk førstehjelp ↗</a>
     </div>
 
     
     <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;margin-top:8px;">
       <div id="faLearnMore" style="font-size:13px;color:var(--muted);margin-bottom:10px;">Lær mer – ta et kurs</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
-        <a href="https://www.rodekors.no/aktiviteter/kurs/" target="_blank" rel="noopener noreferrer" style="background:rgba(214,40,40,0.15);border:1px solid rgba(214,40,40,0.3);color:var(--red);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;">❤️ Røde Kors-kurs</a>
-        <a href="https://www.hjelp30.no" target="_blank" rel="noopener noreferrer" style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);color:var(--blue);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;">📘 Hjelp 3.0</a>
+        <a id="fhLinkRK" href="https://www.rodekors.no/aktiviteter/kurs/" target="_blank" rel="noopener noreferrer" style="background:rgba(214,40,40,0.15);border:1px solid rgba(214,40,40,0.3);color:var(--red);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;">❤️ Røde Kors-kurs</a>
+        <a id="fhLinkH30" href="https://www.hjelp30.no" target="_blank" rel="noopener noreferrer" style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);color:var(--blue);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;">📘 Hjelp 3.0</a>
       </div>
     </div>
   </div>
@@ -1151,7 +1152,7 @@
     <canvas id="shareScoreCanvas" width="320" height="200" style="width:100%;border-radius:14px;display:block;margin-bottom:16px;"></canvas>
     <div style="display:flex;gap:8px;">
       <button id="shareScoreDownloadBtn" onclick="downloadShareCard()" style="flex:1;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#D62828,#F77F00);color:white;font-family:Syne,sans-serif;font-size:14px;font-weight:700;cursor:pointer;">💾 Last ned</button>
-      <button onclick="nativeShareScore()" id="nativeShareScoreBtn" style="flex:1;padding:13px;border-radius:12px;border:none;background:rgba(59,130,246,0.2);border:1px solid rgba(59,130,246,0.4);color:#3B82F6;font-family:Syne,sans-serif;font-size:14px;font-weight:700;cursor:pointer;">↗️ Del</button>
+      <button onclick="nativeShareScore()" id="nativeShareScoreBtn" style="flex:1;padding:13px;border-radius:12px;background:rgba(59,130,246,0.2);border:1px solid rgba(59,130,246,0.4);color:#3B82F6;font-family:Syne,sans-serif;font-size:14px;font-weight:700;cursor:pointer;">↗️ Del</button>
     </div>
     <button onclick="closeShareScore()" style="width:100%;margin-top:8px;padding:11px;border-radius:12px;border:1px solid #2A2A3A;background:none;color:#A0A0B8;font-family:Syne,sans-serif;font-size:13px;cursor:pointer;"><span id="shareScoreCloseBtn">Lukk</span></button>
   </div>
@@ -1197,7 +1198,7 @@
         <button id="syncCopyBtn" onclick="copySyncCode()" style="flex:1;padding:11px;border-radius:10px;border:none;background:linear-gradient(135deg,#8B5CF6,#6366f1);color:white;font-family:Syne,sans-serif;font-size:14px;font-weight:700;cursor:pointer;">📋 Kopier kode</button>
         <button id="syncShareBtn" onclick="shareSyncCode()" style="flex:1;padding:11px;border-radius:10px;border:none;background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.4);color:#8B5CF6;font-family:Syne,sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:none;">↗️ Del</button>
       </div>
-      <div id="syncExportInfo" style="margin-top:14px;font-size:12px;color:var(--muted);line-height:1.6;background:rgba(139,92,246,0.06);border-radius:8px;padding:10px;text-align:left;">💡 Koden inneholder husstandsprofil, sjekkliste-fremgang, kontakter og holdbarhetsdatoer. Ingen personlige passord.</div>
+      <div id="syncExportInfo" style="margin-top:14px;font-size:12px;color:var(--muted);line-height:1.6;background:rgba(139,92,246,0.06);border-radius:8px;padding:10px;text-align:left;">💡 Koden inneholder husstandsprofil, sjekkliste-fremgang, kontakter (navn og telefon) og holdbarhetsdatoer. Del kun med personer du stoler på.</div>
     </div>
     <!-- IMPORT VIEW -->
     <div id="syncImportView" style="display:none;text-align:center;">
@@ -1356,7 +1357,7 @@ const BADGES = [
   {id:'ambassador',e:'📣',n:'Ambassadør',   d:'Delte appen med andre',             pct:31,chk:()=>!!localStorage.getItem('72t_shared')},
   {id:'week7',     e:'🗓️',n:'7-dagershelten',d:'Aksepterte 7-dagers utfordringen',  pct:8, chk:()=>!!localStorage.getItem('72t_7day')&&JSON.parse(localStorage.getItem('72t_7day')||'{}').accepted},
   {id:'expiry',    e:'🔔',n:'Holdbarhetsvokter',d:'Registrerte utløpsdato på 3+ produkter', pct:15, chk:()=>Object.keys(JSON.parse(localStorage.getItem('72t_expiry')||'{}')).length>=3},
-]
+];
 
 // MOTIVATION MESSAGES
 function getMotMsg(p) {
@@ -1461,7 +1462,7 @@ function recordActivity(){
 // ── VIRAL SHARE CHALLENGE ──
 function shareChallenge(platform){
   localStorage.setItem('72t_shared','1'); checkBadges();
-  var pct = parseInt(document.getElementById('progressFill')?.style.width) || 100;
+  var pct = getPctSafe();
   var name = profile ? profile.name : '';
   var en = currentLang === 'en';
   var msg = en
@@ -1534,8 +1535,7 @@ function renderShareCard(){
   ctx.fillText(currentLang==='en'?'Norwegian preparedness app':'Norsk beredskapsapp', 64, 62);
 
   // Get progress
-  var fill = document.getElementById('progressFill');
-  var pct = fill ? parseInt(fill.style.width) || 0 : 0;
+  var pct = getPctSafe();
   var name = profile ? profile.name : '';
 
   // Big percentage
@@ -1596,7 +1596,7 @@ async function nativeShareScore(){
   try {
     var blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
     var file = new File([blob], '72klar-score.png', {type:'image/png'});
-    var pct = parseInt(document.getElementById('progressFill')?.style.width)||0;
+    var pct = getPctSafe();
     var _nEn=currentLang==='en';
     var _nT=_nEn?'72klar! – '+pct+'% prepared':'72klar! – '+pct+'% forberedt';
     var _nB=_nEn?'I am '+pct+'% ready for 72 hours 🛡️ Are you? 72klar.no':'Jeg er '+pct+'% klar for 72 timer 🛡️ Er du? 72klar.no';
@@ -2049,9 +2049,13 @@ function renderBadges(){
   }
 }
 function checkBadges(){
-  const pct=getPct();const newOnes=[];
+  var pct;
+  try { pct=getPct(); } catch(e){ return; }
+  const newOnes=[];
   BADGES.forEach(b=>{
-    if(!earnedBadges.includes(b.id)&&b.chk(pct,contacts.length,checkedItems)){earnedBadges.push(b.id);newOnes.push(b);}
+    try {
+      if(!earnedBadges.includes(b.id)&&b.chk(pct,contacts.length,checkedItems)){earnedBadges.push(b.id);newOnes.push(b);}
+    } catch(e){}
   });
   if(newOnes.length){
     localStorage.setItem('72t_badges',JSON.stringify(earnedBadges));
@@ -2230,6 +2234,8 @@ function renderExpiryWarnings(){
   if(!container) return;
   var en=currentLang==='en';
   var now=new Date();
+  // Normalize to local midnight to avoid UTC timezone off-by-one
+  var today=new Date(now.getFullYear(), now.getMonth(), now.getDate());
   var soon=[], expired=[];
   // Build a lookup from Norwegian storage key to current-language display name
   var nameMap={};
@@ -2244,8 +2250,8 @@ function renderExpiryWarnings(){
   }
   Object.keys(expiryDates).forEach(function(key){
     if(!checkedItems.includes(key)) return; // Ignorer uhukede
-    var date=new Date(expiryDates[key]);
-    var daysLeft=Math.ceil((date-now)/(1000*60*60*24));
+    var date=new Date(expiryDates[key]+'T00:00:00'); // Local midnight, not UTC
+    var daysLeft=Math.round((date-today)/(1000*60*60*24));
     var displayName=nameMap[key]||key.split('::')[1]||key;
     if(daysLeft<0) expired.push({name:displayName,days:Math.abs(daysLeft),date:expiryDates[key]});
     else if(daysLeft<=30) soon.push({name:displayName,days:daysLeft,date:expiryDates[key]});
@@ -2281,6 +2287,7 @@ function checkExpiryNotifications(){
   if(!('Notification' in window)||Notification.permission!=='granted'||!profile) return;
   if(!('serviceWorker' in navigator)) return;
   var now=new Date(); var en=currentLang==='en';
+  var today=new Date(now.getFullYear(), now.getMonth(), now.getDate());
   // Build name map for translated display names in notifications
   var nameMap={};
   var keyCats=getCats(profile.persons, new Set(profile.needs), 'no');
@@ -2292,8 +2299,8 @@ function checkExpiryNotifications(){
   });
   Object.keys(expiryDates).forEach(function(key){
     if(!checkedItems.includes(key)) return;
-    var date=new Date(expiryDates[key]);
-    var daysLeft=Math.ceil((date-now)/(1000*60*60*24));
+    var date=new Date(expiryDates[key]+'T00:00:00'); // Local midnight, not UTC
+    var daysLeft=Math.round((date-today)/(1000*60*60*24));
     var displayName=nameMap[key]||key.split('::')[1]||key;
     // Varsle ved <=14 dager og ved <=0 dager (utløpt), med separate flagg
     var thresholds=[{d:14,id:'14'},{d:0,id:'0'}];
@@ -2591,8 +2598,7 @@ function renderChecklist(){
     else { navigator.setAppBadge(pct).catch(()=>{}); }
   }
   setTimeout(function(){
-    var f = document.getElementById('progressFill');
-    if(f){ var p=parseInt(f.style.width)||0; updateSocialShare(p); sendMilestoneNotif(p); showMilestoneToast(p); }
+    updateSocialShare(pct); sendMilestoneNotif(pct); showMilestoneToast(pct);
   },200);
 }
 
@@ -2652,7 +2658,8 @@ function toggleItem(id){
     else navigator.vibrate(8);
   }
   // Fast path: update just the changed item + progress, avoid full DOM rebuild
-  if(_fastToggle(id, !wasChecked)){
+  // Skip fast path when filter is active – item visibility may need to change
+  if(clFilter === 'all' && _fastToggle(id, !wasChecked)){
     _updateProgress();
     checkBadges();
   } else {
@@ -2769,7 +2776,7 @@ function switchTab(tab,ev){
 }
 
 // SHARE & QR
-const APP_URL = window.location.href.split('?')[0];
+const APP_URL = window.location.href.split('?')[0].split('#')[0];
 
 function openQRModal(){
   document.getElementById('qrUrlDisplay').textContent = APP_URL;
@@ -3021,8 +3028,8 @@ const TRANSLATIONS = {
   shareSub: { no: 'Hjelp venner, familie og naboer å bli bedre forberedt!', en: 'Help friends, family and neighbours get prepared!' },
   // Info accordion titles
   infoTitles: {
-    no: ['Trygghetspunkter & tilfluktsrom','Vann','Mat','Strømbrudd','Evakuering & grab-bag','Kart & navigasjon uten nett','Kommunikasjon uten internett','Offisielle informasjonskilder','Psykologisk førstehjelp'],
-    en: ['Safe points & shelters','Water','Food','Power outage','Evacuation & grab-bag','Maps & navigation offline','Communication without internet','Official information sources','Psychological first aid'],
+    no: ['Trygghetspunkter & tilfluktsrom','Vann','Mat','Strømbrudd','Evakuering & grab-bag','Kart & navigasjon uten nett','Kommunikasjon uten internett','Offisielle informasjonskilder'],
+    en: ['Safe points & shelters','Water','Food','Power outage','Evacuation & grab-bag','Maps & navigation offline','Communication without internet','Official information sources'],
   },
   // Onboarding
   ob: {
@@ -3099,6 +3106,25 @@ function renderFirstAid(){
   var fd=document.getElementById('faDisclaimer');
   if(fd) fd.innerHTML='⚠️ <strong style="color:var(--text);">'+(en?'Important:':'Viktig:')+'</strong> '+(en?'Call 113 for life-threatening situations. These steps are guidance only until help arrives.':'Ring 113 ved livstruende situasjoner. Disse stegene er kun veiledning til hjelp ankommer.');
   var flm=document.getElementById('faLearnMore'); if(flm) flm.textContent=en?'Learn more – take a course':'Lær mer – ta et kurs';
+  // Psykologisk førstehjelp
+  var _fhPsyk=document.getElementById('fhPsykTitle'); if(_fhPsyk) _fhPsyk.textContent=en?'Psychological first aid':'Psykologisk førstehjelp';
+  var _tpanikk=document.getElementById('fht-panikk'); if(_tpanikk) _tpanikk.textContent=en?'Panic & acute anxiety':'Panikk & akutt angst';
+  var _spanikk=document.getElementById('fhs-panikk'); if(_spanikk) _spanikk.textContent=en?'Someone is having a panic or anxiety attack':'Noen er i akutt panikk eller angstanfall';
+  var _bpanikk=document.getElementById('fhb-panikk'); if(_bpanikk) _bpanikk.innerHTML=en?'<div class="fh-step"><div class="fh-num">1</div><div><strong>Calm is contagious</strong> – speak slowly and firmly. Your calm is the most important tool.</div></div><div class="fh-step"><div class="fh-num">2</div><div><strong>Breathe together:</strong> In 4 seconds, hold 4, out 6. Do it yourself first so they can follow.</div></div><div class="fh-step"><div class="fh-num">3</div><div><strong>Ground them (5-4-3-2-1):</strong> "Name 5 things you can SEE, 4 you can HEAR, 3 you can FEEL, 2 you can SMELL, 1 you can TASTE."</div></div><div class="fh-step"><div class="fh-num">4</div><div><strong>Don\'t leave them alone</strong> – physical presence matters more than the right words.</div></div><div class="fh-step"><div class="fh-num">5</div><div>Avoid "pull yourself together" or "it\'s not dangerous" – it makes things worse.</div></div><div class="fh-tip">🫁 In through the nose (4 sec) → Hold (4 sec) → Out through the mouth (6 sec). Repeat 4–6 times.</div>':'<div class="fh-step"><div class="fh-num">1</div><div><strong>Ro smitter</strong> – snakk langsomt og bestemt. Din ro er det viktigste verktøyet.</div></div><div class="fh-step"><div class="fh-num">2</div><div><strong>Pust sammen:</strong> Inn 4 sekunder, hold 4, ut 6. Gjør det selv først så de kan følge deg.</div></div><div class="fh-step"><div class="fh-num">3</div><div><strong>Jord personen (5-4-3-2-1):</strong> «Nevn 5 ting du kan SE, 4 du kan HØRE, 3 du kan KJENNE, 2 du kan LUKTE, 1 du kan SMAKE.»</div></div><div class="fh-step"><div class="fh-num">4</div><div><strong>Ikke la dem være alene</strong> – fysisk nærvær er viktigere enn de rette ordene.</div></div><div class="fh-step"><div class="fh-num">5</div><div>Unngå «ta deg sammen» eller «det er ikke farlig» – det virker mot sin hensikt.</div></div><div class="fh-tip">🫁 Inn gjennom nesen (4 sek) → Hold (4 sek) → Ut gjennom munnen (6 sek). Gjenta 4–6 ganger.</div>';
+  var _tbarn=document.getElementById('fht-barn'); if(_tbarn) _tbarn.textContent=en?'Children in crisis':'Barn i krise';
+  var _sbarn=document.getElementById('fhs-barn'); if(_sbarn) _sbarn.textContent=en?'How to help children who are scared or upset':'Hvordan hjelpe barn som er redde eller urolige';
+  var _bbarn=document.getElementById('fhb-barn'); if(_bbarn) _bbarn.innerHTML=en?'<div class="fh-step"><div class="fh-num">1</div><div><strong>Don\'t dismiss the fear</strong> – never say "it\'s not dangerous". Acknowledge: "I understand you\'re scared. I\'m here."</div></div><div class="fh-step"><div class="fh-num">2</div><div><strong>Explain simply</strong> – honest, short answers. Children fill gaps with fantasies that are worse than reality.</div></div><div class="fh-step"><div class="fh-num">3</div><div><strong>Keep routines</strong> – regular meal and bed times provide security amid chaos.</div></div><div class="fh-step"><div class="fh-num">4</div><div><strong>Let them help</strong> – a small task (filling water bottles, packing a bag) gives a sense of mastery.</div></div><div class="fh-step"><div class="fh-num">5</div><div><strong>Limit media exposure</strong> – news loops greatly increase anxiety, especially in children under 12.</div></div><div class="fh-tip">💡 Toddlers (0–5) mirror their parents\' emotions. Hugs, a calm voice and closeness are most important.</div>':'<div class="fh-step"><div class="fh-num">1</div><div><strong>Ikke avvis frykten</strong> – si aldri «det er ikke farlig». Anerkjenn: «Jeg skjønner du er redd. Jeg er her.»</div></div><div class="fh-step"><div class="fh-num">2</div><div><strong>Forklar enkelt</strong> – ærlige, korte svar. Barn fyller tomrom med fantasier som er verre enn virkeligheten.</div></div><div class="fh-step"><div class="fh-num">3</div><div><strong>Hold rutiner</strong> – faste spisetider og leggetider gir trygghet midt i kaos.</div></div><div class="fh-step"><div class="fh-num">4</div><div><strong>La dem hjelpe til</strong> – en liten oppgave (fylle vannflasker, pakke sekk) gir mestringsfølelse.</div></div><div class="fh-step"><div class="fh-num">5</div><div><strong>Begrens medieeksponering</strong> – nyhetsloop øker angst kraftig, særlig hos barn under 12.</div></div><div class="fh-tip">💡 Småbarn (0–5) speiler foreldrenes følelser. Klem, rolig stemme og nærhet er viktigst.</div>';
+  var _teldre2=document.getElementById('fht-eldre'); if(_teldre2) _teldre2.textContent=en?'Elderly & dementia in crisis':'Eldre & demens i krise';
+  var _seldre2=document.getElementById('fhs-eldre'); if(_seldre2) _seldre2.textContent=en?'Special considerations for elderly and dementia':'Spesielle hensyn for eldre og demente';
+  var _beldre2=document.getElementById('fhb-eldre'); if(_beldre2) _beldre2.innerHTML=en?'<div class="fh-step"><div class="fh-num">1</div><div><strong>Dementia worsens under stress</strong> – keep surroundings as familiar and stable as possible.</div></div><div class="fh-step"><div class="fh-num">2</div><div><strong>Simple messages</strong> – one sentence at a time. Don\'t overwhelm with information.</div></div><div class="fh-step"><div class="fh-num">3</div><div><strong>Don\'t correct</strong> – enter their reality rather than correcting them.</div></div><div class="fh-step"><div class="fh-num">4</div><div><strong>Music and familiar objects</strong> – provide comfort and can significantly reduce agitation.</div></div><div class="fh-step"><div class="fh-num">5</div><div><strong>Medication</strong> – ensure regular medications are not interrupted. Have a 14-day supply.</div></div><div class="fh-tip">💡 Elderly people living alone are especially vulnerable. Check on elderly neighbours during a crisis.</div>':'<div class="fh-step"><div class="fh-num">1</div><div><strong>Demens forverres under stress</strong> – hold omgivelsene så kjente og stabile som mulig.</div></div><div class="fh-step"><div class="fh-num">2</div><div><strong>Enkle beskjeder</strong> – én setning av gangen. Ikke overøs med informasjon.</div></div><div class="fh-step"><div class="fh-num">3</div><div><strong>Ikke korriger</strong> – gå inn i deres virkelighet fremfor å korrigere.</div></div><div class="fh-step"><div class="fh-num">4</div><div><strong>Musikk og kjente gjenstander</strong> – gir trygghet og kan dempe uro betraktelig.</div></div><div class="fh-step"><div class="fh-num">5</div><div><strong>Medisiner</strong> – sørg for at faste medisiner ikke avbrytes. Ha 14 dagers forsyning.</div></div><div class="fh-tip">💡 Eldre som bor alene er ekstra sårbare. Sjekk inn med eldre naboer ved krise.</div>';
+  var _tlangv=document.getElementById('fht-langvarig'); if(_tlangv) _tlangv.textContent=en?'Prolonged crisis (day 2+)':'Langvarig krise (dag 2+)';
+  var _slangv=document.getElementById('fhs-langvarig'); if(_slangv) _slangv.textContent=en?'Taking care of yourself and your family over time':'Ta vare på deg selv og familien over tid';
+  var _blangv=document.getElementById('fhb-langvarig'); if(_blangv) _blangv.innerHTML=en?'<div class="fh-step"><div class="fh-num">1</div><div><strong>Do something concrete</strong> – activity combats helplessness. Anything that gives control helps.</div></div><div class="fh-step"><div class="fh-num">2</div><div><strong>Prioritise sleep</strong> – lack of sleep dramatically weakens judgement. Rest in short shifts.</div></div><div class="fh-step"><div class="fh-num">3</div><div><strong>Eat regularly</strong> – blood sugar drops worsen anxiety and irritability.</div></div><div class="fh-step"><div class="fh-num">4</div><div><strong>Limit rumination</strong> – set aside 15 min for worrying, then focus on what you can control.</div></div><div class="fh-step"><div class="fh-num">5</div><div><strong>Talk to someone</strong> – putting things into words reduces the emotional burden.</div></div><div class="fh-tip">💡 Humour is not inappropriate in a crisis – it is a natural and healthy coping mechanism.</div>':'<div class="fh-step"><div class="fh-num">1</div><div><strong>Gjør noe konkret</strong> – aktivitet bekjemper hjelpeløshet. Alt som gir kontroll hjelper.</div></div><div class="fh-step"><div class="fh-num">2</div><div><strong>Prioriter søvn</strong> – mangel svekker dømmekraft dramatisk. Hvil i korte økter.</div></div><div class="fh-step"><div class="fh-num">3</div><div><strong>Spis regelmessig</strong> – blodsukkerfall forverrer angst og irritabilitet.</div></div><div class="fh-step"><div class="fh-num">4</div><div><strong>Begrens grubling</strong> – sett av 15 min til bekymring, deretter fokus på det du kan påvirke.</div></div><div class="fh-step"><div class="fh-num">5</div><div><strong>Snakk med noen</strong> – å sette ord på ting reduserer den emosjonelle belastningen.</div></div><div class="fh-tip">💡 Humor er ikke upassende i krise – det er et naturlig og sunt mestringsverktøy.</div>';
+  var _fhWH=document.getElementById('fhWhenHelp'); if(_fhWH) _fhWH.innerHTML=en?'⚠️ When should you contact a GP or emergency room?':'⚠️ Når bør du kontakte fastlege eller legevakt?';
+  var _fhWHL=document.getElementById('fhWhenHelpList'); if(_fhWHL) _fhWHL.textContent=en?'Someone has not slept for several days · Refuses to eat/drink · Persistent panic after the danger has passed · Talks about harming themselves · Children under 5 stop speaking/responding normally':'Noen sover ikke på flere dager · Nekter å spise/drikke · Vedvarende panikk etter faren er over · Snakker om å skade seg selv · Barn under 5 slutter å snakke/reagere normalt';
+  var _fhRK=document.getElementById('fhLinkRK'); if(_fhRK) _fhRK.textContent=en?'❤️ Red Cross courses':'❤️ Røde Kors-kurs';
+  var _fhH30=document.getElementById('fhLinkH30'); if(_fhH30) _fhH30.textContent=en?'📘 First Aid 3.0':'📘 Hjelp 3.0';
+  var _fhNK=document.getElementById('fhLinkNKVTS'); if(_fhNK) _fhNK.textContent=en?'NKVTS – Psychological first aid ↗':'NKVTS – Psykologisk førstehjelp ↗';
   var _thlr=document.getElementById('fht-hlr'); if(_thlr) _thlr.textContent=en?'Cardiac arrest (CPR)':'Hjertestans (HLR)';
   var _shlr=document.getElementById('fhs-hlr'); if(_shlr) _shlr.textContent=en?'Unconscious and not breathing normally':'Bevisstløs og puster ikke normalt';
   var _bhlr=document.getElementById('fhb-hlr'); if(_bhlr) _bhlr.innerHTML=en?'<div class="fh-step"><div class="fh-num">1</div><div>Call 113 immediately – put the phone on speaker</div></div><div class="fh-step"><div class="fh-num">2</div><div>Lay the person flat on their back on a hard surface</div></div><div class="fh-step"><div class="fh-num">3</div><div><strong>30 chest compressions:</strong> Place hands in the centre of the chest, press down 5–6 cm with straight arms, 100–120 per minute</div></div><div class="fh-step"><div class="fh-num">4</div><div><strong>2 rescue breaths:</strong> Tilt head back, lift chin, breathe slowly for approx. 1 sec until chest rises</div></div><div class="fh-step"><div class="fh-num">5</div><div>Repeat 30:2 until ambulance arrives</div></div><div class="fh-tip">💡 Defibrillators (AED) show up on Google Maps. They talk you through the process.</div>':'<div class="fh-step"><div class="fh-num">1</div><div>Ring 113 umiddelbart – sett telefonen på høyttaler</div></div><div class="fh-step"><div class="fh-num">2</div><div>Legg personen flatt på ryggen på hardt underlag</div></div><div class="fh-step"><div class="fh-num">3</div><div><strong>30 brystkompresjoner:</strong> Legg hendene midt på brystet, press ned 5–6 cm med strake armer, 100–120 per minutt</div></div><div class="fh-step"><div class="fh-num">4</div><div><strong>2 innblåsinger:</strong> Vipp hodet bakover, løft haken, blås langsomt i ca. 1 sek til brystet hever seg</div></div><div class="fh-step"><div class="fh-num">5</div><div>Gjenta 30:2 til ambulansen ankommer</div></div><div class="fh-tip">💡 Hjertestarter (AED) slår opp på Google Maps. De snakker deg gjennom prosessen.</div>';
@@ -3113,7 +3139,7 @@ function renderFirstAid(){
   var _bbrannskade=document.getElementById('fhb-brannskade'); if(_bbrannskade) _bbrannskade.innerHTML=en?'<div class="fh-step"><div class="fh-num">1</div><div>Remove the source and secure the area</div></div><div class="fh-step"><div class="fh-num">2</div><div><strong>Cool down:</strong> Hold under running lukewarm water (15–20°C) for a minimum of 20 minutes</div></div><div class="fh-step"><div class="fh-num">3</div><div>Do not use ice, butter, toothpaste or any other cream</div></div><div class="fh-step"><div class="fh-num">4</div><div>Cover loosely with clean, moist cloth or burns dressing</div></div><div class="fh-step"><div class="fh-num">5</div><div>Call 113 if: large burns, face/hands/groin affected, chemicals or electricity involved</div></div>':'<div class="fh-step"><div class="fh-num">1</div><div>Fjern kilden og sikre stedet</div></div><div class="fh-step"><div class="fh-num">2</div><div><strong>Kjøl ned:</strong> Hold under rennende, lunkent vann (15–20°C) i minimum 20 minutter</div></div><div class="fh-step"><div class="fh-num">3</div><div>Ikke bruk is, smør, tannkrem eller annen salve</div></div><div class="fh-step"><div class="fh-num">4</div><div>Dekk løst med rent, fuktig tøy eller brannsårbandasje</div></div><div class="fh-step"><div class="fh-num">5</div><div>Ring 113 ved: store brannskader, ansikt/hender/lysken berørt, kjemikalier/strøm involvert</div></div>';
   var _thypotermi=document.getElementById('fht-hypotermi'); if(_thypotermi) _thypotermi.textContent=en?'Hypothermia':'Hypotermi (nedkjøling)';
   var _shypotermi=document.getElementById('fhs-hypotermi'); if(_shypotermi) _shypotermi.textContent=en?'Body temperature below 35°C':'Kroppstemperatur under 35°C';
-  var _bhypotermi=document.getElementById('fhb-hypotermi'); if(_bhypotermi) _bhypotermi.innerHTML=en?'<div class="fh-step"><div class="fh-num">1</div><div>Move the person to shelter from wind and cold</div></div><div class="fh-step"><div class="fh-num">2</div><div>Remove wet clothing carefully – use scissors if available</div></div><div class="fh-step"><div class="fh-num">3</div><div>Wrap in blankets, sleeping bag or foil blanket (room temperature)</div></div><div class="fh-step"><div class="fh-num">4</div><div>Give warm, sweet drinks only if the person is conscious and can swallow</div></div><div class="fh-step"><div class="fh-num">5</div><div>Call 113 – do not rub or massage the skin as this can worsen the condition</div></div><div class="fh-tip">💡 Unconscious with hypothermia: start CPR and call 113 immediately</div>':'<div class="fh-step"><div class="fh-num">1</div><div>Flytt personen til ly for vind og kulde</div></div><div class="fh-step"><div class="fh-num">2</div><div>Fjern våte klær forsiktig – bruk klipser om tilgjengelig</div></div><div class="fh-step"><div class="fh-num">3</div><div>Pakk inn i tepper, sovepose eller metallfolie (romtemperatur)</div></div><div class="fh-step"><div class="fh-num">4</div><div>Gi varm, søt drikke kun om personen er ved bevissthet og kan svelge</div></div><div class="fh-step"><div class="fh-num">5</div><div>Ring 113 – ikke gni eller massér huden da det kan forverre tilstanden</div></div><div class="fh-tip">💡 Bevisstløs ved hypotermi: start HLR og ring 113 øyeblikkelig</div>';
+  var _bhypotermi=document.getElementById('fhb-hypotermi'); if(_bhypotermi) _bhypotermi.innerHTML=en?'<div class="fh-step"><div class="fh-num">1</div><div>Move the person to shelter from wind and cold</div></div><div class="fh-step"><div class="fh-num">2</div><div>Remove wet clothing carefully – use scissors if available</div></div><div class="fh-step"><div class="fh-num">3</div><div>Wrap in blankets, sleeping bag or foil blanket (room temperature)</div></div><div class="fh-step"><div class="fh-num">4</div><div>Give warm, sweet drinks only if the person is conscious and can swallow</div></div><div class="fh-step"><div class="fh-num">5</div><div>Call 113 – do not rub or massage the skin as this can worsen the condition</div></div><div class="fh-tip">💡 Unconscious with hypothermia: start CPR and call 113 immediately</div>':'<div class="fh-step"><div class="fh-num">1</div><div>Flytt personen til ly for vind og kulde</div></div><div class="fh-step"><div class="fh-num">2</div><div>Fjern våte klær forsiktig – bruk saks om tilgjengelig</div></div><div class="fh-step"><div class="fh-num">3</div><div>Pakk inn i tepper, sovepose eller metallfolie (romtemperatur)</div></div><div class="fh-step"><div class="fh-num">4</div><div>Gi varm, søt drikke kun om personen er ved bevissthet og kan svelge</div></div><div class="fh-step"><div class="fh-num">5</div><div>Ring 113 – ikke gni eller massér huden da det kan forverre tilstanden</div></div><div class="fh-tip">💡 Bevisstløs ved hypotermi: start HLR og ring 113 øyeblikkelig</div>';
 }
 
 function applyLang(skipRender){
@@ -3122,6 +3148,8 @@ function applyLang(skipRender){
   const T = TRANSLATIONS;
   const btn = document.getElementById('langToggle');
   if(btn) btn.textContent = en ? '🌐 NO' : '🌐 EN';
+  const obBtn = document.getElementById('obLangToggle');
+  if(obBtn) obBtn.textContent = en ? '🌐 NO' : '🌐 EN';
 
   // Nav
   const navBtns = document.querySelectorAll('nav button');
@@ -3182,27 +3210,8 @@ function applyLang(skipRender){
   // First-aid tab content
   renderFirstAid();
 
-  // Badges - update name, desc and stat text
-  const badgeCards = document.querySelectorAll('.badge-card');
-  const bNames = T.badgeNames[currentLang] || T.badgeNames.no;
-  const bDescs = T.badgeDescs[currentLang] || T.badgeDescs.no;
-  badgeCards.forEach((c,i) => {
-    const nameEl = c.querySelector('.badge-name');
-    const descEl = c.querySelector('.badge-desc');
-    const statEl = c.querySelector('.badge-stat');
-    if(nameEl && i < bNames.length) nameEl.textContent = bNames[i];
-    if(descEl && i < bDescs.length) descEl.textContent = bDescs[i];
-    if(statEl){
-      const isEarned = c.classList.contains('earned');
-      if(isEarned){
-        // preserve "🏆 XX% ..." - just replace the suffix
-        const pctMatch = statEl.textContent.match(/\d+/);
-        if(pctMatch) statEl.textContent = '🏆 ' + pctMatch[0] + '% ' + (en ? 'of users' : 'av brukere');
-      } else {
-        statEl.textContent = '🔒 ' + (en ? 'Not yet earned' : 'Ikke opptjent');
-      }
-    }
-  });
+  // Badges - re-render with correct language (DOM index doesn't match BADGES order due to sorting)
+  renderBadges();
 
   // Onboarding
   const ob = T.ob[currentLang];
@@ -3357,7 +3366,7 @@ function applyLang(skipRender){
   const _fsExpP=document.getElementById('syncExportP'); if(_fsExpP) _fsExpP.textContent=en?'Show this code to someone in your household. They can scan the QR or paste the code on their phone.':'Vis denne koden til noen i husstanden. De kan skanne QR-en eller lime inn koden på sin telefon.';
   const _fsCopy=document.getElementById('syncCopyBtn'); if(_fsCopy) _fsCopy.textContent=en?'📋 Copy code':'📋 Kopier kode';
   const _fsShare=document.getElementById('syncShareBtn'); if(_fsShare) _fsShare.textContent=en?'↗️ Share':'↗️ Del';
-  const _fsExpI=document.getElementById('syncExportInfo'); if(_fsExpI) _fsExpI.textContent=en?'💡 The code contains household profile, checklist progress, contacts and expiry dates. No passwords.':'💡 Koden inneholder husstandsprofil, sjekkliste-fremgang, kontakter og holdbarhetsdatoer. Ingen personlige passord.';
+  const _fsExpI=document.getElementById('syncExportInfo'); if(_fsExpI) _fsExpI.textContent=en?'💡 The code contains household profile, checklist progress, contacts (names and phones) and expiry dates. Only share with people you trust.':'💡 Koden inneholder husstandsprofil, sjekkliste-fremgang, kontakter (navn og telefon) og holdbarhetsdatoer. Del kun med personer du stoler på.';
   const _fsImpH=document.getElementById('syncImportH3'); if(_fsImpH) _fsImpH.textContent=en?'Connect to household':'Koble til husstand';
   const _fsImpP=document.getElementById('syncImportP'); if(_fsImpP) _fsImpP.textContent=en?'Paste the code you received from someone in your household.':'Lim inn koden du fikk fra noen i husstanden din.';
   const _fsImpA=document.getElementById('syncImportAction'); if(_fsImpA) _fsImpA.textContent=en?'📥 Import household':'📥 Importer husstand';
@@ -3404,6 +3413,14 @@ function applyLang(skipRender){
   const er113=document.getElementById('emergRole113'); if(er113) er113.textContent=en?'Medical emergency':'Medisinsk nød';
   const er112=document.getElementById('emergRole112'); if(er112) er112.textContent=en?'Crime, public order':'Kriminalitet, orden';
   const er02800=document.getElementById('emergRole02800'); if(er02800) er02800.textContent=en?'Disasters, evacuation':'Katastrofer, evakuering';
+  // Emergency service names
+  const en110=document.getElementById('emergName110'); if(en110) en110.textContent=en?'Fire Service':'Brannvesen';
+  const en113=document.getElementById('emergName113'); if(en113) en113.textContent=en?'Ambulance':'Ambulanse';
+  const en112=document.getElementById('emergName112'); if(en112) en112.textContent=en?'Police':'Politi';
+  const en02800=document.getElementById('emergName02800'); if(en02800) en02800.textContent=en?'Civil Defence':'Sivilforsvaret';
+  const cn116=document.getElementById('crisisName116123'); if(cn116) cn116.textContent=en?'Mental Health Line':'Mental Helse';
+  const cnRK=document.getElementById('crisisNameRK'); if(cnRK) cnRK.textContent=en?'Red Cross':'Røde Kors';
+  const cnBarn=document.getElementById('crisisNameBarn'); if(cnBarn) cnBarn.textContent=en?'Children\'s Helpline':'Alarmtelefonen for barn';
   ['callBtn110','callBtn113','callBtn112','callBtn02800','callBtnMH','callBtnKSOS','callBtnRK','callBtnBarn'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent=en?'Call':'Ring';});
   // Crisis mental health contacts
   const clbl=document.getElementById('crisisLabel'); if(clbl) clbl.textContent=en?'🆘 Crisis support (mental health)':'🆘 Krisehjelp (psykisk)';
@@ -3597,7 +3614,7 @@ function scheduleAllNotifications(){
       if(delay > 0 && delay < 24*60*60*1000){
         // Due today – schedule with setTimeout
         const _nEn = currentLang === 'en';
-        const _tipIdx = notif.tipIndex % NOTIF_TIPS.length;
+        const _tipIdx = (notif.tipIndex || 0) % NOTIF_TIPS.length;
         const body = _nEn ? (notif.body_en || NOTIF_TIPS_EN[_tipIdx] || NOTIF_TIPS[_tipIdx]) : (notif.body || NOTIF_TIPS[_tipIdx]);
         const title = _nEn ? (notif.title_en || notif.title) : notif.title;
         setTimeout(() => {
@@ -3626,18 +3643,25 @@ function scheduleAllNotifications(){
 // Milestone notifications (triggered by progress)
 function sendMilestoneNotif(pct){
   if(!('Notification' in window) || Notification.permission !== 'granted') return;
-  const key = '72k_mile_' + pct;
+  // Only trigger for actual milestones
+  var milestones = [25, 50, 75, 100];
+  var milestone = null;
+  for(var i = milestones.length - 1; i >= 0; i--){
+    if(pct >= milestones[i]){ milestone = milestones[i]; break; }
+  }
+  if(!milestone) return;
+  var key = '72k_mile_' + milestone;
   if(localStorage.getItem(key)) return;
   localStorage.setItem(key, '1');
   navigator.serviceWorker.ready.then(reg => {
     setTimeout(() => {
       const en = currentLang === 'en';
       let title, body;
-      if(pct >= 100){ title = en?'🥇 100% – You are ready!':'🥇 100% – Du er klar!'; body = en?'Amazing! Share 72klar! with a neighbour – maybe they need help?':'Fantastisk! Del 72klar! med en nabo – kanskje de trenger hjelp?'; }
-      else if(pct >= 75){ title = en?'🏅 75% – Almost there!':'🏅 75% – Nesten i mål!'; body = en?'You are among the best prepared. Just a little left!':'Du er blant de best forberedte i Norge. Bare litt igjen!'; }
-      else if(pct >= 50){ title = en?'⭐ Halfway!':'⭐ Halvveis!'; body = en?'You are now better prepared than 8 out of 10. Keep going!':'Du er nå bedre forberedt enn 8 av 10 nordmenn. Fortsett!'; }
-      else if(pct >= 25){ title = en?'🚀 Good start!':'🚀 Godt i gang!'; body = en?'25% done. Every step makes you safer. Keep going!':'25% fullført. Hvert steg gjør deg tryggere. Fortsett!'; }
-      if(title) reg.showNotification(title, { body, icon: 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23D62828%22/><text y=%22.9em%22 font-size=%2275%22 x=%2212%22>&#x1F6E1;&#xFE0F;</text></svg>', tag: '72klar-mile-'+pct, data: { url: './' } });
+      if(milestone === 100){ title = en?'🥇 100% – You are ready!':'🥇 100% – Du er klar!'; body = en?'Amazing! Share 72klar! with a neighbour – maybe they need help?':'Fantastisk! Del 72klar! med en nabo – kanskje de trenger hjelp?'; }
+      else if(milestone === 75){ title = en?'🏅 75% – Almost there!':'🏅 75% – Nesten i mål!'; body = en?'You are among the best prepared. Just a little left!':'Du er blant de best forberedte i Norge. Bare litt igjen!'; }
+      else if(milestone === 50){ title = en?'⭐ Halfway!':'⭐ Halvveis!'; body = en?'You are now better prepared than 8 out of 10. Keep going!':'Du er nå bedre forberedt enn 8 av 10 nordmenn. Fortsett!'; }
+      else if(milestone === 25){ title = en?'🚀 Good start!':'🚀 Godt i gang!'; body = en?'25% done. Every step makes you safer. Keep going!':'25% fullført. Hvert steg gjør deg tryggere. Fortsett!'; }
+      if(title) reg.showNotification(title, { body, icon: 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23D62828%22/><text y=%22.9em%22 font-size=%2275%22 x=%2212%22>&#x1F6E1;&#xFE0F;</text></svg>', tag: '72klar-mile-'+milestone, data: { url: './' } });
     }, 3000);
   });
 }
@@ -3999,8 +4023,7 @@ function shareScore(){
 // ── FØRSTEHJELP ACCORDION ──
 function toggleFH(card){
   card.classList.toggle('open');
-  var header = card.querySelector('.fh-header');
-  if(header) header.setAttribute('aria-expanded', card.classList.contains('open') ? 'true' : 'false');
+  card.setAttribute('aria-expanded', card.classList.contains('open') ? 'true' : 'false');
 }
 
 // ── LYS/MØRK MODUS ──
@@ -4123,12 +4146,14 @@ function generateSyncCode(){
   // Show code
   var display = document.getElementById('syncCodeDisplay');
   if(display) display.textContent = _syncCode;
-  // Draw QR if code is small enough
+  // Draw QR as URL so scanning opens the app directly with import dialog
   var qrCanvas = document.getElementById('syncQrCanvas');
   if(qrCanvas){
-    if(_syncCode.length < 2000){
+    var syncB64 = _syncCode.substring(4); // strip '72K-' prefix
+    var syncUrl = APP_URL + '#sync=' + encodeURIComponent(syncB64);
+    if(syncUrl.length < 2000){
       qrCanvas.style.display = 'block';
-      drawSyncQR(_syncCode);
+      drawSyncQR(syncUrl);
     } else {
       qrCanvas.style.display = 'none';
     }
@@ -4137,8 +4162,8 @@ function generateSyncCode(){
 function drawSyncQR(text){
   var canvas = document.getElementById('syncQrCanvas');
   if(!canvas || !QRGen) return;
-  var qr = QRGen.make(text);
-  if(!qr) return;
+  var qr = QRGen.generate(text);
+  if(!qr){ canvas.style.display='none'; return; }
   var ctx = canvas.getContext('2d');
   var sz = qr.size;
   var scale = Math.floor(200 / sz);
@@ -4240,7 +4265,7 @@ function importHousehold(){
   localStorage.removeItem('72t_weekly_done');
   ['72k_mile_25','72k_mile_50','72k_mile_75','72k_mile_100'].forEach(function(k){ localStorage.removeItem(k); });
   _lastMilestone = 0;
-  profile = { name: p.name, persons: parseInt(p.persons)||1, needs: p.needs || [], postnr: p.postnr || '', startDate: Date.now() };
+  profile = { name: String(p.name||'').substring(0,50), persons: Math.max(1,Math.min(20,parseInt(p.persons)||1)), needs: Array.isArray(p.needs)?p.needs.filter(function(n){return ['baby','eldre','hund','medisin'].includes(n);}):[], postnr: String(p.postnr||'').substring(0,4), startDate: Date.now() };
   localStorage.setItem('72t_profile', JSON.stringify(profile));
   // Rebuild checked items from indices
   var keyCats = getCats(profile.persons, new Set(profile.needs), 'no');
@@ -4273,6 +4298,7 @@ function importHousehold(){
   setTimeout(function(){
     closeSyncModal();
     startApp();
+    checkBadges();
     applyLang();
     showToastMsg(en ? '👨‍👩‍👧 Household synced!' : '👨‍👩‍👧 Husstand synkronisert!');
   }, 1500);
@@ -4399,10 +4425,9 @@ function dismissWelcomeBack() {
 
 document.addEventListener('DOMContentLoaded', function() {
   applyTheme();
-  fetchFarevarsel();
   scheduleNotifDayClear();
   if(profile){
-    startApp();          // renders checklist/motivation/etc first
+    startApp();          // renders checklist/motivation/etc first (includes fetchFarevarsel)
     applyLang(true);      // translate only – startApp already rendered
     updateChecklistDate();
     setTimeout(updateNotifUI, 500);
