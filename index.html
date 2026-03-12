@@ -417,9 +417,163 @@
   .cat-accordion.all-done .cat-head-title { color:var(--muted); }
   .cat-accordion.all-done .cat-head { opacity:0.7; }
   .checklist-item { transition: opacity 0.25s; }
+
+  /* SPLASH / INFOLAPP */
+  #splashOverlay {
+    display:none; position:fixed; inset:0; z-index:9999;
+    background:var(--dark);
+    flex-direction:column; overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  #splashOverlay.visible { display:flex; }
+  .splash-hero {
+    background:linear-gradient(145deg, var(--red) 0%, #8B0000 55%, #3d0000 100%);
+    padding:52px 28px 36px; position:relative; overflow:hidden; text-align:center;
+    flex-shrink:0;
+  }
+  .splash-hero::before {
+    content:'🛡️'; position:absolute; right:-30px; top:-30px;
+    font-size:180px; opacity:0.07; transform:rotate(18deg); pointer-events:none;
+  }
+  .splash-hero::after {
+    content:''; position:absolute; left:0; bottom:0; right:0; height:60px;
+    background:linear-gradient(to top, var(--dark), transparent); pointer-events:none;
+  }
+  .splash-logo { font-family:'Syne',sans-serif; font-size:52px; font-weight:800; letter-spacing:-2px; color:white; animation:splashFadeUp 0.6s ease both; }
+  .splash-tagline { font-size:17px; color:rgba(255,255,255,0.85); margin-top:8px; line-height:1.5; animation:splashFadeUp 0.6s 0.1s ease both; }
+  .splash-body { flex:1; padding:28px 22px 32px; animation:splashFadeUp 0.5s 0.2s ease both; }
+  .splash-section-label {
+    font-family:'Syne',sans-serif; font-size:11px; font-weight:700;
+    text-transform:uppercase; letter-spacing:1.5px; color:var(--orange);
+    margin-bottom:14px;
+  }
+  .splash-features { display:flex; flex-direction:column; gap:12px; margin-bottom:28px; }
+  .splash-feat {
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:14px 16px; display:flex; align-items:center; gap:14px;
+  }
+  .splash-feat-icon { font-size:28px; flex-shrink:0; width:36px; text-align:center; }
+  .splash-feat-text strong { display:block; font-size:15px; font-weight:700; color:var(--text); }
+  .splash-feat-text span { font-size:13px; color:var(--muted); line-height:1.4; }
+  .splash-stats {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+    margin-bottom:28px;
+  }
+  .splash-stat {
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:12px 8px; text-align:center;
+  }
+  .splash-stat-num { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:var(--orange); }
+  .splash-stat-label { font-size:11px; color:var(--muted); margin-top:2px; }
+  .splash-cta-area { display:flex; flex-direction:column; gap:10px; margin-top:8px; }
+  .splash-cta-install {
+    width:100%; padding:16px; border-radius:14px; border:none;
+    background:linear-gradient(135deg,var(--blue),#6366f1);
+    color:white; font-family:'Syne',sans-serif; font-size:17px; font-weight:800;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+    transition:transform 0.15s;
+  }
+  .splash-cta-install:active { transform:scale(0.97); }
+  .splash-cta-continue {
+    width:100%; padding:15px; border-radius:14px; border:none;
+    background:linear-gradient(135deg,var(--red),var(--orange));
+    color:white; font-family:'Syne',sans-serif; font-size:17px; font-weight:800;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+    transition:transform 0.15s;
+  }
+  .splash-cta-continue:active { transform:scale(0.97); }
+  .splash-cta-skip {
+    width:100%; padding:12px; border-radius:12px; border:1px solid var(--border);
+    background:none; color:var(--muted); font-family:'DM Sans',sans-serif;
+    font-size:14px; cursor:pointer; transition:all 0.2s;
+  }
+  .splash-note {
+    text-align:center; font-size:12px; color:var(--muted); margin-top:18px; line-height:1.6;
+  }
+  .splash-dsb {
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(214,40,40,0.08); border:1px solid rgba(214,40,40,0.2);
+    border-radius:8px; padding:6px 12px; font-size:12px; color:var(--muted);
+    margin-top:12px;
+  }
+  @keyframes splashFadeUp {
+    from { opacity:0; transform:translateY(18px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
 </style>
 </head>
 <body>
+
+<!-- SPLASH / INFOLAPP – vises kun for nye besøkende -->
+<div id="splashOverlay">
+  <div class="splash-hero">
+    <div id="splashLangToggle" onclick="toggleLang();renderSplashLang();" style="position:absolute;top:12px;right:16px;background:rgba(255,255,255,0.18);border-radius:8px;padding:5px 10px;font-size:13px;font-weight:700;cursor:pointer;color:white;z-index:1;">🌐 EN</div>
+    <div class="splash-logo">72klar!</div>
+    <div class="splash-tagline" id="splashTagline">Klar til å klare deg selv – i 72 timer</div>
+  </div>
+
+  <div class="splash-body">
+    <div class="splash-section-label" id="splashWhatLabel">Hva er 72klar?</div>
+
+    <div class="splash-features">
+      <div class="splash-feat">
+        <div class="splash-feat-icon">✅</div>
+        <div class="splash-feat-text">
+          <strong id="splashF1T">Personlig sjekkliste</strong>
+          <span id="splashF1S">Tilpasset din husstand – antall personer, barn, eldre, kjæledyr og medisiner</span>
+        </div>
+      </div>
+      <div class="splash-feat">
+        <div class="splash-feat-icon">⚠️</div>
+        <div class="splash-feat-text">
+          <strong id="splashF2T">Farevarsler i sanntid</strong>
+          <span id="splashF2S">Offisielle varsler fra Meteorologisk institutt, koblet til hva du mangler</span>
+        </div>
+      </div>
+      <div class="splash-feat">
+        <div class="splash-feat-icon">🏛️</div>
+        <div class="splash-feat-text">
+          <strong id="splashF3T">Trygghetspunkter</strong>
+          <span id="splashF3S">Finn nærmeste kommunale samlingspunkt med vann, varme og strøm</span>
+        </div>
+      </div>
+      <div class="splash-feat">
+        <div class="splash-feat-icon">🚑</div>
+        <div class="splash-feat-text">
+          <strong id="splashF4T">Førstehjelp & psykisk helse</strong>
+          <span id="splashF4S">Steg-for-steg veiledning – HLR, blødning, brannskade og psykologisk førstehjelp</span>
+        </div>
+      </div>
+      <div class="splash-feat">
+        <div class="splash-feat-icon">📲</div>
+        <div class="splash-feat-text">
+          <strong id="splashF5T">Fungerer offline</strong>
+          <span id="splashF5S">Installer som app – fungerer uten nett, akkurat når du trenger den mest</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="splash-section-label" id="splashWhyLabel">Hvorfor 72 timer?</div>
+    <div class="splash-stats">
+      <div class="splash-stat"><div class="splash-stat-num">72t</div><div class="splash-stat-label" id="splashStat1">Klare deg selv</div></div>
+      <div class="splash-stat"><div class="splash-stat-num">0 kr</div><div class="splash-stat-label" id="splashStat2">Helt gratis</div></div>
+      <div class="splash-stat"><div class="splash-stat-num">100%</div><div class="splash-stat-label" id="splashStat3">Privat & offline</div></div>
+    </div>
+
+    <div class="splash-dsb" id="splashDsb">🛡️ Basert på anbefalinger fra DSB – Direktoratet for samfunnssikkerhet</div>
+
+    <div class="splash-cta-area">
+      <button class="splash-cta-install" id="splashInstallBtn" onclick="splashInstall()" style="display:none;">
+        📲 <span id="splashInstallText">Installer som app</span>
+      </button>
+      <button class="splash-cta-continue" id="splashContinueBtn" onclick="dismissSplash()">
+        🛡️ <span id="splashContinueText">Kom i gang</span>
+      </button>
+    </div>
+
+    <div class="splash-note" id="splashNote">Ingen konto, ingen reklame, ingen data lagres utenfor din enhet.</div>
+  </div>
+</div>
 
 <!-- ONBOARDING -->
 <div id="onboarding" style="display:none;flex-direction:column;min-height:100vh;">
@@ -1913,7 +2067,7 @@ function resetAll(){
   if(!confirm(currentLang==='en'?'Start completely over?\nThis deletes ALL data:\n• Household profile\n• All checkmarks\n• Expiry dates\n• Contacts\n• Badges\n\nUse this to show the app to someone new.':'Start helt på nytt?\nDette sletter ALLE data:\n• Husstandsprofil\n• Alle avkrysninger\n• Holdbarhetsdatoer\n• Kontakter\n• Merker\n\nBruk dette for å vise appen til noen nye.'))return;
   ['72t_profile','72t_checked','72t_contacts','72t_badges','72t_weekly_done',
        '72t_7day','72t_7day_shown','72t_shared','72t_last_activity','72t_features_seen',
-       '72t_last_visit','72t_last_check','72t_pwa_dismissed','72t_expiry',
+       '72t_last_visit','72t_last_check','72t_pwa_dismissed','72t_expiry','72t_splash_seen',
        '72k_notif','72k_notif_start','72k_notif_shown','72k_notif_today',
        '72k_mile_25','72k_mile_50','72k_mile_75','72k_mile_100']
     .forEach(k=>localStorage.removeItem(k));
@@ -3923,6 +4077,9 @@ window.addEventListener('beforeinstallprompt', (e) => {
   // Show onboarding install button
   const ob = document.getElementById('obInstallBtn2');
   if(ob) ob.style.display='flex';
+  // Show splash install button if splash is visible
+  const splashBtn = document.getElementById('splashInstallBtn');
+  if(splashBtn) splashBtn.style.display='flex';
   // Update install card
   updateInstallCard();
 });
@@ -4423,6 +4580,75 @@ function dismissWelcomeBack() {
 }
 // ──────────────────────────────────────────────────────
 
+// ── SPLASH / INFOLAPP ────────────────────────────────
+function showSplash(){
+  var overlay = document.getElementById('splashOverlay');
+  if(overlay) overlay.classList.add('visible');
+  renderSplashLang();
+  // Show install button if PWA prompt is available
+  if(pwaPrompt){
+    var btn = document.getElementById('splashInstallBtn');
+    if(btn) btn.style.display = 'flex';
+  }
+}
+function dismissSplash(){
+  var overlay = document.getElementById('splashOverlay');
+  if(!overlay) return;
+  overlay.style.transition = 'opacity 0.3s';
+  overlay.style.opacity = '0';
+  setTimeout(function(){
+    overlay.classList.remove('visible');
+    overlay.style.opacity = '';
+    overlay.style.transition = '';
+  }, 300);
+  localStorage.setItem('72t_splash_seen', '1');
+  // Show onboarding
+  var ob = document.getElementById('onboarding');
+  if(ob) ob.style.display = 'flex';
+  applyLang();
+  checkSyncHash();
+}
+function splashInstall(){
+  if(pwaPrompt){
+    pwaPrompt.prompt();
+    pwaPrompt.userChoice.then(function(choice){
+      if(choice.outcome === 'accepted'){
+        showToastMsg(currentLang==='en'?'✓ App installed!':'✓ App installert!');
+      }
+      dismissSplash();
+    }).catch(function(){ dismissSplash(); });
+  } else {
+    showToastMsg(currentLang==='en'?'iPhone/Safari: tap the Share button → "Add to Home Screen"':'iPhone/Safari: trykk Del-knappen → «Legg til på Hjem-skjerm»');
+  }
+}
+function renderSplashLang(){
+  var en = currentLang === 'en';
+  var lb = document.getElementById('splashLangToggle');
+  if(lb) lb.textContent = en ? '🌐 NO' : '🌐 EN';
+  var el;
+  el=document.getElementById('splashTagline'); if(el) el.textContent=en?'Ready to take care of yourself – for 72 hours':'Klar til å klare deg selv – i 72 timer';
+  el=document.getElementById('splashWhatLabel'); if(el) el.textContent=en?'What is 72klar?':'Hva er 72klar?';
+  el=document.getElementById('splashF1T'); if(el) el.textContent=en?'Personal checklist':'Personlig sjekkliste';
+  el=document.getElementById('splashF1S'); if(el) el.textContent=en?'Tailored to your household – number of people, children, elderly, pets and medication':'Tilpasset din husstand – antall personer, barn, eldre, kjæledyr og medisiner';
+  el=document.getElementById('splashF2T'); if(el) el.textContent=en?'Live weather alerts':'Farevarsler i sanntid';
+  el=document.getElementById('splashF2S'); if(el) el.textContent=en?'Official alerts from the Met Office, linked to what you\'re missing':'Offisielle varsler fra Meteorologisk institutt, koblet til hva du mangler';
+  el=document.getElementById('splashF3T'); if(el) el.textContent=en?'Safe points':'Trygghetspunkter';
+  el=document.getElementById('splashF3S'); if(el) el.textContent=en?'Find the nearest municipal gathering point with water, warmth and power':'Finn nærmeste kommunale samlingspunkt med vann, varme og strøm';
+  el=document.getElementById('splashF4T'); if(el) el.textContent=en?'First aid & mental health':'Førstehjelp & psykisk helse';
+  el=document.getElementById('splashF4S'); if(el) el.textContent=en?'Step-by-step guidance – CPR, bleeding, burns and psychological first aid':'Steg-for-steg veiledning – HLR, blødning, brannskade og psykologisk førstehjelp';
+  el=document.getElementById('splashF5T'); if(el) el.textContent=en?'Works offline':'Fungerer offline';
+  el=document.getElementById('splashF5S'); if(el) el.textContent=en?'Install as an app – works without internet, exactly when you need it most':'Installer som app – fungerer uten nett, akkurat når du trenger den mest';
+  el=document.getElementById('splashWhyLabel'); if(el) el.textContent=en?'Why 72 hours?':'Hvorfor 72 timer?';
+  el=document.getElementById('splashStat1'); if(el) el.textContent=en?'Self-sufficient':'Klare deg selv';
+  el=document.getElementById('splashStat2'); if(el) el.textContent=en?'Completely free':'Helt gratis';
+  el=document.getElementById('splashStat3'); if(el) el.textContent=en?'Private & offline':'Privat & offline';
+  el=document.getElementById('splashDsb'); if(el) el.innerHTML=en?'🛡️ Based on recommendations from DSB – Norwegian Directorate for Civil Protection':'🛡️ Basert på anbefalinger fra DSB – Direktoratet for samfunnssikkerhet';
+  el=document.getElementById('splashInstallText'); if(el) el.textContent=en?'Install as app':'Installer som app';
+  el=document.getElementById('splashContinueText'); if(el) el.textContent=en?'Get started':'Kom i gang';
+  el=document.getElementById('splashNote'); if(el) el.textContent=en?'No account, no ads, no data stored outside your device.':'Ingen konto, ingen reklame, ingen data lagres utenfor din enhet.';
+}
+// ──────────────────────────────────────────────────────
+
 document.addEventListener('DOMContentLoaded', function() {
   applyTheme();
   scheduleNotifDayClear();
@@ -4432,7 +4658,11 @@ document.addEventListener('DOMContentLoaded', function() {
     updateChecklistDate();
     setTimeout(updateNotifUI, 500);
     checkSyncHash();
+  } else if(!localStorage.getItem('72t_splash_seen')){
+    // Brand new visitor – show splash infolapp
+    showSplash();
   } else {
+    // Returning visitor who saw splash but hasn't finished onboarding
     var ob = document.getElementById('onboarding');
     if(ob) ob.style.display = 'flex';
     applyLang();         // translate onboarding UI for returning EN users
