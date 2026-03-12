@@ -220,6 +220,16 @@
   .item-desc { font-size: 14px; color: var(--muted); margin-top: 2px; }
   .item-qty { font-size: 13px; background: rgba(247,127,0,0.15); color: var(--orange); border-radius: 6px; padding: 2px 7px; font-weight: 600; white-space: nowrap; margin-top: 4px; display: inline-block; }
   .item-emoji { font-size: 20px; }
+  .expiry-nudge {
+    font-size:11px; background:rgba(245,158,11,0.12); color:var(--gold);
+    border:1px solid rgba(245,158,11,0.3); border-radius:6px;
+    padding:2px 7px; cursor:pointer; white-space:nowrap; flex-shrink:0;
+    animation:expiryPulse 2s ease 1;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .expiry-nudge:active { background:rgba(245,158,11,0.25); }
+  @keyframes expiryPulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  .expiry-set { font-size:11px; color:var(--muted); white-space:nowrap; flex-shrink:0; }
 
   /* CONTACTS */
   .contacts-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
@@ -507,7 +517,7 @@
 <!-- SPLASH / INFOLAPP – vises kun for nye besøkende -->
 <div id="splashOverlay">
   <div class="splash-hero">
-    <div id="splashLangToggle" onclick="toggleLang();renderSplashLang();" style="position:absolute;top:12px;right:16px;background:rgba(255,255,255,0.18);border-radius:8px;padding:5px 10px;font-size:13px;font-weight:700;cursor:pointer;color:white;z-index:1;">🌐 EN</div>
+    <div id="splashLangToggle" onclick="currentLang=currentLang==='no'?'en':'no';localStorage.setItem('72t_lang',currentLang);renderSplashLang();" style="position:absolute;top:12px;right:16px;background:rgba(255,255,255,0.18);border-radius:8px;padding:5px 10px;font-size:13px;font-weight:700;cursor:pointer;color:white;z-index:1;">🌐 EN</div>
     <div class="splash-logo">72klar!</div>
     <div class="splash-tagline" id="splashTagline">Klar til å klare deg selv – i 72 timer</div>
   </div>
@@ -782,6 +792,7 @@
       <div id="checklistLastUpdated" style="font-size:11px;color:var(--muted);margin-top:6px;text-align:right;"></div>
     </div>
     <div id="expiryWarnings" style="display:none;margin-bottom:14px;"></div>
+    <div id="notifNudge" style="display:none;"></div>
     <div class="cl-filter-wrap" id="clFilterWrap">
       <button class="cl-filter-btn active" id="clFilterAll"    onclick="setClFilter('all')">Alle</button>
       <button class="cl-filter-btn"        id="clFilterTodo"   onclick="setClFilter('todo')">⬜ Gjenstår</button>
@@ -2036,7 +2047,7 @@ function startApp(){
   document.getElementById('headerSub').textContent=_saEn?'Hi, '+p.name+'! Ready for 72 hours.':'Hei, '+p.name+'! Klar for 72 timer.';
   const nl=[];if(needs.has('baby'))nl.push(_saEn?'baby':'baby');if(needs.has('eldre'))nl.push(_saEn?'elderly':'eldre');if(needs.has('hund'))nl.push(_saEn?'pet':'kjæledyr');if(needs.has('medisin'))nl.push(_saEn?'medication':'medisiner');
   document.getElementById('householdSummary').textContent='📊 '+n+(_saEn?' person'+( n>1?'s':''):' person'+(n>1?'er':''))+' · '+Math.round(n*9)+(_saEn?' L water':' L vann')+' · '+n*3+(_saEn?' portions/day':' porsjoner/dag')+(nl.length?' · '+nl.join(', '):'');
-  renderDailyTip(); renderWeeklyReminder(); renderChecklist(); fetchFarevarsel(); showNewFeaturesBanner(); recordActivity(); renderContacts(); renderMotivation(); renderWeeklyFocus(); renderExpiryWarnings(); checkExpiryNotifications(); checkInactivityReminder(); show7DayBanner(); renderTrygghetspunkter(); showWelcomeBack(); initMilestoneTracker();
+  renderDailyTip(); renderWeeklyReminder(); renderChecklist(); fetchFarevarsel(); showNewFeaturesBanner(); recordActivity(); renderContacts(); renderMotivation(); renderWeeklyFocus(); renderExpiryWarnings(); renderNotifNudge(); checkExpiryNotifications(); checkInactivityReminder(); show7DayBanner(); renderTrygghetspunkter(); showWelcomeBack(); initMilestoneTracker();
 }
 function _goToOnboarding(){
   document.getElementById('app').style.display='none';
@@ -2068,6 +2079,8 @@ function resetAll(){
   ['72t_profile','72t_checked','72t_contacts','72t_badges','72t_weekly_done',
        '72t_7day','72t_7day_shown','72t_shared','72t_last_activity','72t_features_seen',
        '72t_last_visit','72t_last_check','72t_pwa_dismissed','72t_expiry','72t_splash_seen',
+       '72t_expiry_tip_shown',
+       '72t_notif_nudge_dismissed',
        '72k_notif','72k_notif_start','72k_notif_shown','72k_notif_today',
        '72k_mile_25','72k_mile_50','72k_mile_75','72k_mile_100']
     .forEach(k=>localStorage.removeItem(k));
@@ -2305,7 +2318,7 @@ function renderWeeklyFocus(){
     +'<div style="font-family:Syne,sans-serif;font-size:17px;font-weight:800;">'+esc(focus.name)+'</div>'
     +(focus.qty?'<div style="font-size:13px;color:var(--orange);font-weight:600;margin-top:2px;">'+esc(focus.qty)+'</div>':'')
     +'</div></div>'
-    +'<button onclick="toggleItem(\''+focus.key.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\');renderWeeklyFocus();renderMotivation();" '
+    +'<button onclick="toggleItem(\''+focus.key.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\',true);renderWeeklyFocus();renderMotivation();" '
     +'style="width:100%;margin-top:14px;padding:13px;border-radius:12px;border:none;'
     +'background:linear-gradient(135deg,var(--green),#27AE60);color:white;'
     +'font-family:Syne,sans-serif;font-size:15px;font-weight:700;cursor:pointer;">'
@@ -2368,6 +2381,7 @@ function saveExpiry(){
   var clearBtn=document.getElementById('imExpiryClear');
   if(clearBtn) clearBtn.style.display=date?'block':'none';
   renderExpiryWarnings();
+  renderChecklist();
   checkBadges();
 }
 function clearExpiry(){
@@ -2382,7 +2396,58 @@ function clearExpiry(){
   if(input) input.value='';
   if(clearBtn) clearBtn.style.display='none';
   renderExpiryWarnings();
+  renderChecklist();
 }
+// ── VARSLER-NUDGE (vises etter 3+ avhukinger) ─────────
+function renderNotifNudge(){
+  var container = document.getElementById('notifNudge');
+  if(!container) return;
+  // Skjul hvis: varsler allerede aktivert, nudge avvist, under 3 avhukinger, eller nettleseren støtter det ikke
+  var alreadyEnabled = ('Notification' in window) && Notification.permission === 'granted' && localStorage.getItem('72k_notif') === '1';
+  var dismissed = localStorage.getItem('72t_notif_nudge_dismissed');
+  var tooFew = checkedItems.length < 3;
+  if(alreadyEnabled || dismissed || tooFew || !('Notification' in window)){
+    container.style.display = 'none';
+    return;
+  }
+  // Allerede avslått av nettleseren – ikke mas
+  if(Notification.permission === 'denied'){
+    container.style.display = 'none';
+    return;
+  }
+  container.style.display = 'block';
+  var en = currentLang === 'en';
+  container.innerHTML =
+    '<div style="background:linear-gradient(135deg,rgba(247,127,0,0.1),rgba(214,40,40,0.06));border:1px solid rgba(247,127,0,0.35);border-radius:14px;padding:16px;margin-bottom:14px;position:relative;">'
+    +'<button onclick="dismissNotifNudge()" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0;line-height:1;">✕</button>'
+    +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">'
+    +'<span style="font-size:28px;">🔔</span>'
+    +'<div>'
+    +'<div style="font-family:Syne,sans-serif;font-size:15px;font-weight:800;color:var(--orange);">'
+    +(en?'Stay on track!':'Hold deg oppdatert!')+'</div>'
+    +'<div style="font-size:13px;color:var(--muted);line-height:1.5;margin-top:2px;">'
+    +(en?'Get daily tips, expiry reminders and milestone celebrations. You can turn them off anytime.':'Få daglige tips, holdbarhetspåminnelser og milepælsfeiringer. Du kan skru dem av når som helst.')+'</div>'
+    +'</div></div>'
+    +'<button onclick="acceptNotifNudge()" style="width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--red),var(--orange));color:white;font-family:Syne,sans-serif;font-size:14px;font-weight:700;cursor:pointer;">'
+    +'🔔 '+(en?'Turn on notifications':'Skru på varsler')+'</button>'
+    +'</div>';
+}
+function acceptNotifNudge(){
+  localStorage.setItem('72t_notif_nudge_dismissed','1');
+  requestNotifPermission();
+  renderNotifNudge();
+}
+function dismissNotifNudge(){
+  localStorage.setItem('72t_notif_nudge_dismissed','1');
+  var container = document.getElementById('notifNudge');
+  if(container){
+    container.style.transition = 'opacity 0.3s, transform 0.3s';
+    container.style.opacity = '0';
+    container.style.transform = 'translateY(-8px)';
+    setTimeout(function(){ container.style.display = 'none'; container.style.opacity = ''; container.style.transform = ''; }, 300);
+  }
+}
+
 function renderExpiryWarnings(){
   var container=document.getElementById('expiryWarnings');
   if(!container) return;
@@ -2721,6 +2786,28 @@ function renderChecklist(){
 
       el.appendChild(cb);
       el.appendChild(info);
+
+      // Holdbarhetsdato-indikator for holdbare varer
+      if(_isPerishable(id)){
+        if(isC && expiryDates[id]){
+          // Avhuket + dato satt → vis datoen
+          var expTag = document.createElement('div');
+          expTag.className = 'expiry-set';
+          expTag.textContent = '📅 ' + expiryDates[id];
+          expTag.style.cursor = 'pointer';
+          expTag.onclick = function(e){ e.stopPropagation(); openItemModal(item, id, isC); };
+          el.appendChild(expTag);
+        } else {
+          // Uhuket, eller avhuket uten dato → vis tappbar 📅-nudge
+          var nudge = document.createElement('div');
+          nudge.className = 'expiry-nudge';
+          nudge.textContent = '📅';
+          nudge.setAttribute('title', currentLang==='en'?'Set expiry date':'Sett holdbarhetsdato');
+          nudge.onclick = function(e){ e.stopPropagation(); openItemModal(item, id, isC); };
+          el.appendChild(nudge);
+        }
+      }
+
       el.appendChild(emoji);
       body.appendChild(el);
     });
@@ -2774,7 +2861,7 @@ function openItemModal(item, id, isC){
   checkBtn.style.background = checked ? 'rgba(46,204,113,0.2)' : 'linear-gradient(135deg,var(--green),#27AE60)';
   checkBtn.style.color = checked ? 'var(--green)' : 'white';
   checkBtn.onclick = function(){
-    toggleItem(id);
+    toggleItem(id, true);
     closeItemModal();
   };
   overlay.style.display = 'flex';
@@ -2795,7 +2882,21 @@ function closeItemModal(){
   var overlay = document.getElementById('itemModalOverlay');
   if(overlay) overlay.style.display = 'none';
 }
-function toggleItem(id){
+
+// ── HOLDBARHETSDATO: identifiser varer som bør ha utløpsdato ──
+var _PERISHABLE_CATS = ['Vann & Drikke', 'Mat', 'Helse', 'Baby', 'Eldre', 'Kjæledyr'];
+var _PERISHABLE_EXCLUDE = ['boksåpner', 'can opener', 'nødliste', 'health info', 'bur', 'cage', 'bleier', 'nappies', 'våtservietter', 'wet wipes', 'babyklær', 'baby clothes', 'tepper', 'blankets'];
+function _isPerishable(id){
+  // id format: "💧 Vann & Drikke::Drikkevann"
+  var catPart = id.split('::')[0] || '';
+  var itemPart = (id.split('::')[1] || '').toLowerCase();
+  var inCat = _PERISHABLE_CATS.some(function(c){ return catPart.indexOf(c) !== -1; });
+  if(!inCat) return false;
+  var excluded = _PERISHABLE_EXCLUDE.some(function(ex){ return itemPart.indexOf(ex) !== -1; });
+  return !excluded;
+}
+
+function toggleItem(id, _skipAutoOpen){
   markChecklistUpdated();
   var wasChecked = checkedItems.includes(id);
   if(wasChecked) checkedItems=checkedItems.filter(i=>i!==id);
@@ -2812,8 +2913,8 @@ function toggleItem(id){
     else navigator.vibrate(8);
   }
   // Fast path: update just the changed item + progress, avoid full DOM rebuild
-  // Skip fast path when filter is active – item visibility may need to change
-  if(clFilter === 'all' && _fastToggle(id, !wasChecked)){
+  // Skip fast path when filter is active or when perishable item toggled (expiry badge changes)
+  if(clFilter === 'all' && !_isPerishable(id) && _fastToggle(id, !wasChecked)){
     _updateProgress();
     checkBadges();
   } else {
@@ -2822,6 +2923,30 @@ function toggleItem(id){
   // Oppdater motivasjon-kort etter toggle
   renderWeeklyFocus();
   renderExpiryWarnings();
+  renderNotifNudge();
+  // Auto-åpne modalen for holdbare varer når de hukes av (ikke av-hukes)
+  if(!wasChecked && !_skipAutoOpen && _isPerishable(id)){
+    setTimeout(function(){
+      // Guard: verify item is still checked (user may have double-tapped)
+      if(!checkedItems.includes(id)) return;
+      // Find the display-language item to pass to openItemModal
+      var displayCats = getCats(profile.persons, new Set(profile.needs), currentLang);
+      var keyCats = getCats(profile.persons, new Set(profile.needs), 'no');
+      for(var ci=0; ci<keyCats.length; ci++){
+        for(var ii=0; ii<keyCats[ci].items.length; ii++){
+          if(keyCats[ci].name+'::'+keyCats[ci].items[ii].name === id){
+            openItemModal(displayCats[ci].items[ii], id, true);
+            // Vis engangs-tips første gang
+            if(!localStorage.getItem('72t_expiry_tip_shown')){
+              localStorage.setItem('72t_expiry_tip_shown','1');
+              showToastMsg(currentLang==='en'?'💡 Tip: Set an expiry date so you get reminders!':'💡 Tips: Sett holdbarhetsdato så får du påminnelser!');
+            }
+            return;
+          }
+        }
+      }
+    }, 350);
+  }
 }
 // Fast toggle: update single item in-place without rebuilding the whole checklist
 function _fastToggle(id, isNowChecked){
@@ -3608,6 +3733,7 @@ function applyLang(skipRender){
     renderMotivation();
     renderWeeklyFocus();
     renderExpiryWarnings();
+    renderNotifNudge();
     renderTrygghetspunkter();
     renderContacts();
   }
@@ -3894,7 +4020,7 @@ const TRYGGHETSPUNKTER = {
 
 // Postnummerregister – Bring/Posten offisielt register (mars 2026)
 // 359 kommuner, 706 ranges, dekker 5122 postnumre
-const _KN=['Alstahaug','Alta','Alvdal','Alver','Andøy','Aremark','Arendal','Asker','Askvoll','Askøy','Aukra','Aure','Aurland','Aurskog-Høland','Austevoll','Austrheim','Averøy','Balsfjord','Bamble','Bardu','Beiarn','Bergen','Berlevåg','Bindal','Birkenes','Bjerkreim','Bjørnafjorden','Bodø','Bokn','Bremanger','Brønnøy','Bygland','Bykle','Båtsfjord','Bærum','Bø','Bømlo','Deatnu tana','Dovre','Drammen','Drangedal','Dyrøy','Dønna','Eidfjord','Eidskog','Eidsvoll','Eigersund','Elverum','Enebakk','Engerdal','Etne','Etnedal','Evenes','Evje og hornnes','Farsund','Fauske','Fedje','Fitjar','Fjaler','Fjord','Flakstad','Flatanger','Flekkefjord','Flesberg','Flå','Folldal','Fredrikstad','Frogn','Froland','Frosta','Frøya','Fyresdal','Færder','Gamvik','Gausdal','Gildeskål','Giske','Gjemnes','Gjerdrum','Gjerstad','Gjesdal','Gjøvik','Gloppen','Gol','Gran','Grane','Gratangen','Grimstad','Grong','Grue','Gulen','Guovdageaidnu kautokeino','Gáivuotna kåfjord','Hadsel','Halden','Hamar','Hamarøy','Hammerfest','Haram','Hareid','Harstad','Hasvik','Hattfjelldal','Haugesund','Heim','Hemnes','Hemsedal','Herøy (møre og romsdal)','Herøy (nordland)','Hitra','Hjartdal','Hjelmeland','Hol','Hole','Holmestrand','Holtålen','Horten','Hurdal','Hustadvika','Hvaler','Hyllestad','Hå','Hægebostad','Høyanger','Høylandet','Ibestad','Inderøy','Indre fosen','Indre østfold','Iveland','Jan mayen','Jevnaker','Karasjohka karasjok','Karlsøy','Karmøy','Kinn','Klepp','Kongsberg','Kongsvinger','Kragerø','Kristiansand','Kristiansund','Krødsherad','Kvam','Kvinesdal','Kvinnherad','Kviteseid','Kvitsøy','Kvæfjord','Kvænangen','Larvik','Lavangen','Lebesby','Leirfjord','Leka','Lesja','Levanger','Lier','Lierne','Lillehammer','Lillesand','Lillestrøm','Lindesnes','Lom','Loppa','Lund','Lunner','Lurøy','Luster','Lyngdal','Lyngen','Lærdal','Lødingen','Lørenskog','Løten','Malvik','Marker','Masfjorden','Melhus','Meløy','Meråker','Midt-Telemark','Midtre gauldal','Modalen','Modum','Molde','Moskenes','Moss','Målselv','Måsøy','Namsos','Namsskogan','Nannestad','Narvik','Nes','Nesbyen','Nesna','Nesodden','Nissedal','Nittedal','Nome','Nord-Aurdal','Nord-Fron','Nord-Odal','Nordkapp','Nordre follo','Nordre land','Nordreisa','Nore og uvdal','Notodden','Nærøysund','Oppdal','Orkland','Os','Osen','Oslo','Osterøy','Overhalla','Porsanger porsángu porsanki','Porsgrunn','Rakkestad','Rana','Randaberg','Rauma','Rendalen','Rennebu','Rindal','Ringebu','Ringerike','Ringsaker','Risør','Rollag','Råde','Rælingen','Rødøy','Røros','Røst','Røyrvik','Salangen','Saltdal','Samnanger','Sande','Sandefjord','Sandnes','Sarpsborg','Sauda','Sel','Selbu','Seljord','Senja','Sigdal','Siljan','Sirdal','Skaun','Skien','Skiptvet','Skjervøy','Skjåk','Smøla','Snåsa','Sogndal','Sokndal','Sola','Solund','Sortland','Stad','Stange','Stavanger','Steigen','Steinkjer','Stjørdal','Stor-Elvdal','Stord','Storfjord','Strand','Stranda','Stryn','Sula','Suldal','Sunndal','Sunnfjord','Surnadal','Svalbard','Sveio','Sykkylven','Sømna','Søndre land','Sør-Aurdal','Sør-Fron','Sør-Odal','Sør-Varanger','Sørfold','Sørreisa','Time','Tingvoll','Tinn','Tjeldsund','Tokke','Tolga','Tromsø','Trondheim','Trysil','Træna','Tvedestrand','Tydal','Tynset','Tysnes','Tysvær','Tønsberg','Ullensaker','Ullensvang','Ulstein','Ulvik','Unjargga nesseby','Utsira','Vadsø','Vaksdal','Valle','Vang','Vanylven','Vardø','Vefsn','Vega','Vegårshei','Vennesla','Verdal','Vestby','Vestnes','Vestre slidre','Vestre toten','Vestvågøy','Vevelstad','Vik','Vindafjord','Vinje','Volda','Voss','Vågan','Vågå','Våler (innlandet)','Våler (østfold)','Værøy','Åfjord','Ål','Ålesund','Åmli','Åmot','Årdal','Ås','Åseral','Åsnes','Øksnes','Ørland','Ørsta','Østre toten','Øvre eiker','Øyer','Øygarden','Øystre slidre'];
+const _KN=['Alstahaug','Alta','Alvdal','Alver','Andøy','Aremark','Arendal','Asker','Askvoll','Askøy','Aukra','Aure','Aurland','Aurskog-Høland','Austevoll','Austrheim','Averøy','Balsfjord','Bamble','Bardu','Beiarn','Bergen','Berlevåg','Bindal','Birkenes','Bjerkreim','Bjørnafjorden','Bodø','Bokn','Bremanger','Brønnøy','Bygland','Bykle','Båtsfjord','Bærum','Bø','Bømlo','Deatnu Tana','Dovre','Drammen','Drangedal','Dyrøy','Dønna','Eidfjord','Eidskog','Eidsvoll','Eigersund','Elverum','Enebakk','Engerdal','Etne','Etnedal','Evenes','Evje og Hornnes','Farsund','Fauske','Fedje','Fitjar','Fjaler','Fjord','Flakstad','Flatanger','Flekkefjord','Flesberg','Flå','Folldal','Fredrikstad','Frogn','Froland','Frosta','Frøya','Fyresdal','Færder','Gamvik','Gausdal','Gildeskål','Giske','Gjemnes','Gjerdrum','Gjerstad','Gjesdal','Gjøvik','Gloppen','Gol','Gran','Grane','Gratangen','Grimstad','Grong','Grue','Gulen','Guovdageaidnu Kautokeino','Gáivuotna Kåfjord','Hadsel','Halden','Hamar','Hamarøy','Hammerfest','Haram','Hareid','Harstad','Hasvik','Hattfjelldal','Haugesund','Heim','Hemnes','Hemsedal','Herøy (Møre og Romsdal)','Herøy (Nordland)','Hitra','Hjartdal','Hjelmeland','Hol','Hole','Holmestrand','Holtålen','Horten','Hurdal','Hustadvika','Hvaler','Hyllestad','Hå','Hægebostad','Høyanger','Høylandet','Ibestad','Inderøy','Indre Fosen','Indre Østfold','Iveland','Jan Mayen','Jevnaker','Karasjohka Karasjok','Karlsøy','Karmøy','Kinn','Klepp','Kongsberg','Kongsvinger','Kragerø','Kristiansand','Kristiansund','Krødsherad','Kvam','Kvinesdal','Kvinnherad','Kviteseid','Kvitsøy','Kvæfjord','Kvænangen','Larvik','Lavangen','Lebesby','Leirfjord','Leka','Lesja','Levanger','Lier','Lierne','Lillehammer','Lillesand','Lillestrøm','Lindesnes','Lom','Loppa','Lund','Lunner','Lurøy','Luster','Lyngdal','Lyngen','Lærdal','Lødingen','Lørenskog','Løten','Malvik','Marker','Masfjorden','Melhus','Meløy','Meråker','Midt-Telemark','Midtre Gauldal','Modalen','Modum','Molde','Moskenes','Moss','Målselv','Måsøy','Namsos','Namsskogan','Nannestad','Narvik','Nes','Nesbyen','Nesna','Nesodden','Nissedal','Nittedal','Nome','Nord-Aurdal','Nord-Fron','Nord-Odal','Nordkapp','Nordre Follo','Nordre Land','Nordreisa','Nore og Uvdal','Notodden','Nærøysund','Oppdal','Orkland','Os','Osen','Oslo','Osterøy','Overhalla','Porsanger Porsángu Porsanki','Porsgrunn','Rakkestad','Rana','Randaberg','Rauma','Rendalen','Rennebu','Rindal','Ringebu','Ringerike','Ringsaker','Risør','Rollag','Råde','Rælingen','Rødøy','Røros','Røst','Røyrvik','Salangen','Saltdal','Samnanger','Sande','Sandefjord','Sandnes','Sarpsborg','Sauda','Sel','Selbu','Seljord','Senja','Sigdal','Siljan','Sirdal','Skaun','Skien','Skiptvet','Skjervøy','Skjåk','Smøla','Snåsa','Sogndal','Sokndal','Sola','Solund','Sortland','Stad','Stange','Stavanger','Steigen','Steinkjer','Stjørdal','Stor-Elvdal','Stord','Storfjord','Strand','Stranda','Stryn','Sula','Suldal','Sunndal','Sunnfjord','Surnadal','Svalbard','Sveio','Sykkylven','Sømna','Søndre Land','Sør-Aurdal','Sør-Fron','Sør-Odal','Sør-Varanger','Sørfold','Sørreisa','Time','Tingvoll','Tinn','Tjeldsund','Tokke','Tolga','Tromsø','Trondheim','Trysil','Træna','Tvedestrand','Tydal','Tynset','Tysnes','Tysvær','Tønsberg','Ullensaker','Ullensvang','Ulstein','Ulvik','Unjargga Nesseby','Utsira','Vadsø','Vaksdal','Valle','Vang','Vanylven','Vardø','Vefsn','Vega','Vegårshei','Vennesla','Verdal','Vestby','Vestnes','Vestre Slidre','Vestre Toten','Vestvågøy','Vevelstad','Vik','Vindafjord','Vinje','Volda','Voss','Vågan','Vågå','Våler (Innlandet)','Våler (Østfold)','Værøy','Åfjord','Ål','Ålesund','Åmli','Åmot','Årdal','Ås','Åseral','Åsnes','Øksnes','Ørland','Ørsta','Østre Toten','Øvre Eiker','Øyer','Øygarden','Øystre Slidre'];
 const POSTNR_RANGES=[
   [1,1295,215],[1300,1369,34],[1371,1399,7],[1400,1406,205],[1407,,348],
   [1408,1425,205],[1429,1435,348],[1440,1449,67],[1450,1454,197],[1455,,67],
