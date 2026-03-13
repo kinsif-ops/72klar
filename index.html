@@ -230,6 +230,11 @@
   .expiry-nudge:active { background:rgba(245,158,11,0.25); }
   @keyframes expiryPulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
   .expiry-set { font-size:11px; color:var(--muted); white-space:nowrap; flex-shrink:0; }
+  .custom-item .item-name { font-style:italic; }
+  .custom-del { background:none; border:none; color:var(--muted); font-size:16px; cursor:pointer; padding:4px 6px; flex-shrink:0; opacity:0.5; transition:opacity 0.15s; }
+  .custom-del:hover,.custom-del:active { opacity:1; color:var(--red); }
+  .add-custom-btn { width:100%; padding:10px; border:1px dashed var(--border); border-radius:10px; background:none; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; margin-top:4px; transition:all 0.15s; display:flex; align-items:center; justify-content:center; gap:6px; }
+  .add-custom-btn:hover,.add-custom-btn:active { border-color:var(--orange); color:var(--orange); }
 
   /* CONTACTS */
   .contacts-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
@@ -1489,6 +1494,7 @@ let checkedItems = JSON.parse(localStorage.getItem('72t_checked') || '[]');
 let contacts = JSON.parse(localStorage.getItem('72t_contacts') || '[]');
 let earnedBadges = JSON.parse(localStorage.getItem('72t_badges') || '[]');
 let expiryDates = JSON.parse(localStorage.getItem('72t_expiry') || '{}');
+let customItems = JSON.parse(localStorage.getItem('72t_custom') || '{}'); // {catKeyName: [{name,emoji}]}
 let selectedPersons = 1, customNum = 6, selectedNeeds = new Set();
 var catKeyMap = {}, itemKeyMap = {}; // Shared key maps for fast toggle
 
@@ -2004,6 +2010,7 @@ function getCats(n, needs, lang) {
     {name:T("💊 Helse & Førstehjelp","💊 Health & First Aid"), items:[
       {name:T("Førstehjelpsskrin","First aid kit"),desc:()=>T("Bør inneholde: Plaster i ulike størrelser · Sterile bandasjer og kompresser · Elastisk bandasje · Desinfeksjonsmiddel (klorheksidin eller jod) · Saks og pinsett · Engangshansker · Termometer · Aluminiumsredningsduk · Øyeskyll · Sikkerhetsnåler · Trekantbandasje til armbind","Should include: Plasters in various sizes · Sterile bandages and dressings · Elastic bandage · Disinfectant (chlorhexidine or iodine) · Scissors and tweezers · Disposable gloves · Thermometer · Emergency foil blanket · Eye wash · Safety pins · Triangular bandage for sling"),qty:()=>n>=4?T("2 stk","2 pcs"):T("1 stk","1 pc"),emoji:"🩹"},
       {name:T("Smertestillende","Pain relief"),desc:()=>T("Ha begge typene tilgjengelig:\n\n💊 Paracetamol (f.eks. Paracet) – lindrer smerte og senker feber. Trygt for de fleste, også barn og gravide.\n\n💊 Ibuprofen (f.eks. Ibux) – virker også mot betennelse og hevelse. Ikke til barn under 6 måneder eller ved magesår.\n\nOBS: Følg alltid dosering på pakningen. Ha nok til minst 72 timer for hele husstanden.","Have both types available:\n\n💊 Paracetamol (e.g. Paracet) – relieves pain and reduces fever. Safe for most people, including children and pregnant women.\n\n💊 Ibuprofen (e.g. Ibux) – also works against inflammation and swelling. Not for children under 6 months or with stomach ulcers.\n\nNote: Always follow the dosage on the packaging. Have enough for at least 72 hours for the whole household."),qty:()=>n+T(' pakker av hver',' packs of each'),emoji:"🩺"},
+      {name:T("Jodtabletter","Iodine tablets"),desc:()=>T("Beskytter skjoldbruskkjertelen ved radioaktivt utslipp. DSB anbefaler dette i beredskapslageret.\n\nDosering: Voksne og barn over 12 år: 2 tabletter (130 mg). Barn 3–12 år: 1 tablett (65 mg). Barn under 3 år: ½ tablett.\n\nTa KUN etter instruks fra myndighetene. Ikke ta forebyggende uten offisiell beskjed.","Protects the thyroid gland during a radioactive release. Recommended by Norwegian authorities for emergency preparedness.\n\nDosage: Adults and children over 12: 2 tablets (130 mg). Children 3–12: 1 tablet (65 mg). Children under 3: ½ tablet.\n\nTake ONLY when instructed by authorities. Do not take preventively without official notice."),qty:()=>n>=3?T("2 pakker","2 packs"):T("1 pakke","1 pack"),emoji:"☢️"},
     ]},
     {name:T("🔦 Lys & Energi","🔦 Light & Energy"), items:[
       {name:T("Lommelykt + batterier","Torch + batteries"),desc:()=>T("Ladbare eller AA-batterier","Rechargeable or AA batteries"),qty:()=>n>=3?Math.ceil(n/2)+T(' stk',' pcs'):T("1 stk","1 pc"),emoji:"🔦"},
@@ -2136,6 +2143,7 @@ function resetAll(){
        '72t_last_visit','72t_last_check','72t_pwa_dismissed','72t_expiry','72t_splash_seen',
        '72t_expiry_tip_shown',
        '72t_notif_nudge_dismissed',
+       '72t_custom',
        '72k_notif','72k_notif_start','72k_notif_shown','72k_notif_today',
        '72k_mile_25','72k_mile_50','72k_mile_75','72k_mile_100']
     .forEach(k=>localStorage.removeItem(k));
@@ -2343,6 +2351,7 @@ var PURCHASE_INFO = {
   'boksåpner':        {price:'30–50',store:{no:'Dagligvare / Clas Ohlson',en:'Grocery / hardware'},tip:{no:'Enkel manuell type. Test at den fungerer.',en:'Simple manual type. Test that it works.'}},
   'Førstehjelpsskrin':{price:'150–300',store:{no:'Apotek / Clas Ohlson',en:'Pharmacy / hardware'},tip:{no:'Ferdigpakket skrin + ekstra plaster og bandasje.',en:'Pre-packed kit + extra plasters and bandages.'}},
   'Smertestillende':  {price:'50–100',store:{no:'Apotek / dagligvare',en:'Pharmacy / grocery'},tip:{no:'Paracet + Ibux. Sjekk holdbarhetsdato.',en:'Paracetamol + Ibuprofen. Check expiry date.'}},
+  'Jodtabletter':     {price:'50–100',store:{no:'Apotek',en:'Pharmacy'},tip:{no:'Kaliumjodid 65 mg. Spør på apoteket – reseptfritt. Holder i årevis.',en:'Potassium iodide 65 mg. Ask at the pharmacy – no prescription needed. Lasts for years.'}},
   'Faste medisiner':  {price:'—',store:{no:'Apotek (resept)',en:'Pharmacy (prescription)'},tip:{no:'Be fastlegen om 3-måneders resept. Start med dette.',en:'Ask your doctor for a 3-month prescription. Start here.'}},
   'Lommelykt':        {price:'100–250',store:{no:'Clas Ohlson / Biltema',en:'Hardware store'},tip:{no:'LED-lykt + ekstra AA-batterier. Hodelykt er enda bedre.',en:'LED torch + extra AA batteries. Headlamp is even better.'}},
   'Stearinlys':       {price:'30–60',store:{no:'Dagligvare / Nille',en:'Grocery / discount'},tip:{no:'Bloklys holder lengst. Ha en lighter ved siden av.',en:'Block candles last longest. Keep a lighter next to them.'}},
@@ -3017,6 +3026,63 @@ function renderChecklist(){
       body.appendChild(el);
     });
 
+    // ── CUSTOM ITEMS for this category ──
+    var catKeyName = catKeyMap[cat.name] || cat.name;
+    var customs = customItems[catKeyName] || [];
+    customs.forEach(function(ci, idx){
+      var cId = '_custom::'+catKeyName+'::'+ci.name;
+      var cIsC = checkedItems.includes(cId);
+
+      // Respect filter
+      if(clFilter === 'todo' && cIsC) return;
+      if(clFilter === 'done' && !cIsC) return;
+
+      var cel = document.createElement('div');
+      cel.className = 'checklist-item custom-item' + (cIsC?' checked':'');
+
+      var ccb = document.createElement('div');
+      ccb.className = 'checkbox' + (cIsC ? ' checked-anim' : '');
+      ccb.innerHTML = cIsC ? '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><polyline points="3,9 7,13 15,5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '';
+      ccb.onclick = function(e){
+        e.stopPropagation();
+        toggleCustomItem(cId);
+      };
+
+      var cinfo = document.createElement('div');
+      cinfo.className = 'item-info';
+      cinfo.style.flex = '1';
+      cinfo.innerHTML = '<div class="item-name">'+esc(ci.name)+'</div>';
+
+      var cdel = document.createElement('button');
+      cdel.className = 'custom-del';
+      cdel.textContent = '✕';
+      cdel.setAttribute('title', currentLang==='en'?'Remove custom item':'Fjern egendefinert punkt');
+      cdel.onclick = function(e){
+        e.stopPropagation();
+        removeCustomItem(catKeyName, idx, cId);
+      };
+
+      var cemoji = document.createElement('div');
+      cemoji.className = 'item-emoji';
+      cemoji.textContent = ci.emoji || '📌';
+
+      cel.appendChild(ccb);
+      cel.appendChild(cinfo);
+      cel.appendChild(cdel);
+      cel.appendChild(cemoji);
+      body.appendChild(cel);
+    });
+
+    // ── ADD (+) BUTTON ──
+    var addBtn = document.createElement('button');
+    addBtn.className = 'add-custom-btn';
+    addBtn.innerHTML = '+ '+(currentLang==='en'?'Add own item':'Legg til eget punkt');
+    addBtn.onclick = function(e){
+      e.stopPropagation();
+      promptAddCustomItem(catKeyName);
+    };
+    body.appendChild(addBtn);
+
     wrapper.appendChild(head);
     wrapper.appendChild(body);
     cont.appendChild(wrapper);
@@ -3154,6 +3220,46 @@ function toggleItem(id, _skipAutoOpen){
     }, 350);
   }
 }
+// ── EGENDEFINERTE PUNKTER ──
+function promptAddCustomItem(catKeyName){
+  var en = currentLang === 'en';
+  var name = prompt(en ? 'What do you want to add?' : 'Hva vil du legge til?');
+  if(!name || !name.trim()) return;
+  name = name.trim().substring(0, 80);
+  if(!customItems[catKeyName]) customItems[catKeyName] = [];
+  // Prevent duplicates
+  var exists = customItems[catKeyName].some(function(ci){ return ci.name.toLowerCase() === name.toLowerCase(); });
+  if(exists){
+    showToastMsg(en ? 'This item already exists' : 'Dette punktet finnes allerede');
+    return;
+  }
+  customItems[catKeyName].push({ name: name, emoji: '📌' });
+  localStorage.setItem('72t_custom', JSON.stringify(customItems));
+  renderChecklist();
+}
+function toggleCustomItem(cId){
+  var wasChecked = checkedItems.includes(cId);
+  if(wasChecked) checkedItems = checkedItems.filter(function(k){ return k !== cId; });
+  else checkedItems.push(cId);
+  localStorage.setItem('72t_checked', JSON.stringify(checkedItems));
+  if(navigator.vibrate){
+    if(!wasChecked) navigator.vibrate([12, 30, 8]);
+    else navigator.vibrate(8);
+  }
+  renderChecklist();
+}
+function removeCustomItem(catKeyName, idx, cId){
+  var en = currentLang === 'en';
+  if(!confirm(en ? 'Remove this item?' : 'Fjerne dette punktet?')) return;
+  if(customItems[catKeyName]) customItems[catKeyName].splice(idx, 1);
+  if(customItems[catKeyName] && customItems[catKeyName].length === 0) delete customItems[catKeyName];
+  localStorage.setItem('72t_custom', JSON.stringify(customItems));
+  // Also remove from checked
+  checkedItems = checkedItems.filter(function(k){ return k !== cId; });
+  localStorage.setItem('72t_checked', JSON.stringify(checkedItems));
+  renderChecklist();
+}
+
 // Fast toggle: update single item in-place without rebuilding the whole checklist
 function _fastToggle(id, isNowChecked){
   // Find the item element by scanning checklist items
