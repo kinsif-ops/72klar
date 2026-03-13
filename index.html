@@ -783,11 +783,12 @@
       <div style="background:linear-gradient(135deg,rgba(214,40,40,0.2),rgba(247,127,0,0.1));padding:20px 18px;position:relative;overflow:hidden;">
         <div style="position:absolute;right:-10px;top:-10px;font-size:80px;opacity:0.06;transform:rotate(12deg);pointer-events:none;">⚡</div>
         <div style="display:flex;align-items:center;gap:14px;">
-          <div style="font-size:36px;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(214,40,40,0.4));">⚡</div>
-          <div>
+          <div id="simCardHours" style="font-family:Syne,sans-serif;font-size:34px;font-weight:800;line-height:1;flex-shrink:0;min-width:56px;text-align:center;background:linear-gradient(135deg,var(--red),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">⚡</div>
+          <div style="flex:1;">
             <div id="simCardTitle" style="font-family:Syne,sans-serif;font-size:17px;font-weight:800;color:white;">Hva om strømmen gikk NÅ?</div>
-            <div id="simCardSub" style="font-size:13px;color:var(--muted);margin-top:3px;line-height:1.4;">Trykk for å se hvor lenge du klarer deg – basert på vær, klokke og sjekkliste</div>
+            <div id="simCardSub" style="font-size:13px;color:var(--muted);margin-top:3px;line-height:1.4;">Trykk for å se hvor lenge du klarer deg</div>
           </div>
+          <div style="color:var(--muted);font-size:14px;flex-shrink:0;">▸</div>
         </div>
       </div>
     </div>
@@ -2101,7 +2102,7 @@ function startApp(){
   document.getElementById('headerSub').textContent=_saEn?'Hi, '+p.name+'! Ready for 72 hours.':'Hei, '+p.name+'! Klar for 72 timer.';
   const nl=[];if(needs.has('baby'))nl.push(_saEn?'baby':'baby');if(needs.has('eldre'))nl.push(_saEn?'elderly':'eldre');if(needs.has('hund'))nl.push(_saEn?'pet':'kjæledyr');if(needs.has('medisin'))nl.push(_saEn?'medication':'medisiner');
   document.getElementById('householdSummary').textContent='📊 '+n+(_saEn?' person'+( n>1?'s':''):' person'+(n>1?'er':''))+' · '+Math.round(n*9)+(_saEn?' L water':' L vann')+' · '+n*3+(_saEn?' portions/day':' porsjoner/dag')+(nl.length?' · '+nl.join(', '):'');
-  renderDailyTip(); renderWeeklyReminder(); renderChecklist(); fetchFarevarsel(); showNewFeaturesBanner(); recordActivity(); renderContacts(); renderMotivation(); renderWeeklyFocus(); renderExpiryWarnings(); renderNotifNudge(); checkExpiryNotifications(); checkInactivityReminder(); show7DayBanner(); renderTrygghetspunkter(); showWelcomeBack(); initMilestoneTracker();
+  renderDailyTip(); renderWeeklyReminder(); renderChecklist(); fetchFarevarsel(); showNewFeaturesBanner(); recordActivity(); renderContacts(); renderMotivation(); renderWeeklyFocus(); renderExpiryWarnings(); renderNotifNudge(); updateSimCard(); checkExpiryNotifications(); checkInactivityReminder(); show7DayBanner(); renderTrygghetspunkter(); showWelcomeBack(); initMilestoneTracker();
 }
 function _goToOnboarding(){
   document.getElementById('app').style.display='none';
@@ -2361,44 +2362,65 @@ var PURCHASE_INFO = {
 };
 
 // Beregn sim-timer-effekt for en vare (hvor mye den endrer resultatet)
+// Rask sim-beregning (brukes av sim-kort og ukens oppgave)
+function quickSimHours(items){
+  if(!profile) return 0;
+  var persons = profile.persons;
+  var needs = new Set(profile.needs);
+  var keyCats = getCats(persons, needs, 'no');
+  function qHas(sub){
+    for(var ci=0;ci<keyCats.length;ci++){
+      for(var ii=0;ii<keyCats[ci].items.length;ii++){
+        var k=keyCats[ci].name+'::'+keyCats[ci].items[ii].name;
+        if(k.toLowerCase().indexOf(sub.toLowerCase())!==-1 && items.includes(k)) return true;
+      }
+    }
+    return false;
+  }
+  var limits=[];
+  limits.push(qHas('Drikkevann')?72:24);
+  limits.push((qHas('Hermetikkmat')||qHas('Knekkebrød')||qHas('Nøtter'))?72:(persons>=3?30:36));
+  var phone=qHas('Powerbank')?48:8;
+  limits.push(qHas('Radio')?72:phone);
+  if(needs.has('medisin')) limits.push(qHas('Faste medisiner')?72:18);
+  if(needs.has('baby')) limits.push(qHas('Barnemat')?72:10);
+  return Math.max(0, Math.min(72, Math.min.apply(null,limits)));
+}
+
+// Oppdater sim-kort med live timer
+function updateSimCard(){
+  var el = document.getElementById('simCardHours');
+  var title = document.getElementById('simCardTitle');
+  var sub = document.getElementById('simCardSub');
+  if(!el || !profile) return;
+  var hours = quickSimHours(checkedItems);
+  var en = currentLang === 'en';
+  el.textContent = hours + 't';
+  if(hours >= 72){
+    title.textContent = en ? 'You are ready for 72 hours!' : 'Du er klar for 72 timer!';
+    sub.textContent = en ? 'Tap for full situation report' : 'Trykk for full situasjonsrapport';
+    el.style.background = 'linear-gradient(135deg,var(--green),#27AE60)';
+  } else {
+    title.textContent = en
+      ? 'You would manage ~' + hours + ' of 72 hours'
+      : 'Du klarer deg i ~' + hours + ' av 72 timer';
+    sub.textContent = en ? 'Tap for full situation report' : 'Trykk for full situasjonsrapport';
+    el.style.background = hours >= 48
+      ? 'linear-gradient(135deg,var(--orange),#F59E0B)'
+      : 'linear-gradient(135deg,var(--red),var(--orange))';
+  }
+  // Re-apply clip
+  el.style.webkitBackgroundClip = 'text';
+  el.style.webkitTextFillColor = 'transparent';
+  el.style.backgroundClip = 'text';
+}
+
 function _calcSimImpact(itemKey){
   if(!profile) return 0;
-  // Simuler med og uten denne varen
   var withItem = checkedItems.slice();
   var withoutItem = withItem.filter(function(k){ return k !== itemKey; });
   if(!withItem.includes(itemKey)) withItem.push(itemKey);
-
-  function quickSim(items){
-    var persons = profile.persons;
-    var needs = new Set(profile.needs);
-    var keyCats = getCats(persons, needs, 'no');
-    function qHas(sub){
-      for(var ci=0;ci<keyCats.length;ci++){
-        for(var ii=0;ii<keyCats[ci].items.length;ii++){
-          var k=keyCats[ci].name+'::'+keyCats[ci].items[ii].name;
-          if(k.toLowerCase().indexOf(sub.toLowerCase())!==-1 && items.includes(k)) return true;
-        }
-      }
-      return false;
-    }
-    var limits=[];
-    // Water
-    limits.push(qHas('Drikkevann')?72:24);
-    // Food
-    limits.push((qHas('Hermetikkmat')||qHas('Knekkebrød')||qHas('Nøtter'))?72:(persons>=3?30:36));
-    // Comm
-    var phone=qHas('Powerbank')?48:8;
-    limits.push(qHas('Radio')?72:phone);
-    // Meds
-    if(needs.has('medisin')) limits.push(qHas('Faste medisiner')?72:18);
-    // Baby
-    if(needs.has('baby')) limits.push(qHas('Barnemat')?72:10);
-    return Math.min.apply(null,limits);
-  }
-
-  var hoursWith = quickSim(withItem);
-  var hoursWithout = quickSim(withoutItem);
-  return hoursWith - hoursWithout;
+  return quickSimHours(withItem) - quickSimHours(withoutItem);
 }
 
 function getWeeklyFocus(){
@@ -3107,6 +3129,7 @@ function toggleItem(id, _skipAutoOpen){
   renderWeeklyFocus();
   renderExpiryWarnings();
   renderNotifNudge();
+  updateSimCard();
   // Auto-åpne modalen for holdbare varer når de hukes av (ikke av-hukes)
   if(!wasChecked && !_skipAutoOpen && _isPerishable(id)){
     setTimeout(function(){
@@ -3844,8 +3867,6 @@ function applyLang(skipRender){
   const ssLbl=document.getElementById('shareStatusLabel'); if(ssLbl) ssLbl.textContent=en?'Share your preparedness status':'Del din beredskapsstatus';
   const spBtn=document.getElementById('shareProgressBtn'); if(spBtn) spBtn.textContent=en?'↗️ Share your progress':'↗️ Del fremgangen din';
   const tipLbl=document.getElementById('tipLabel'); if(tipLbl) tipLbl.textContent=en?'💡 Today\'s preparedness tip':'💡 Dagens beredskapstips';
-  const simT=document.getElementById('simCardTitle'); if(simT) simT.textContent=en?'What if the power went out NOW?':'Hva om strømmen gikk NÅ?';
-  const simS=document.getElementById('simCardSub'); if(simS) simS.textContent=en?'Tap to see how long you\'d last – based on weather, time and your checklist':'Trykk for å se hvor lenge du klarer deg – basert på vær, klokke og sjekkliste';
   const ptitle=document.getElementById('progressTitle'); if(ptitle) ptitle.textContent=en?'Preparedness status':'Beredskapsstatus';
   // Settings section
   const setLbl=document.getElementById('settingsLabel'); if(setLbl) setLbl.textContent=en?'⚙️ Settings':'⚙️ Innstillinger';
@@ -3919,6 +3940,7 @@ function applyLang(skipRender){
     renderWeeklyFocus();
     renderExpiryWarnings();
     renderNotifNudge();
+    updateSimCard();
     renderTrygghetspunkter();
     renderContacts();
   }
