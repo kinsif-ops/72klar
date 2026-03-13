@@ -4882,6 +4882,7 @@ async function runSimulation(){
 
   // Show loading state
   overlay.style.display = 'block';
+  document.body.style.overflow = 'hidden'; // Prevent body scroll behind overlay
   content.innerHTML =
     '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;">'
     +'<div style="text-align:center;">'
@@ -4914,7 +4915,10 @@ async function runSimulation(){
       });
     }
     var wUrl='https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current=temperature_2m,wind_speed_10m,precipitation&timezone=Europe%2FOslo';
-    var wR = await fetch(wUrl);
+    var wCtrl = new AbortController();
+    var wTimer = setTimeout(function(){ wCtrl.abort(); }, 5000);
+    var wR = await fetch(wUrl, {signal:wCtrl.signal});
+    clearTimeout(wTimer);
     var wD = await wR.json();
     temp = Math.round(wD.current.temperature_2m);
   } catch(e){ temp = null; }
@@ -4928,109 +4932,240 @@ async function runSimulation(){
   var keyCats = getCats(persons, needs, 'no');
   var displayCats = getCats(persons, needs, currentLang);
 
-  function has(substring){
-    for(var ci=0;ci<keyCats.length;ci++){
-      for(var ii=0;ii<keyCats[ci].items.length;ii++){
-        var key = keyCats[ci].name+'::'+keyCats[ci].items[ii].name;
-        if(key.toLowerCase().indexOf(substring.toLowerCase()) !== -1 && checkedItems.includes(key)) return true;
-      }
-    }
-    return false;
-  }
   function displayName(substring){
+    var firstMatch = null;
+    var checkedMatch = null;
     for(var ci=0;ci<displayCats.length;ci++){
       for(var ii=0;ii<displayCats[ci].items.length;ii++){
         var key = keyCats[ci].name+'::'+keyCats[ci].items[ii].name;
-        if(key.toLowerCase().indexOf(substring.toLowerCase()) !== -1)
-          return { name: displayCats[ci].items[ii].name, emoji: displayCats[ci].items[ii].emoji, key: key, has: checkedItems.includes(key) };
+        if(key.toLowerCase().indexOf(substring.toLowerCase()) !== -1){
+          var obj = { name: displayCats[ci].items[ii].name, emoji: displayCats[ci].items[ii].emoji, key: key, has: checkedItems.includes(key) };
+          if(!firstMatch) firstMatch = obj;
+          if(obj.has && !checkedMatch) checkedMatch = obj;
+        }
       }
     }
-    return null;
+    // Return checked match if any, otherwise first match (for name/emoji/key)
+    return checkedMatch || firstMatch || null;
   }
 
-  // Samle kritiske varer
-  var items = [
-    { id:'lommelykt', sub:'Lommelykt', critical:isNight, impact:4 },
-    { id:'stearinlys', sub:'Stearinlys', critical:isNight, impact:2 },
-    { id:'powerbank', sub:'Powerbank', critical:true, impact:6 },
-    { id:'radio', sub:'Radio', critical:true, impact:5 },
-    { id:'drikkevann', sub:'Drikkevann', critical:true, impact:10 },
-    { id:'hermetikk', sub:'Hermetikkmat', critical:true, impact:5 },
-    { id:'knekkebrød', sub:'Knekkebrød', critical:false, impact:3 },
-    { id:'tepper', sub:'tepper', critical:isCold, impact: isCold?8:2 },
-    { id:'klær', sub:'Varme klær', critical:isCold, impact: isCold?5:1 },
-    { id:'førstehjelpsskrin', sub:'Førstehjelpsskrin', critical:false, impact:3 },
-    { id:'kontanter', sub:'Kontanter', critical:false, impact:2 },
-    { id:'boksåpner', sub:'boksåpner', critical:false, impact:2 },
-  ];
-  if(needs.has('medisin')) items.push({ id:'medisiner', sub:'Faste medisiner', critical:true, impact:10 });
-  if(needs.has('baby')) items.push({ id:'barnemat', sub:'Barnemat', critical:true, impact:8 });
-  if(needs.has('hund')) items.push({ id:'kjæledyrmat', sub:'Kjæledyrmat', critical:false, impact:4 });
+  // ══════════════════════════════════════════════════
+  // REALISTISK RESSURSFORBRUK-MODELL
+  // «Klart seg» = opprettholdt forsvarlige leveforhold
+  // Timen er den TIDLIGSTE ressursen som blir uholdbar
+  // ══════════════════════════════════════════════════
 
-  // Beregn score
-  var maxScore = 0, score = 0;
+  // Beregn temperaturavhengig varmetap
+  // Norsk bolig: ~1.5°C/time varmetap ved ΔT=30°C (godt isolert)
+  // Faregrense: innetemperatur under 10°C
+  var indoorStart = 21; // typisk starttemp innendørs
+  var outdoorTemp = temp !== null ? temp : (isWinter ? -5 : 12);
+  var heatLossRate = Math.max(0, (indoorStart - outdoorTemp) * 0.05); // °C/time
+  var hoursTo10C = heatLossRate > 0 ? Math.round((indoorStart - 10) / heatLossRate) : 999;
+
+  // ── Ressursgrenser (timer til uholdbart) ──
+  var limits = [];
   var timeline = [];
   var fixes = [];
 
-  items.forEach(function(it){
-    var d = displayName(it.sub);
-    if(!d) return;
-    maxScore += it.impact;
-    var got = d.has;
-    if(got) score += it.impact;
-
-    var status = got ? 'ok' : (it.critical ? 'fail' : 'warn');
-    var emoji = got ? '✅' : (it.critical ? '❌' : '⚠️');
-
-    var msg = '';
-    if(it.sub === 'Lommelykt' || it.id === 'lommelykt'){
-      if(got) msg = en ? 'You have a <strong>torch</strong> – you can see in the dark.' : 'Du har <strong>lommelykt</strong> – du kan se i mørket.';
-      else if(isNight) msg = en ? 'You have <strong>no torch</strong>. It\'s pitch dark – you can\'t find anything.' : 'Du har <strong>ingen lommelykt</strong>. Det er bekmørkt – du finner ingenting.';
-      else msg = en ? 'You have <strong>no torch</strong>. It\'s still light, but nightfall will be a problem.' : 'Du har <strong>ingen lommelykt</strong>. Det er fortsatt lyst, men kvelden blir et problem.';
-    } else if(it.id === 'stearinlys'){
-      if(got) msg = en ? '<strong>Candles</strong> provide warmth and light.' : '<strong>Stearinlys</strong> gir varme og lys.';
-      else msg = en ? 'No <strong>candles</strong> – you lose a heat and light source.' : 'Ingen <strong>stearinlys</strong> – du mister en varme- og lyskilde.';
-    } else if(it.id === 'powerbank'){
-      if(got) msg = en ? '<strong>Powerbank</strong> keeps your phone alive for communication.' : '<strong>Powerbank</strong> holder telefonen i live for kommunikasjon.';
-      else msg = en ? '<strong>No powerbank</strong>. Your phone dies within hours – no contact with the outside world.' : '<strong>Ingen powerbank</strong>. Telefonen dør i løpet av timer – ingen kontakt med omverdenen.';
-    } else if(it.id === 'radio'){
-      if(got) msg = en ? '<strong>Battery radio</strong> – you receive official crisis information from NRK P1.' : '<strong>Batteriradio</strong> – du mottar offisiell kriseinformasjon fra NRK P1.';
-      else msg = en ? '<strong>No battery radio</strong>. When the phone dies, you have no source of information.' : '<strong>Ingen batteriradio</strong>. Når telefonen dør, har du ingen informasjonskilde.';
-    } else if(it.id === 'drikkevann'){
-      var litres = Math.round(persons * 9);
-      if(got) msg = en ? '<strong>'+litres+'L water</strong> – enough for '+persons+' people for 3 days.' : '<strong>'+litres+'L vann</strong> – nok til '+persons+' personer i 3 dager.';
-      else msg = en ? '<strong>No water supply</strong>. Taps stop working. '+persons+' people need '+litres+'L for 72 hours.' : '<strong>Ingen vannlager</strong>. Kranene slutter å virke. '+persons+' personer trenger '+litres+'L for 72 timer.';
-    } else if(it.id === 'hermetikk'){
-      if(got) msg = en ? '<strong>Canned food</strong> – you can eat without power or cooking.' : '<strong>Hermetikk</strong> – du kan spise uten strøm eller matlaging.';
-      else msg = en ? '<strong>No canned food</strong>. The fridge warms up within hours. After 48h the freezer too.' : '<strong>Ingen hermetikk</strong>. Kjøleskapet varmes opp i løpet av timer. Etter 48t fryseren også.';
-    } else if(it.id === 'tepper'){
-      if(got) msg = isCold ? (en ? '<strong>Warm blankets</strong> – critical at '+tempStr+'.' : '<strong>Varme tepper</strong> – kritisk ved '+tempStr+'.') : (en ? '<strong>Blankets</strong> available.' : '<strong>Tepper</strong> tilgjengelig.');
-      else msg = isCold ? (en ? '<strong>No extra blankets</strong>. At '+tempStr+' the indoor temperature drops fast without heating.' : '<strong>Ingen ekstra tepper</strong>. Ved '+tempStr+' synker innetemperaturen raskt uten oppvarming.') : (en ? 'No extra <strong>blankets</strong> – manageable in current weather.' : 'Ingen ekstra <strong>tepper</strong> – håndterbart i nåværende vær.');
-    } else if(it.id === 'medisiner'){
-      if(got) msg = en ? '<strong>Medication supply</strong> secured for 14 days.' : '<strong>Medisinlager</strong> sikret for 14 dager.';
-      else msg = en ? '<strong>No medication stock</strong>. Pharmacies may be closed – this is critical.' : '<strong>Ingen medisinlager</strong>. Apotek kan være stengt – dette er kritisk.';
-    } else if(it.id === 'barnemat'){
-      if(got) msg = en ? '<strong>Baby food</strong> – your child is taken care of.' : '<strong>Barnemat</strong> – barnet ditt er ivaretatt.';
-      else msg = en ? '<strong>No baby food stock</strong>. Shops may be closed for days.' : '<strong>Ingen barnemat på lager</strong>. Butikker kan være stengt i dagevis.';
+  // 1. VANN – 3L/person/dag → uten lager, uholdbart etter ~24t
+  var dVann = displayName('Drikkevann');
+  if(dVann){
+    if(dVann.has){
+      var wL = Math.round(persons*9);
+      timeline.push({status:'ok',emoji:'✅',msg:en
+        ?'<strong>'+wL+'L water</strong> stored – enough for '+persons+' people for 3 days. The taps may stop working, but you are covered.'
+        :'<strong>'+wL+'L vann</strong> lagret – nok til '+persons+' personer i 3 dager. Kranene kan slutte å virke, men du er dekket.',
+        limit:72});
+      limits.push(72);
     } else {
-      if(got) msg = '<strong>'+esc(d.name)+'</strong> ✓';
-      else msg = (en?'Missing: ':'Mangler: ')+'<strong>'+esc(d.name)+'</strong>';
+      timeline.push({status:'fail',emoji:'❌',msg:en
+        ?'<strong>No stored water.</strong> Taps may stop. Dehydration affects judgement after 12h, becomes dangerous after 24h. '+persons+' people need '+Math.round(persons*9)+'L for 72 hours.'
+        :'<strong>Ingen vannlager.</strong> Kranene kan stoppe. Dehydrering påvirker dømmekraft etter 12t, blir farlig etter 24t. '+persons+' personer trenger '+Math.round(persons*9)+'L for 72 timer.',
+        limit:24});
+      limits.push(24);
+      fixes.push({name:dVann.name,emoji:dVann.emoji,key:dVann.key,limit:24,critical:true});
     }
+  }
 
-    timeline.push({ status:status, emoji:emoji, msg:msg, impact:it.impact, got:got });
-    if(!got) fixes.push({ name:d.name, emoji:d.emoji, key:d.key, impact:it.impact, critical:it.critical });
-  });
+  // 2. VARME – temperaturavhengig
+  var dTepper = displayName('tepper');
+  var dKlær = displayName('Varme klær');
+  var hasWarmth = (dTepper && dTepper.has) || (dKlær && dKlær.has);
+  if(isCold){
+    var warmLimit = hasWarmth ? Math.min(hoursTo10C + 24, 72) : Math.min(hoursTo10C, 72);
+    if(hasWarmth){
+      timeline.push({status:'ok',emoji:'✅',msg:en
+        ?'<strong>Warm blankets/clothes</strong> available. The house reaches 10°C in ~'+hoursTo10C+'h at '+tempStr+', but you can insulate and endure.'
+        :'<strong>Varme tepper/klær</strong> tilgjengelig. Huset når 10°C på ~'+hoursTo10C+'t ved '+tempStr+', men du kan isolere deg og holde ut.',
+        limit:warmLimit});
+      limits.push(warmLimit);
+    } else {
+      timeline.push({status:'fail',emoji:'❌',msg:en
+        ?'<strong>No extra blankets or warm clothes.</strong> At '+tempStr+', indoor temperature drops to 10°C in ~'+hoursTo10C+'h. '+(needs.has('eldre')?'The elderly person is at risk of hypothermia.':'Risk of hypothermia increases.')
+        :'<strong>Ingen ekstra tepper eller varme klær.</strong> Ved '+tempStr+' synker innetemperaturen til 10°C på ~'+hoursTo10C+'t. '+(needs.has('eldre')?'Den eldre personen har risiko for hypotermi.':'Risikoen for hypotermi øker.'),
+        limit:hoursTo10C});
+      limits.push(hoursTo10C);
+      if(dTepper) fixes.push({name:dTepper.name,emoji:dTepper.emoji,key:dTepper.key,limit:hoursTo10C,critical:true});
+    }
+  } else {
+    if(hasWarmth) timeline.push({status:'ok',emoji:'✅',msg:en
+      ?'Temperature is '+tempStr+' – warmth is <strong>not a concern</strong> right now.'
+      :'Temperaturen er '+tempStr+' – varme er <strong>ikke et problem</strong> akkurat nå.',limit:72});
+    limits.push(72);
+  }
 
-  // Beregn timer
-  var pct72 = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
-  var hours = Math.round(72 * (score / maxScore));
-  if(isCold && !has('tepper') && !has('sovepose')) hours = Math.min(hours, 36);
-  if(!has('Drikkevann')) hours = Math.min(hours, 24);
-  if(needs.has('medisin') && !has('Faste medisiner')) hours = Math.min(hours, 18);
+  // 3. MAT – kjøleskap dør 4-6t, fryser 24-48t, uten lager uholdbart ~36t
+  var dHerm = displayName('Hermetikkmat');
+  var dKnekk = displayName('Knekkebrød');
+  var dNøtter = displayName('Nøtter');
+  var hasFood = (dHerm&&dHerm.has)||(dKnekk&&dKnekk.has)||(dNøtter&&dNøtter.has);
+  var foodLimit = hasFood ? 72 : (persons >= 3 ? 30 : 36);
+  if(hasFood){
+    timeline.push({status:'ok',emoji:'✅',msg:en
+      ?'<strong>Emergency food</strong> available (canned goods, crackers, nuts). The fridge dies in 4–6h, the freezer in 24–48h – eat perishables first, then switch.'
+      :'<strong>Nødmat</strong> tilgjengelig (hermetikk, knekkebrød, nøtter). Kjøleskapet dør om 4–6t, fryseren om 24–48t – spis ferskvarer først, bytt så.',
+      limit:72});
+  } else {
+    timeline.push({status:'warn',emoji:'⚠️',msg:en
+      ?'<strong>No emergency food.</strong> Fridge food lasts 4–6h, freezer 24–48h (don\'t open it!). After that, nothing to eat. '+(persons>=3?'With '+persons+' people, this becomes critical faster.':'')
+      :'<strong>Ingen nødmat.</strong> Kjøleskapsmat holder 4–6t, frysemat 24–48t (ikke åpne den!). Etter det har du ingenting å spise. '+(persons>=3?'Med '+persons+' personer blir dette kritisk raskere.':''),
+      limit:foodLimit});
+    if(dHerm) fixes.push({name:dHerm.name,emoji:dHerm.emoji,key:dHerm.key,limit:foodLimit,critical:false});
+  }
+  limits.push(foodLimit);
+
+  // 4. LYS – mørke = immobilisert, men ikke livsfarlig
+  var dLykt = displayName('Lommelykt');
+  var dLys = displayName('Stearinlys');
+  var hasLight = (dLykt&&dLykt.has)||(dLys&&dLys.has);
+  if(isNight){
+    if(hasLight){
+      timeline.push({status:'ok',emoji:'✅',msg:en
+        ?'<strong>Light sources</strong> available. You can navigate, find supplies and take care of children.'
+        :'<strong>Lyskilder</strong> tilgjengelig. Du kan navigere, finne utstyr og ta deg av barn.',limit:72});
+    } else {
+      timeline.push({status:'fail',emoji:'❌',msg:en
+        ?'<strong>No light.</strong> It is pitch dark. You cannot find supplies, help children, or move safely. Every night (~10h) is essentially lost.'
+        :'<strong>Ingen lys.</strong> Det er bekmørkt. Du kan ikke finne utstyr, hjelpe barn eller bevege deg trygt. Hver natt (~10t) er i praksis tapt.',limit:72});
+      if(dLykt) fixes.push({name:dLykt.name,emoji:dLykt.emoji,key:dLykt.key,limit:72,critical:true});
+    }
+  } else {
+    if(hasLight){
+      timeline.push({status:'ok',emoji:'✅',msg:en
+        ?'Still light outside. You have <strong>torches/candles</strong> ready for tonight.'
+        :'Fortsatt lyst ute. Du har <strong>lommelykt/stearinlys</strong> klare til i kveld.',limit:72});
+    } else {
+      timeline.push({status:'warn',emoji:'⚠️',msg:en
+        ?'No light sources. It\'s still bright, but <strong>tonight will be a problem</strong>.'
+        :'Ingen lyskilder. Det er fortsatt lyst, men <strong>i kveld blir det et problem</strong>.',limit:72});
+      if(dLykt) fixes.push({name:dLykt.name,emoji:dLykt.emoji,key:dLykt.key,limit:72,critical:false});
+    }
+  }
+
+  // 5. KOMMUNIKASJON – telefon dør 6-12t, radio = eneste livline
+  var dPB = displayName('Powerbank');
+  var dRadio = displayName('Radio');
+  var phoneHours = (dPB&&dPB.has) ? 48 : 8; // med powerbank holder mobilen ~48t
+  var hasRadio = dRadio&&dRadio.has;
+  var commLimit = hasRadio ? 72 : phoneHours;
+  if(dPB&&dPB.has){
+    timeline.push({status:'ok',emoji:'✅',msg:en
+      ?'<strong>Powerbank</strong> extends your phone battery to ~48h. You can call, receive alerts and use offline maps.'
+      :'<strong>Powerbank</strong> forlenger telefonbatteriet til ~48t. Du kan ringe, motta varsler og bruke offlinekart.',limit:48});
+  } else {
+    timeline.push({status:'fail',emoji:'❌',msg:en
+      ?'<strong>No powerbank.</strong> Your phone dies in 6–8 hours. After that: no calls, no maps, no alerts.'
+      :'<strong>Ingen powerbank.</strong> Telefonen dør om 6–8 timer. Etter det: ingen samtaler, ingen kart, ingen varsler.',limit:8});
+    if(dPB) fixes.push({name:dPB.name,emoji:dPB.emoji,key:dPB.key,limit:8,critical:true});
+  }
+  if(hasRadio){
+    timeline.push({status:'ok',emoji:'✅',msg:en
+      ?'<strong>Battery radio</strong> – you receive crisis updates from NRK P1 even after your phone dies.'
+      :'<strong>Batteriradio</strong> – du mottar kriseoppdateringer fra NRK P1 selv etter at telefonen dør.',limit:72});
+  } else {
+    timeline.push({status:'warn',emoji:'⚠️',msg:en
+      ?'<strong>No battery radio.</strong> When your phone dies'+(dPB&&dPB.has?' (after ~48h)':' (after ~8h)')+', you have zero access to official crisis information. You could miss evacuation orders.'
+      :'<strong>Ingen batteriradio.</strong> Når telefonen dør'+(dPB&&dPB.has?' (etter ~48t)':' (etter ~8t)')+', har du null tilgang til offisiell kriseinformasjon. Du kan gå glipp av evakueringsordre.',limit:commLimit});
+    if(dRadio) fixes.push({name:dRadio.name,emoji:dRadio.emoji,key:dRadio.key,limit:commLimit,critical:true});
+  }
+  limits.push(commLimit);
+
+  // 6. MEDISINER – kritisk innen 12-24t
+  if(needs.has('medisin')){
+    var dMed = displayName('Faste medisiner');
+    if(dMed && dMed.has){
+      timeline.push({status:'ok',emoji:'✅',msg:en
+        ?'<strong>14-day medication supply</strong> secured. Pharmacies may be closed for days during a crisis.'
+        :'<strong>14 dagers medisinlager</strong> sikret. Apotek kan være stengt i dagevis under en krise.',limit:72});
+      limits.push(72);
+    } else {
+      timeline.push({status:'fail',emoji:'❌',msg:en
+        ?'<strong>No medication stock.</strong> Pharmacies close without power. Depending on the medication, this becomes dangerous within 12–24 hours.'
+        :'<strong>Ingen medisinlager.</strong> Apotek stenger uten strøm. Avhengig av medisinen blir dette farlig innen 12–24 timer.',limit:18});
+      limits.push(18);
+      if(dMed) fixes.push({name:dMed.name,emoji:dMed.emoji,key:dMed.key,limit:18,critical:true});
+    }
+  }
+
+  // 7. BABY – uten mat/melk krise innen 8-12t
+  if(needs.has('baby')){
+    var dBaby = displayName('Barnemat');
+    if(dBaby && dBaby.has){
+      timeline.push({status:'ok',emoji:'✅',msg:en
+        ?'<strong>Baby food/formula</strong> stocked. Your child is taken care of for 3+ days.'
+        :'<strong>Barnemat/morsmelkerstatning</strong> på lager. Barnet ditt er ivaretatt i 3+ dager.',limit:72});
+      limits.push(72);
+    } else {
+      timeline.push({status:'fail',emoji:'❌',msg:en
+        ?'<strong>No baby food.</strong> A small child cannot eat canned goods. Shops may be closed. This is critical within 8–12 hours.'
+        :'<strong>Ingen barnemat.</strong> Et lite barn kan ikke spise hermetikk. Butikker kan være stengt. Dette er kritisk innen 8–12 timer.',limit:10});
+      limits.push(10);
+      if(dBaby) fixes.push({name:dBaby.name,emoji:dBaby.emoji,key:dBaby.key,limit:10,critical:true});
+    }
+  }
+
+  // 8. KJÆLEDYR
+  if(needs.has('hund')){
+    var dPet = displayName('Kjæledyrmat');
+    if(dPet && dPet.has){
+      timeline.push({status:'ok',emoji:'✅',msg:en
+        ?'<strong>Pet food</strong> stocked for 3 days.'
+        :'<strong>Kjæledyrmat</strong> på lager i 3 dager.',limit:72});
+    } else {
+      timeline.push({status:'warn',emoji:'⚠️',msg:en
+        ?'<strong>No pet food.</strong> Your pet needs feeding within 24 hours.'
+        :'<strong>Ingen kjæledyrmat.</strong> Kjæledyret ditt trenger mat innen 24 timer.',limit:48});
+      if(dPet) fixes.push({name:dPet.name,emoji:dPet.emoji,key:dPet.key,limit:48,critical:false});
+    }
+  }
+
+  // 9. FØRSTEHJELPSSKRIN – ikke tidsavgrensende, men viktig
+  var dFH = displayName('Førstehjelpsskrin');
+  if(dFH){
+    if(dFH.has) timeline.push({status:'ok',emoji:'✅',msg:en?'<strong>First aid kit</strong> available.':'<strong>Førstehjelpsskrin</strong> tilgjengelig.',limit:72});
+    else timeline.push({status:'warn',emoji:'⚠️',msg:en?'No <strong>first aid kit</strong>. If anyone gets hurt, you have no supplies.':'Ingen <strong>førstehjelpsskrin</strong>. Hvis noen skader seg, har du ikke utstyr.',limit:72});
+  }
+
+  // 10. KONTANTER
+  var dKontanter = displayName('Kontanter');
+  if(dKontanter){
+    if(dKontanter.has) timeline.push({status:'ok',emoji:'✅',msg:en?'<strong>Cash</strong> available – card terminals won\'t work.':'<strong>Kontanter</strong> tilgjengelig – kortterminaler fungerer ikke.',limit:72});
+    else timeline.push({status:'warn',emoji:'⚠️',msg:en?'No <strong>cash</strong>. Card payment requires power – you can\'t buy anything.':'Ingen <strong>kontanter</strong>. Kortbetaling krever strøm – du kan ikke kjøpe noe.',limit:72});
+  }
+
+  // ── Beregn endelig timer ──
+  // Timer = den tidligste ressursen som blir uholdbar
+  var hours = limits.length > 0 ? Math.min.apply(null, limits) : 0;
   hours = Math.max(0, Math.min(72, hours));
 
-  // Sorter fixes etter impact (viktigst først)
-  fixes.sort(function(a,b){ return b.impact - a.impact; });
+  // Finn den begrensende faktoren
+  var limitingIdx = limits.indexOf(hours);
+  var limitingItem = timeline.filter(function(t){ return t.limit === hours && t.status !== 'ok'; })[0];
+  var limitingReason = limitingItem ? limitingItem.msg : '';
+
+  // Sorter fixes etter grense (mest presserende først)
+  fixes.sort(function(a,b){ return a.limit - b.limit; });
   var topFixes = fixes.slice(0, 3);
 
   // Trygghetspunkt
@@ -5050,7 +5185,7 @@ async function runSimulation(){
   if(temp !== null) html += (en?'It is <strong>'+tempStr+'</strong> outside.':'Det er <strong>'+tempStr+'</strong> ute.') + ' ';
   if(isNight) html += en?'It\'s <strong>dark</strong>.':'Det er <strong>mørkt</strong>.';
   else html += en?'It\'s still light.':'Det er fortsatt lyst.';
-  html += ' ' + persons + (en?' people in your household.':' personer i husstanden.');
+  html += ' ' + persons + (en?(' person'+(persons>1?'s':'')+' in your household.'):(' person'+(persons>1?'er':'')+' i husstanden.'));
   if(needs.has('baby')) html += ' '+(en?'Including a <strong>small child</strong>.':'Inkludert et <strong>lite barn</strong>.');
   if(needs.has('eldre')) html += ' '+(en?'Including an <strong>elderly person</strong>.':'Inkludert en <strong>eldre person</strong>.');
   if(needs.has('medisin')) html += ' '+(en?'Someone depends on <strong>medication</strong>.':'Noen er avhengig av <strong>medisiner</strong>.');
@@ -5061,10 +5196,12 @@ async function runSimulation(){
   html += '<div class="sim-body">';
   html += '<div class="sim-timeline-label sim-anim" style="animation-delay:0.15s">'+(en?'Your situation':'Din situasjon')+'</div>';
 
-  // Sort: fails first, then warns, then ok
+  // Sort: fails first by urgency, then warns, then ok
   var sorted = timeline.slice().sort(function(a,b){
     var order = {fail:0,warn:1,ok:2};
-    return (order[a.status]||2) - (order[b.status]||2);
+    var oa = order[a.status]||2, ob = order[b.status]||2;
+    if(oa !== ob) return oa - ob;
+    return (a.limit||72) - (b.limit||72); // most urgent first within same status
   });
 
   sorted.forEach(function(item, i){
@@ -5081,14 +5218,23 @@ async function runSimulation(){
   html += '<div class="sim-hours" id="simHoursNum">'+hours+'</div>';
   html += '<div class="sim-hours-label">'+(en?'of 72 hours':'av 72 timer')+'</div>';
   html += '<div class="sim-bar-wrap"><div class="sim-bar-fill" id="simBarFill" style="width:0%"></div></div>';
-  html += '<div style="font-size:13px;color:var(--muted);">'
+  html += '<div style="font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5;">'
     + (name ? name+' ' : '')
-    + (en ? 'and household would manage approx. <strong style="color:var(--orange)">'+hours+' of 72 hours</strong>.'
-          : 'og husstanden ville klart ca. <strong style="color:var(--orange)">'+hours+' av 72 timer</strong>.')
+    + (en ? 'and household could maintain acceptable conditions for approx. <strong style="color:var(--orange)">'+hours+' of 72 hours</strong>.'
+          : 'og husstanden kunne opprettholdt forsvarlige forhold i ca. <strong style="color:var(--orange)">'+hours+' av 72 timer</strong>.')
     + '</div>';
+  if(hours < 72 && limitingReason){
+    html += '<div style="font-size:12px;color:var(--red);margin-top:8px;padding:8px 10px;background:rgba(214,40,40,0.08);border-radius:8px;line-height:1.5;">'
+      +(en?'⏱️ Limiting factor (~'+hours+'h): ':'⏱️ Begrensende faktor (~'+hours+'t): ')
+      +limitingReason+'</div>';
+  }
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:10px;font-style:italic;line-height:1.5;">'
+    +(en?'«Managed» = maintained drinkable water, liveable temperature, food, communication and medical needs for all household members.'
+       :'«Klart seg» = opprettholdt drikkevann, levelig temperatur, mat, kommunikasjon og medisinske behov for alle i husstanden.')
+    +'</div>';
   html += '</div>';
 
-  // Topp 3 ting å fikse
+  // Topp 3 ting å fikse – eller gratulasjon
   if(topFixes.length > 0){
     html += '<div class="sim-fix-title sim-anim" style="animation-delay:'+(rd+0.15).toFixed(2)+'s">'
       +(en?'Fix these first':'Fiks dette først')+'</div>';
@@ -5096,10 +5242,18 @@ async function runSimulation(){
       var fd = rd + 0.2 + i * 0.08;
       html += '<div class="sim-fix-item sim-anim" style="animation-delay:'+fd.toFixed(2)+'s" onclick="closeSimulation();setTimeout(function(){var nb=document.querySelectorAll(\'nav button\');if(nb[1])nb[1].click();},200);">';
       html += '<div class="sim-fix-emoji">'+fix.emoji+'</div>';
-      html += '<div class="sim-fix-text">'+esc(fix.name)+(fix.critical?' <span style="color:var(--red);font-size:11px;font-weight:700;">'+( en?'CRITICAL':'KRITISK')+'</span>':'')+'</div>';
+      html += '<div class="sim-fix-text">'+esc(fix.name)+(fix.critical?' <span style="color:var(--red);font-size:11px;font-weight:700;">'+( en?'~'+fix.limit+'h':'~'+fix.limit+'t')+'</span>':'')+'</div>';
       html += '<div class="sim-fix-arrow">→</div>';
       html += '</div>';
     });
+  } else if(hours >= 72){
+    html += '<div class="sim-anim" style="animation-delay:'+(rd+0.15).toFixed(2)+'s;background:linear-gradient(135deg,rgba(46,204,113,0.12),rgba(46,204,113,0.04));border:1px solid rgba(46,204,113,0.35);border-radius:14px;padding:18px;text-align:center;">'
+      +'<div style="font-size:36px;margin-bottom:8px;">🛡️</div>'
+      +'<div style="font-family:Syne,sans-serif;font-size:17px;font-weight:800;color:var(--green);">'+(en?'You are fully prepared!':'Du er fullt forberedt!')+'</div>'
+      +'<div style="font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5;">'
+      +(en?'Your household can maintain acceptable conditions for the full 72 hours. You are among the best prepared in Norway.'
+         :'Husstanden din kan opprettholde forsvarlige forhold i hele 72 timer. Du er blant de best forberedte i Norge.')
+      +'</div></div>';
   }
 
   // Trygghetspunkt
@@ -5133,13 +5287,21 @@ async function runSimulation(){
 function closeSimulation(){
   var overlay = document.getElementById('simOverlay');
   if(overlay) overlay.style.display = 'none';
+  document.body.style.overflow = '';
 }
+// Escape key closes sim
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape'){
+    var sim = document.getElementById('simOverlay');
+    if(sim && sim.style.display === 'block'){ closeSimulation(); return; }
+  }
+});
 
 function shareSimulation(hours){
   var en = currentLang === 'en';
   var name = profile ? profile.name : '';
   var text = en
-    ? (name||'I') + ' would survive ' + hours + ' of 72 hours in a power outage ⚡🛡️ How long would you last? Try 72klar! ' + APP_URL
+    ? (name||'I') + ' would manage ' + hours + ' of 72 hours in a power outage ⚡🛡️ How long would you last? Try 72klar! ' + APP_URL
     : (name||'Jeg') + ' ville klart ' + hours + ' av 72 timer ved strømbrudd ⚡🛡️ Hvor lenge klarer du deg? Prøv 72klar! ' + APP_URL;
   if(navigator.share){
     navigator.share({title:'72klar!', text:text, url:APP_URL}).catch(function(){});
