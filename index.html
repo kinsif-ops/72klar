@@ -548,6 +548,48 @@
   .sim-trygg { background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.25); border-radius:12px; padding:14px; margin-top:14px; display:flex; gap:12px; align-items:center; }
   @keyframes simFadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
   .sim-anim { animation:simFadeIn 0.4s ease both; }
+
+  /* KRISEMODUS */
+  #crisisOverlay { display:none; position:fixed; inset:0; z-index:2000; background:var(--dark); overflow-y:auto; -webkit-overflow-scrolling:touch; }
+  #crisisOverlay.active { display:flex; flex-direction:column; }
+  .crisis-header { background:linear-gradient(160deg,#2a0000 0%,#1a0000 50%,#0a0a1e 100%); padding:20px 18px 18px; position:relative; overflow:hidden; flex-shrink:0; }
+  .crisis-header::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,0,0,0.02) 3px,rgba(255,0,0,0.02) 4px); pointer-events:none; }
+  .crisis-pulse { width:12px; height:12px; border-radius:50%; background:var(--red); display:inline-block; margin-right:8px; animation:crisisPulse 1.5s ease infinite; }
+  @keyframes crisisPulse { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(214,40,40,0.7)} 50%{opacity:0.8;box-shadow:0 0 0 8px rgba(214,40,40,0)} }
+  .crisis-exit { position:absolute; top:16px; right:16px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:var(--muted); border-radius:10px; padding:8px 14px; font-size:13px; cursor:pointer; font-family:'DM Sans',sans-serif; }
+  .crisis-title { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:white; margin-top:4px; }
+  .crisis-time { font-size:12px; color:rgba(255,255,255,0.5); margin-top:4px; font-family:'DM Sans',sans-serif; }
+  .crisis-body { flex:1; padding:18px; }
+  .crisis-section { margin-bottom:20px; }
+  .crisis-section-label { font-family:'Syne',sans-serif; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--red); margin-bottom:10px; }
+  .crisis-step { display:flex; gap:12px; align-items:flex-start; padding:12px 14px; background:var(--card); border:1px solid var(--border); border-radius:12px; margin-bottom:8px; }
+  .crisis-step-num { font-family:'Syne',sans-serif; font-size:14px; font-weight:800; color:var(--red); min-width:24px; }
+  .crisis-step-text { font-size:14px; line-height:1.6; color:var(--text); flex:1; }
+  .crisis-step-text strong { color:white; }
+  .crisis-resource { display:flex; align-items:center; gap:12px; padding:14px; background:var(--card); border:1px solid var(--border); border-radius:12px; margin-bottom:8px; }
+  .crisis-resource-icon { font-size:24px; flex-shrink:0; }
+  .crisis-resource-info { flex:1; }
+  .crisis-resource-name { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; color:var(--text); }
+  .crisis-resource-detail { font-size:12px; color:var(--muted); margin-top:2px; line-height:1.4; }
+  .crisis-resource-bar { height:6px; background:var(--border); border-radius:99px; margin-top:6px; overflow:hidden; }
+  .crisis-resource-bar-fill { height:6px; border-radius:99px; transition:width 0.8s ease; }
+  .crisis-resource.ok { border-color:rgba(46,204,113,0.3); }
+  .crisis-resource.ok .crisis-resource-bar-fill { background:var(--green); }
+  .crisis-resource.warn { border-color:rgba(247,127,0,0.3); }
+  .crisis-resource.warn .crisis-resource-bar-fill { background:var(--orange); }
+  .crisis-resource.fail { border-color:rgba(214,40,40,0.3); }
+  .crisis-resource.fail .crisis-resource-bar-fill { background:var(--red); }
+  .crisis-contact { display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--card); border:1px solid var(--border); border-radius:12px; margin-bottom:8px; }
+  .crisis-contact-info { flex:1; }
+  .crisis-contact-name { font-weight:700; font-size:14px; }
+  .crisis-contact-num { font-size:13px; color:var(--muted); }
+  .crisis-call-btn { background:linear-gradient(135deg,var(--green),#27AE60); color:white; border:none; border-radius:10px; padding:10px 16px; font-family:'Syne',sans-serif; font-size:14px; font-weight:700; cursor:pointer; text-decoration:none; flex-shrink:0; }
+  .crisis-nav-btn { display:flex; align-items:center; gap:12px; width:100%; padding:14px; background:var(--card); border:1px solid var(--border); border-radius:12px; margin-bottom:8px; cursor:pointer; text-align:left; font-family:'DM Sans',sans-serif; font-size:14px; color:var(--text); }
+  .crisis-nav-btn:active { background:var(--dark2); }
+  .crisis-nav-icon { font-size:22px; flex-shrink:0; }
+  .crisis-nav-arrow { color:var(--muted); margin-left:auto; }
+  @keyframes crisisFade { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .crisis-anim { animation:crisisFade 0.35s ease both; }
 </style>
 </head>
 <body>
@@ -797,6 +839,18 @@
         </div>
       </div>
     </div>
+
+    <!-- KRISEMODUS AKTIVERING -->
+    <div id="crisisSuggestBanner" style="display:none;background:linear-gradient(135deg,rgba(214,40,40,0.2),rgba(214,40,40,0.08));border:1px solid rgba(214,40,40,0.5);border-radius:14px;padding:16px;margin-bottom:14px;cursor:pointer;animation:crisisPulse 3s ease infinite;" onclick="activateCrisisMode()">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span class="crisis-pulse"></span>
+        <div style="flex:1;">
+          <div id="crisisSuggestTitle" style="font-family:Syne,sans-serif;font-size:15px;font-weight:800;color:var(--red);">Farevarsel! Aktiver krisemodus?</div>
+          <div id="crisisSuggestSub" style="font-size:12px;color:var(--muted);margin-top:2px;">Trykk for handlingsplan, ressursoversikt og nødkontakter</div>
+        </div>
+      </div>
+    </div>
+    <button id="crisisManualBtn" onclick="activateCrisisMode()" style="display:none;width:100%;padding:12px;border-radius:12px;border:1px solid rgba(214,40,40,0.3);background:rgba(214,40,40,0.06);color:var(--red);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;margin-bottom:14px;transition:all 0.15s;">🔴 <span id="crisisManualLabel">Aktiver krisemodus</span></button>
 
     <!-- SOCIAL SHARE SCORE -->
     <div id="socialShareCard" style="display:none;background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:14px;text-align:center;">
@@ -1404,6 +1458,17 @@
 
 <!-- KRISESIMULATOR MODAL -->
 <div id="simOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:1002;overflow-y:auto;-webkit-overflow-scrolling:touch;" onclick="closeSimulation()">
+
+<!-- KRISEMODUS OVERLAY -->
+<div id="crisisOverlay">
+  <div class="crisis-header">
+    <button class="crisis-exit" onclick="exitCrisisMode()" id="crisisExitBtn">✕ Avslutt</button>
+    <div><span class="crisis-pulse"></span><span style="font-family:Syne,sans-serif;font-size:11px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:2px;" id="crisisActiveLabel">KRISEMODUS AKTIV</span></div>
+    <div class="crisis-title" id="crisisTitle">Strømbrudd</div>
+    <div class="crisis-time" id="crisisTime"></div>
+  </div>
+  <div class="crisis-body" id="crisisBody"></div>
+</div>
   <div style="min-height:100%;padding:0;" onclick="event.stopPropagation()">
     <div id="simContent" style="max-width:480px;margin:0 auto;padding:0 0 40px;"></div>
   </div>
@@ -1950,8 +2015,10 @@ async function fetchFarevarsel(){
       det+=(_fen?'<span style="color:var(--muted);font-size:12px;">⚠️ For detailed maps, check varsom.no and yr.no</span>':'<span style="color:var(--muted);font-size:12px;">⚠️ For detaljerte kart, sjekk varsom.no og yr.no</span>');
       if(body) body.innerHTML=det;
       // Koble farevarsel til manglende punkter
+      window._fareLevel = level;
       if(level>=1&&profile){ var _miss=getMissingForWeather(weatherTypes); renderWeatherWarningCard(_miss,level); }
       else { renderWeatherWarningCard(null,0); }
+      if(level>=2) suggestCrisisMode(level);
       metAlertSuccess=true;
     }
   } catch(e){ /* MET API failed, fall back to Open-Meteo */ }
@@ -2109,7 +2176,7 @@ function startApp(){
   document.getElementById('headerSub').textContent=_saEn?'Hi, '+p.name+'! Ready for 72 hours.':'Hei, '+p.name+'! Klar for 72 timer.';
   const nl=[];if(needs.has('baby'))nl.push(_saEn?'baby':'baby');if(needs.has('eldre'))nl.push(_saEn?'elderly':'eldre');if(needs.has('hund'))nl.push(_saEn?'pet':'kjæledyr');if(needs.has('medisin'))nl.push(_saEn?'medication':'medisiner');
   document.getElementById('householdSummary').textContent='📊 '+n+(_saEn?' person'+( n>1?'s':''):' person'+(n>1?'er':''))+' · '+Math.round(n*9)+(_saEn?' L water':' L vann')+' · '+n*3+(_saEn?' portions/day':' porsjoner/dag')+(nl.length?' · '+nl.join(', '):'');
-  renderDailyTip(); renderWeeklyReminder(); renderChecklist(); fetchFarevarsel(); showNewFeaturesBanner(); recordActivity(); renderContacts(); renderMotivation(); renderWeeklyFocus(); renderExpiryWarnings(); renderNotifNudge(); updateSimCard(); checkExpiryNotifications(); checkInactivityReminder(); show7DayBanner(); renderTrygghetspunkter(); showWelcomeBack(); initMilestoneTracker();
+  renderDailyTip(); renderWeeklyReminder(); renderChecklist(); fetchFarevarsel(); showNewFeaturesBanner(); recordActivity(); renderContacts(); renderMotivation(); renderWeeklyFocus(); renderExpiryWarnings(); renderNotifNudge(); updateSimCard(); updateCrisisUI(); checkExpiryNotifications(); checkInactivityReminder(); show7DayBanner(); renderTrygghetspunkter(); showWelcomeBack(); initMilestoneTracker();
 }
 function _goToOnboarding(){
   document.getElementById('app').style.display='none';
@@ -5127,6 +5194,328 @@ function dismissWelcomeBack() {
 // ──────────────────────────────────────────────────────
 
 // ══════════════════════════════════════════════════════
+// KRISEMODUS – Handlingsplan ved reell krise
+// ══════════════════════════════════════════════════════
+var _crisisActive = false;
+var _crisisStartTime = null;
+
+function suggestCrisisMode(level){
+  // Show suggest banner when orange/red warning
+  var banner = document.getElementById('crisisSuggestBanner');
+  if(banner && !_crisisActive && !localStorage.getItem('72t_crisis_dismissed_'+new Date().toDateString())){
+    banner.style.display = 'block';
+    var en = currentLang === 'en';
+    var title = document.getElementById('crisisSuggestTitle');
+    var sub = document.getElementById('crisisSuggestSub');
+    if(title) title.textContent = level >= 3
+      ? (en ? '🔴 Red weather warning! Activate crisis mode?' : '🔴 Rødt farevarsel! Aktiver krisemodus?')
+      : (en ? '🟠 Severe weather warning – activate crisis mode?' : '🟠 Oransje farevarsel – aktiver krisemodus?');
+    if(sub) sub.textContent = en ? 'Tap for action plan, resource overview and emergency contacts' : 'Trykk for handlingsplan, ressursoversikt og nødkontakter';
+  }
+}
+
+function activateCrisisMode(){
+  if(!profile) return;
+  _crisisActive = true;
+  _crisisStartTime = _crisisStartTime || new Date();
+  document.body.style.overflow = 'hidden';
+  var overlay = document.getElementById('crisisOverlay');
+  if(overlay) overlay.classList.add('active');
+  // Hide suggestion banner
+  var banner = document.getElementById('crisisSuggestBanner');
+  if(banner) banner.style.display = 'none';
+  renderCrisisMode();
+  // Start timer update
+  if(window._crisisTimer) clearInterval(window._crisisTimer);
+  window._crisisTimer = setInterval(renderCrisisTimer, 60000);
+}
+
+function exitCrisisMode(){
+  _crisisActive = false;
+  document.body.style.overflow = '';
+  var overlay = document.getElementById('crisisOverlay');
+  if(overlay) overlay.classList.remove('active');
+  if(window._crisisTimer) clearInterval(window._crisisTimer);
+  // Dismiss suggest for today
+  localStorage.setItem('72t_crisis_dismissed_'+new Date().toDateString(), '1');
+}
+
+function renderCrisisTimer(){
+  var el = document.getElementById('crisisTime');
+  if(!el || !_crisisStartTime) return;
+  var elapsed = Date.now() - _crisisStartTime.getTime();
+  var hrs = Math.floor(elapsed / 3600000);
+  var mins = Math.floor((elapsed % 3600000) / 60000);
+  var en = currentLang === 'en';
+  el.textContent = (en ? 'Crisis active for ' : 'Krise aktiv i ') + (hrs > 0 ? hrs + 't ' : '') + mins + (en ? 'min' : ' min');
+}
+
+function renderCrisisMode(){
+  var body = document.getElementById('crisisBody');
+  if(!body || !profile) return;
+  var en = currentLang === 'en';
+  var persons = profile.persons;
+  var needs = new Set(profile.needs);
+  var name = profile.name || '';
+  var now = new Date();
+  var hour = now.getHours();
+  var isNight = hour >= 22 || hour < 6;
+
+  // Translate header
+  var titleEl = document.getElementById('crisisTitle');
+  var exitEl = document.getElementById('crisisExitBtn');
+  var activeEl = document.getElementById('crisisActiveLabel');
+  if(titleEl) titleEl.textContent = en ? 'Power outage' : 'Strømbrudd';
+  if(exitEl) exitEl.textContent = '✕ '+(en ? 'Exit' : 'Avslutt');
+  if(activeEl) activeEl.textContent = en ? 'CRISIS MODE ACTIVE' : 'KRISEMODUS AKTIV';
+  renderCrisisTimer();
+
+  // Get item status
+  var keyCats = getCats(persons, needs, 'no');
+  function qHas(sub){
+    for(var ci=0;ci<keyCats.length;ci++){
+      for(var ii=0;ii<keyCats[ci].items.length;ii++){
+        var k=keyCats[ci].name+'::'+keyCats[ci].items[ii].name;
+        if(k.toLowerCase().indexOf(sub.toLowerCase())!==-1 && checkedItems.includes(k)) return true;
+      }
+    }
+    return false;
+  }
+
+  var html = '';
+  var d = 0; // animation delay counter
+
+  // ── SECTION 1: FIRST STEPS ──
+  html += '<div class="crisis-section">';
+  html += '<div class="crisis-section-label crisis-anim" style="animation-delay:'+(d*0.08)+'s">'+(en?'First steps – right now':'Første steg – akkurat nå')+'</div>';
+
+  var steps = [];
+  steps.push({text: en
+    ? '<strong>Breathe.</strong> Don\'t panic. You are prepared for this.'
+    : '<strong>Pust.</strong> Ikke få panikk. Du er forberedt på dette.'});
+
+  if(isNight && qHas('Lommelykt'))
+    steps.push({text: en ? '<strong>Grab your torch</strong> – it\'s dark. Check that it works.' : '<strong>Finn lommelykten</strong> – det er mørkt. Sjekk at den virker.'});
+  else if(isNight)
+    steps.push({text: en ? 'It\'s dark. <strong>Find candles or your phone torch</strong> immediately.' : 'Det er mørkt. <strong>Finn stearinlys eller mobillykten</strong> umiddelbart.'});
+
+  steps.push({text: en
+    ? '<strong>Check that everyone is OK.</strong> '+ persons +' people in your household.'
+    : '<strong>Sjekk at alle har det bra.</strong> '+ persons +' personer i husstanden.'});
+
+  if(needs.has('medisin'))
+    steps.push({text: en ? '<strong>Secure medication.</strong> Locate the supply now – you may need it before power returns.' : '<strong>Sikre medisinene.</strong> Finn lageret nå – du kan trenge det før strømmen kommer tilbake.'});
+  if(needs.has('baby'))
+    steps.push({text: en ? '<strong>Prepare baby supplies.</strong> Warm formula/food while you still have hot water.' : '<strong>Gjør klar babyutstyr.</strong> Varm morsmelkerstatning/mat mens du fortsatt har varmt vann.'});
+
+  steps.push({text: en
+    ? '<strong>Check if it\'s just you or a larger outage.</strong> Call a neighbour or check <a href="https://www.telecominfraproject.com" style="color:var(--blue);">nettstatus</a>.'
+    : '<strong>Sjekk om det bare er deg eller et større utfall.</strong> Ring en nabo eller sjekk <a href="https://kraftsystemet.no" style="color:var(--blue);">kraftsystemet.no</a>.'});
+
+  steps.push({text: en
+    ? '<strong>Don\'t open the fridge.</strong> It stays cold for 4–6 hours if you keep it closed. The freezer holds 24–48h.'
+    : '<strong>Ikke åpne kjøleskapet.</strong> Det holder seg kaldt i 4–6 timer hvis du lar det stå igjen. Fryseren holder 24–48t.'});
+
+  if(qHas('Radio'))
+    steps.push({text: en ? '<strong>Turn on your battery radio.</strong> NRK P1 broadcasts crisis updates 24/7.' : '<strong>Skru på batteriradio.</strong> NRK P1 sender kriseoppdateringer døgnet rundt.'});
+  else if(qHas('Powerbank'))
+    steps.push({text: en ? '<strong>Save phone battery.</strong> Turn off WiFi, Bluetooth, lower brightness. Use only for radio (NRK P1 via app) and calls.' : '<strong>Spar telefonbatteri.</strong> Slå av WiFi, Bluetooth, senk lysstyrke. Bruk bare til radio (NRK P1 via appen) og samtaler.'});
+  else
+    steps.push({text: en ? '<strong>Save phone battery NOW.</strong> No powerbank = phone dies in 6–8h. Airplane mode, lowest brightness. Use only for critical calls.' : '<strong>Spar telefonbatteri NÅ.</strong> Ingen powerbank = telefonen dør om 6–8t. Flymodus, lavest lysstyrke. Bruk bare til kritiske samtaler.'});
+
+  steps.forEach(function(s, i){
+    d++;
+    html += '<div class="crisis-step crisis-anim" style="animation-delay:'+(d*0.08)+'s">';
+    html += '<div class="crisis-step-num">'+(i+1)+'</div>';
+    html += '<div class="crisis-step-text">'+s.text+'</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // ── SECTION 2: RESOURCE STATUS ──
+  html += '<div class="crisis-section">';
+  d++;
+  html += '<div class="crisis-section-label crisis-anim" style="animation-delay:'+(d*0.08)+'s">'+(en?'Your resources':'Dine ressurser')+'</div>';
+
+  var resources = [];
+
+  // Water
+  var hasWater = qHas('Drikkevann');
+  var waterL = Math.round(persons * 9);
+  var waterEnd = new Date(now.getTime() + (hasWater ? 72 : 0) * 3600000);
+  resources.push({
+    icon:'💧', name:en?'Water':'Vann',
+    detail: hasWater
+      ? (en?waterL+'L stored – lasts until '+_fmtDate(waterEnd,en) : waterL+'L lagret – holder til '+_fmtDate(waterEnd,en))
+      : (en?'No stored water. Find alternative sources immediately.' : 'Ingen vannlager. Finn alternative kilder umiddelbart.'),
+    hours: hasWater?72:0, status: hasWater?'ok':'fail'
+  });
+
+  // Food
+  var hasFood = qHas('Hermetikkmat')||qHas('Knekkebrød')||qHas('Nøtter');
+  var foodHrs = hasFood ? 72 : 36;
+  var foodEnd = new Date(now.getTime() + foodHrs * 3600000);
+  resources.push({
+    icon:'🥫', name:en?'Food':'Mat',
+    detail: hasFood
+      ? (en?'Emergency food available. Eat fridge food first, then freezer, then canned.' : 'Nødmat tilgjengelig. Spis kjøleskapsmat først, deretter frysemat, deretter hermetikk.')
+      : (en?'No emergency food. Fridge: ~6h, Freezer: ~48h (keep closed!). After that, nothing.' : 'Ingen nødmat. Kjøleskap: ~6t, Fryser: ~48t (hold lukket!). Etter det, ingenting.'),
+    hours:foodHrs, status: hasFood?'ok':'warn'
+  });
+
+  // Power/Comms
+  var hasPB = qHas('Powerbank');
+  var hasRadio = qHas('Radio');
+  var commHrs = hasRadio ? 72 : (hasPB ? 48 : 8);
+  var phoneEnd = new Date(now.getTime() + (hasPB?48:8) * 3600000);
+  resources.push({
+    icon:'📱', name:en?'Communication':'Kommunikasjon',
+    detail: hasRadio
+      ? (en?'Battery radio + '+(hasPB?'powerbank':'phone')+'. Information secured for 72h.' : 'Batteriradio + '+(hasPB?'powerbank':'telefon')+'. Informasjon sikret i 72t.')
+      : hasPB
+        ? (en?'Powerbank extends phone to ~48h. No radio – save battery for NRK app.' : 'Powerbank forlenger telefon til ~48t. Ingen radio – spar batteri til NRK-appen.')
+        : (en?'Phone dies in ~8h. No radio. Save battery: airplane mode, lowest brightness, critical calls only.' : 'Telefon dør om ~8t. Ingen radio. Spar batteri: flymodus, lavest lysstyrke, kun kritiske samtaler.'),
+    hours:commHrs, status: hasRadio?'ok':(hasPB?'warn':'fail')
+  });
+
+  // Light
+  var hasLight = qHas('Lommelykt')||qHas('Stearinlys');
+  resources.push({
+    icon:'🔦', name:en?'Light':'Lys',
+    detail: hasLight
+      ? (en?'Torch and/or candles available.' : 'Lommelykt og/eller stearinlys tilgjengelig.')
+      : (en?'No light sources. Use phone torch sparingly – it drains battery fast.' : 'Ingen lyskilder. Bruk mobillykten sparsomt – den tapper batteriet raskt.'),
+    hours:hasLight?72:72, status: hasLight?'ok':'warn'
+  });
+
+  // Warmth (only if cold)
+  var hasWarmth = qHas('tepper')||qHas('Varme klær');
+  if(window._fareLevel >= 1 || (new Date().getMonth() >= 9 || new Date().getMonth() <= 3)){
+    resources.push({
+      icon:'🧣', name:en?'Warmth':'Varme',
+      detail: hasWarmth
+        ? (en?'Blankets/warm clothes available. Gather everyone in one room to conserve heat.' : 'Tepper/varme klær tilgjengelig. Samle alle i ett rom for å bevare varmen.')
+        : (en?'No extra blankets. Layer all available clothes. Stay in the smallest room. Close doors.' : 'Ingen ekstra tepper. Lag på med alt av klær. Hold dere i minste rom. Lukk dører.'),
+      hours:72, status: hasWarmth?'ok':'warn'
+    });
+  }
+
+  // Meds
+  if(needs.has('medisin')){
+    var hasMed = qHas('Faste medisiner');
+    resources.push({
+      icon:'💊', name:en?'Medication':'Medisiner',
+      detail: hasMed
+        ? (en?'14-day supply secured.' : '14 dagers forsyning sikret.')
+        : (en?'No medication stock! Ration what you have. Contact doctor/pharmacy early.' : 'Ingen medisinlager! Rasjonér det du har. Kontakt lege/apotek tidlig.'),
+      hours:hasMed?72:18, status:hasMed?'ok':'fail'
+    });
+  }
+
+  resources.forEach(function(r){
+    d++;
+    html += '<div class="crisis-resource '+r.status+' crisis-anim" style="animation-delay:'+(d*0.08)+'s">';
+    html += '<div class="crisis-resource-icon">'+r.icon+'</div>';
+    html += '<div class="crisis-resource-info">';
+    html += '<div class="crisis-resource-name">'+r.name+'</div>';
+    html += '<div class="crisis-resource-detail">'+r.detail+'</div>';
+    html += '<div class="crisis-resource-bar"><div class="crisis-resource-bar-fill" style="width:'+Math.round(r.hours/72*100)+'%"></div></div>';
+    html += '</div></div>';
+  });
+  html += '</div>';
+
+  // ── SECTION 3: EMERGENCY CONTACTS ──
+  html += '<div class="crisis-section">';
+  d++;
+  html += '<div class="crisis-section-label crisis-anim" style="animation-delay:'+(d*0.08)+'s">'+(en?'Emergency contacts':'Nødkontakter')+'</div>';
+
+  // Fixed emergency numbers
+  var emergNums = [
+    {name:en?'Fire/rescue':'Brannvesen', num:'110', emoji:'🚒'},
+    {name:en?'Ambulance':'Ambulanse', num:'113', emoji:'🚑'},
+    {name:en?'Police':'Politi', num:'112', emoji:'👮'},
+  ];
+  emergNums.forEach(function(c){
+    d++;
+    html += '<div class="crisis-contact crisis-anim" style="animation-delay:'+(d*0.08)+'s">';
+    html += '<span style="font-size:24px;">'+c.emoji+'</span>';
+    html += '<div class="crisis-contact-info"><div class="crisis-contact-name">'+c.name+'</div><div class="crisis-contact-num">'+c.num+'</div></div>';
+    html += '<a href="tel:'+c.num+'" class="crisis-call-btn">'+(en?'Call':'Ring')+'</a>';
+    html += '</div>';
+  });
+
+  // User's own contacts
+  if(contacts.length > 0){
+    d++;
+    html += '<div style="font-size:12px;color:var(--muted);margin:8px 0 6px;font-weight:600;" class="crisis-anim" style="animation-delay:'+(d*0.08)+'s">'+(en?'Your contacts':'Dine kontakter')+'</div>';
+    contacts.forEach(function(c){
+      d++;
+      html += '<div class="crisis-contact crisis-anim" style="animation-delay:'+(d*0.08)+'s">';
+      html += '<span style="font-size:24px;">👤</span>';
+      html += '<div class="crisis-contact-info"><div class="crisis-contact-name">'+esc(c.name)+'</div><div class="crisis-contact-num">'+esc(c.phone)+(c.role?' · '+esc(c.role):'')+'</div></div>';
+      html += '<a href="tel:'+esc(c.phone)+'" class="crisis-call-btn">'+(en?'Call':'Ring')+'</a>';
+      html += '</div>';
+    });
+  }
+  html += '</div>';
+
+  // ── SECTION 4: TRYGGHETSPUNKT ──
+  var postnr = profile.postnr || '';
+  var kommune = getKommune(postnr);
+  if(kommune && kommune.trygghetspunkter.length > 0){
+    html += '<div class="crisis-section">';
+    d++;
+    html += '<div class="crisis-section-label crisis-anim" style="animation-delay:'+(d*0.08)+'s">'+(en?'Safe points nearby':'Trygghetspunkter i nærheten')+'</div>';
+    kommune.trygghetspunkter.forEach(function(tp){
+      d++;
+      html += '<a href="'+esc(tp.gmaps)+'" target="_blank" rel="noopener noreferrer" class="crisis-nav-btn crisis-anim" style="animation-delay:'+(d*0.08)+'s;text-decoration:none;">';
+      html += '<span class="crisis-nav-icon">🏛️</span>';
+      html += '<div style="flex:1;"><div style="font-weight:700;">'+esc(tp.navn)+'</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">'+esc(tp.adresse)+'</div></div>';
+      html += '<span class="crisis-nav-arrow">🗺️ →</span>';
+      html += '</a>';
+    });
+    html += '</div>';
+  }
+
+  // ── SECTION 5: QUICK LINKS ──
+  html += '<div class="crisis-section">';
+  d++;
+  html += '<div class="crisis-section-label crisis-anim" style="animation-delay:'+(d*0.08)+'s">'+(en?'Quick access':'Hurtigtilgang')+'</div>';
+  d++;
+  html += '<button class="crisis-nav-btn crisis-anim" style="animation-delay:'+(d*0.08)+'s" onclick="exitCrisisMode();setTimeout(function(){var nb=document.querySelectorAll(\'nav button\');if(nb[3])nb[3].click();},200);"><span class="crisis-nav-icon">🚑</span><div style="flex:1;font-weight:700;">'+(en?'First aid guides':'Førstehjelp-veiledninger')+'</div><span class="crisis-nav-arrow">→</span></button>';
+  d++;
+  html += '<button class="crisis-nav-btn crisis-anim" style="animation-delay:'+(d*0.08)+'s" onclick="exitCrisisMode();setTimeout(function(){var nb=document.querySelectorAll(\'nav button\');if(nb[1])nb[1].click();},200);"><span class="crisis-nav-icon">✅</span><div style="flex:1;font-weight:700;">'+(en?'Your checklist':'Din sjekkliste')+'</div><span class="crisis-nav-arrow">→</span></button>';
+  html += '</div>';
+
+  // ── DISCLAIMER ──
+  d++;
+  html += '<div class="crisis-anim" style="animation-delay:'+(d*0.08)+'s;text-align:center;padding:16px 0 24px;font-size:11px;color:var(--muted);line-height:1.6;">'
+    +(en?'This is guidance only, not a substitute for official instructions.<br>Follow authorities: <strong>varsom.no</strong> · <strong>NRK P1</strong> · <strong>112</strong>'
+       :'Dette er kun veiledning, ikke en erstatning for offisielle instrukser.<br>Følg myndighetene: <strong>varsom.no</strong> · <strong>NRK P1</strong> · <strong>112</strong>')
+    +'</div>';
+
+  body.innerHTML = html;
+}
+
+function _fmtDate(d, en){
+  var days = en
+    ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+    : ['søn','man','tir','ons','tor','fre','lør'];
+  return days[d.getDay()] + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
+// Show/hide crisis button on motivasjon tab
+function updateCrisisUI(){
+  var btn = document.getElementById('crisisManualBtn');
+  var en = currentLang === 'en';
+  if(btn){
+    btn.style.display = profile ? 'block' : 'none';
+    var lbl = document.getElementById('crisisManualLabel');
+    if(lbl) lbl.textContent = en ? 'Activate crisis mode' : 'Aktiver krisemodus';
+  }
+}
+
+// ══════════════════════════════════════════════════════
 // KRISESIMULATOR – «Hva om strømmen gikk NÅ?»
 // ══════════════════════════════════════════════════════
 
@@ -5546,9 +5935,10 @@ function closeSimulation(){
   if(overlay) overlay.style.display = 'none';
   document.body.style.overflow = '';
 }
-// Escape key closes sim
+// Escape key: crisis mode first, then sim
 document.addEventListener('keydown', function(e){
   if(e.key === 'Escape'){
+    if(_crisisActive){ exitCrisisMode(); return; }
     var sim = document.getElementById('simOverlay');
     if(sim && sim.style.display === 'block'){ closeSimulation(); return; }
   }
