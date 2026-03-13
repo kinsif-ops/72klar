@@ -2331,6 +2331,76 @@ function closeBadgeModal(){
 }
 
 // ── FUNKSJON 1: UKENS OPPGAVE ──────────────────────────
+
+// Kjøpsinformasjon per vare (norsk nøkkel → info)
+var PURCHASE_INFO = {
+  'Drikkevann':       {price:'50–80',store:{no:'Dagligvare',en:'Grocery'},tip:{no:'Kjøp 6-pakk 1.5L flasker. Billigst på Rema/Kiwi.',en:'Buy 6-pack 1.5L bottles. Cheapest at budget groceries.'}},
+  'Vannrensingstabletter':{price:'80–120',store:{no:'Apotek / friluft',en:'Pharmacy / outdoor'},tip:{no:'Katadyn Micropur eller Lifesystems. Holder i årevis.',en:'Katadyn Micropur or Lifesystems. Lasts for years.'}},
+  'Hermetikkmat':     {price:'100–200',store:{no:'Dagligvare',en:'Grocery'},tip:{no:'Bønner, fisk, kjøttboller. Kjøp det du faktisk liker å spise.',en:'Beans, fish, meatballs. Buy stuff you actually like eating.'}},
+  'Knekkebrød':       {price:'30–60',store:{no:'Dagligvare',en:'Grocery'},tip:{no:'Wasa eller Sørlandskneip. Lang holdbarhet.',en:'Long shelf life. Pick any brand you like.'}},
+  'Nøtter':           {price:'40–80',store:{no:'Dagligvare',en:'Grocery'},tip:{no:'Blandede nøtter + rosiner. Høy energi per krone.',en:'Mixed nuts + raisins. High energy per krone.'}},
+  'boksåpner':        {price:'30–50',store:{no:'Dagligvare / Clas Ohlson',en:'Grocery / hardware'},tip:{no:'Enkel manuell type. Test at den fungerer.',en:'Simple manual type. Test that it works.'}},
+  'Førstehjelpsskrin':{price:'150–300',store:{no:'Apotek / Clas Ohlson',en:'Pharmacy / hardware'},tip:{no:'Ferdigpakket skrin + ekstra plaster og bandasje.',en:'Pre-packed kit + extra plasters and bandages.'}},
+  'Smertestillende':  {price:'50–100',store:{no:'Apotek / dagligvare',en:'Pharmacy / grocery'},tip:{no:'Paracet + Ibux. Sjekk holdbarhetsdato.',en:'Paracetamol + Ibuprofen. Check expiry date.'}},
+  'Faste medisiner':  {price:'—',store:{no:'Apotek (resept)',en:'Pharmacy (prescription)'},tip:{no:'Be fastlegen om 3-måneders resept. Start med dette.',en:'Ask your doctor for a 3-month prescription. Start here.'}},
+  'Lommelykt':        {price:'100–250',store:{no:'Clas Ohlson / Biltema',en:'Hardware store'},tip:{no:'LED-lykt + ekstra AA-batterier. Hodelykt er enda bedre.',en:'LED torch + extra AA batteries. Headlamp is even better.'}},
+  'Stearinlys':       {price:'30–60',store:{no:'Dagligvare / Nille',en:'Grocery / discount'},tip:{no:'Bloklys holder lengst. Ha en lighter ved siden av.',en:'Block candles last longest. Keep a lighter next to them.'}},
+  'Powerbank':        {price:'200–400',store:{no:'Elkjøp / Clas Ohlson',en:'Electronics store'},tip:{no:'Minst 10.000 mAh. Lad den ferdig og legg i skuffen.',en:'At least 10,000 mAh. Charge it and put it in the drawer.'}},
+  'Radio':            {price:'200–400',store:{no:'Elkjøp / Clas Ohlson',en:'Electronics store'},tip:{no:'DAB+/FM med batteridrift. NRK P1 sender alltid ved krise.',en:'DAB+/FM battery-powered. National radio always broadcasts in crisis.'}},
+  'tepper':           {price:'150–400',store:{no:'IKEA / Jysk',en:'Home store'},tip:{no:'Ullpledd eller fleece. Ha minst ett per person.',en:'Wool or fleece blanket. Have at least one per person.'}},
+  'Varme klær':       {price:'—',store:{no:'Allerede hjemme?',en:'Already at home?'},tip:{no:'Legg frem ull-undertøy, lue og raggsokker. Ikke kjøp – finn fram.',en:'Set out wool base layers, hat and thick socks. Don\'t buy – find them.'}},
+  'Toalettpapir':     {price:'30–50',store:{no:'Dagligvare',en:'Grocery'},tip:{no:'Du har sikkert dette. Sjekk at du har nok for en uke.',en:'You probably have this. Check that you have enough for a week.'}},
+  'Håndsprit':        {price:'30–60',store:{no:'Dagligvare / apotek',en:'Grocery / pharmacy'},tip:{no:'0.5L holder lenge. Viktig når vannet er begrenset.',en:'0.5L lasts a long time. Important when water is limited.'}},
+  'Kopier':           {price:'0',store:{no:'Hjemme (skriver/foto)',en:'Home (printer/photo)'},tip:{no:'Fotografer pass, forsikring, ID. Lagre i nettsky + utskrift i pose.',en:'Photograph passport, insurance, ID. Save in cloud + printout in bag.'}},
+  'Kontanter':        {price:'500–1000',store:{no:'Minibank',en:'ATM'},tip:{no:'Ta ut nå. Småsedler (50, 100, 200). Legg i en konvolutt hjemme.',en:'Withdraw now. Small bills. Put in an envelope at home.'}},
+  'Kart':             {price:'0–100',store:{no:'Nett / kartbutikk',en:'Online / map shop'},tip:{no:'Last ned Maps.me eller skriv ut Google Maps over nærområdet.',en:'Download Maps.me or print Google Maps of your local area.'}},
+  'Ryggsekk':         {price:'—',store:{no:'Allerede hjemme?',en:'Already at home?'},tip:{no:'Hvilken som helst 30-40L sekk. Plasser den ved utgangsdøren.',en:'Any 30-40L backpack. Place it by the front door.'}},
+  'Bleier':           {price:'80–150',store:{no:'Dagligvare',en:'Grocery'},tip:{no:'Én stor pakke holder 3+ dager. Roter som vanlig.',en:'One large pack lasts 3+ days. Rotate as usual.'}},
+  'Barnemat':         {price:'100–200',store:{no:'Dagligvare',en:'Grocery'},tip:{no:'Glass/poser med lang holdbarhet. Kjøp det barnet faktisk spiser.',en:'Jars/pouches with long shelf life. Buy what the child actually eats.'}},
+  'Kjæledyrmat':      {price:'80–150',store:{no:'Dagligvare / dyrebutikk',en:'Grocery / pet shop'},tip:{no:'Tørrfôr holder lengst. 3 dagers forsyning.',en:'Dry food lasts longest. 3-day supply.'}},
+};
+
+// Beregn sim-timer-effekt for en vare (hvor mye den endrer resultatet)
+function _calcSimImpact(itemKey){
+  if(!profile) return 0;
+  // Simuler med og uten denne varen
+  var withItem = checkedItems.slice();
+  var withoutItem = withItem.filter(function(k){ return k !== itemKey; });
+  if(!withItem.includes(itemKey)) withItem.push(itemKey);
+
+  function quickSim(items){
+    var persons = profile.persons;
+    var needs = new Set(profile.needs);
+    var keyCats = getCats(persons, needs, 'no');
+    function qHas(sub){
+      for(var ci=0;ci<keyCats.length;ci++){
+        for(var ii=0;ii<keyCats[ci].items.length;ii++){
+          var k=keyCats[ci].name+'::'+keyCats[ci].items[ii].name;
+          if(k.toLowerCase().indexOf(sub.toLowerCase())!==-1 && items.includes(k)) return true;
+        }
+      }
+      return false;
+    }
+    var limits=[];
+    // Water
+    limits.push(qHas('Drikkevann')?72:24);
+    // Food
+    limits.push((qHas('Hermetikkmat')||qHas('Knekkebrød')||qHas('Nøtter'))?72:(persons>=3?30:36));
+    // Comm
+    var phone=qHas('Powerbank')?48:8;
+    limits.push(qHas('Radio')?72:phone);
+    // Meds
+    if(needs.has('medisin')) limits.push(qHas('Faste medisiner')?72:18);
+    // Baby
+    if(needs.has('baby')) limits.push(qHas('Barnemat')?72:10);
+    return Math.min.apply(null,limits);
+  }
+
+  var hoursWith = quickSim(withItem);
+  var hoursWithout = quickSim(withoutItem);
+  return hoursWith - hoursWithout;
+}
+
 function getWeeklyFocus(){
   if(!profile) return null;
   var cats=getCats(profile.persons, new Set(profile.needs), 'no');
@@ -2346,6 +2416,7 @@ function getWeeklyFocus(){
         best={
           key:key,
           name:displayCats[ci].items[ii].name,
+          noName:item.name, // for PURCHASE_INFO lookup
           emoji:displayCats[ci].items[ii].emoji,
           qty:displayCats[ci].items[ii].qty?displayCats[ci].items[ii].qty():'',
         };
@@ -2361,22 +2432,80 @@ function renderWeeklyFocus(){
   var en=currentLang==='en';
   if(!focus){ container.style.display='none'; return; }
   container.style.display='block';
-  container.innerHTML=
-    '<div style="display:flex;align-items:center;gap:4px;margin-bottom:10px;">'
+
+  // Finn kjøpsinfo
+  var pInfo = null;
+  var noName = focus.noName || '';
+  Object.keys(PURCHASE_INFO).forEach(function(k){
+    if(!pInfo && noName.toLowerCase().indexOf(k.toLowerCase()) !== -1) pInfo = PURCHASE_INFO[k];
+  });
+
+  // Beregn sim-effekt
+  var simDelta = _calcSimImpact(focus.key);
+
+  var html = '';
+  // Header
+  html += '<div style="display:flex;align-items:center;gap:4px;margin-bottom:12px;">'
     +'<span style="font-size:14px;">🎯</span>'
     +'<span style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:1px;">'
-    +(en?'This week\'s task':'Denne ukens oppgave')+'</span></div>'
-    +'<div style="display:flex;align-items:center;gap:14px;">'
+    +(en?'This week\'s task':'Denne ukens oppgave')+'</span></div>';
+
+  // Item name + emoji
+  html += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">'
     +'<span style="font-size:36px;">'+esc(focus.emoji)+'</span>'
     +'<div style="flex:1;">'
-    +'<div style="font-family:Syne,sans-serif;font-size:17px;font-weight:800;">'+esc(focus.name)+'</div>'
+    +'<div style="font-family:Syne,sans-serif;font-size:18px;font-weight:800;">'+esc(focus.name)+'</div>'
     +(focus.qty?'<div style="font-size:13px;color:var(--orange);font-weight:600;margin-top:2px;">'+esc(focus.qty)+'</div>':'')
-    +'</div></div>'
-    +'<button onclick="toggleItem(\''+focus.key.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\',true);renderWeeklyFocus();renderMotivation();" '
-    +'style="width:100%;margin-top:14px;padding:13px;border-radius:12px;border:none;'
+    +'</div></div>';
+
+  // Purchase info cards
+  if(pInfo){
+    html += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">';
+
+    // Price + store
+    if(pInfo.price && pInfo.price !== '—' && pInfo.price !== '0'){
+      html += '<div style="display:flex;gap:8px;">';
+      html += '<div style="flex:1;background:rgba(247,127,0,0.08);border:1px solid rgba(247,127,0,0.2);border-radius:10px;padding:10px 12px;text-align:center;">'
+        +'<div style="font-family:Syne,sans-serif;font-size:16px;font-weight:800;color:var(--orange);">'+pInfo.price+' kr</div>'
+        +'<div style="font-size:11px;color:var(--muted);margin-top:2px;">'+(en?'approx. price':'ca. pris')+'</div></div>';
+      html += '<div style="flex:1;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:10px 12px;text-align:center;">'
+        +'<div style="font-family:Syne,sans-serif;font-size:14px;font-weight:700;color:var(--blue);">🏪 '+(en?pInfo.store.en:pInfo.store.no)+'</div>'
+        +'<div style="font-size:11px;color:var(--muted);margin-top:2px;">'+(en?'where to buy':'hvor du får det')+'</div></div>';
+      html += '</div>';
+    } else if(pInfo.price === '0' || pInfo.price === '—'){
+      html += '<div style="background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.2);border-radius:10px;padding:10px 12px;text-align:center;">'
+        +'<div style="font-size:13px;color:var(--green);font-weight:600;">✓ '+(en?pInfo.store.en:pInfo.store.no)
+        +(pInfo.price==='0'?' – '+(en?'free':'gratis'):'')+'</div></div>';
+    }
+
+    // Practical tip
+    var tip = en ? pInfo.tip.en : pInfo.tip.no;
+    if(tip){
+      html += '<div style="font-size:13px;color:var(--muted);line-height:1.5;padding:0 2px;">'
+        +'💡 '+tip+'</div>';
+    }
+
+    html += '</div>';
+  }
+
+  // Sim impact
+  if(simDelta > 0){
+    html += '<div style="background:linear-gradient(135deg,rgba(214,40,40,0.1),rgba(247,127,0,0.06));border:1px solid rgba(214,40,40,0.25);border-radius:10px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">'
+      +'<span style="font-size:20px;">⚡</span>'
+      +'<div style="flex:1;font-size:13px;color:var(--text);line-height:1.4;">'
+      +(en?'Adds <strong style="color:var(--orange);">+'+simDelta+' hours</strong> to your crisis simulation'
+         :'Gir <strong style="color:var(--orange);">+'+simDelta+' timer</strong> i krisesimulatoren')
+      +'</div></div>';
+  }
+
+  // Action button
+  html += '<button onclick="toggleItem(\''+focus.key.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\',true);renderWeeklyFocus();renderMotivation();" '
+    +'style="width:100%;padding:13px;border-radius:12px;border:none;'
     +'background:linear-gradient(135deg,var(--green),#27AE60);color:white;'
     +'font-family:Syne,sans-serif;font-size:15px;font-weight:700;cursor:pointer;">'
     +'✅ '+(en?'Done – I have this!':'Gjort – dette har jeg!')+'</button>';
+
+  container.innerHTML = html;
 }
 
 // ── FUNKSJON 2: FAREVARSEL KOBLET TIL MANGLER ─────────
