@@ -510,6 +510,39 @@
     from { opacity:0; transform:translateY(18px); }
     to   { opacity:1; transform:translateY(0); }
   }
+
+  /* KRISESIMULATOR */
+  .sim-header { background:linear-gradient(160deg,#1a0a0a 0%,#0f1a2e 100%); padding:24px 20px 20px; position:relative; overflow:hidden; }
+  .sim-header::before { content:'⚡'; position:absolute; right:-15px; top:-15px; font-size:120px; opacity:0.04; transform:rotate(15deg); pointer-events:none; }
+  .sim-close { position:absolute; top:14px; right:16px; background:rgba(255,255,255,0.1); border:none; color:var(--muted); width:36px; height:36px; border-radius:50%; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:1; }
+  .sim-time { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; color:var(--red); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px; }
+  .sim-scenario { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:white; line-height:1.35; margin-bottom:6px; }
+  .sim-weather { font-size:14px; color:var(--muted); line-height:1.5; }
+  .sim-body { padding:20px; }
+  .sim-timeline-label { font-family:'Syne',sans-serif; font-size:12px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:14px; }
+  .sim-item { display:flex; gap:12px; align-items:flex-start; padding:12px 0; border-bottom:1px solid var(--border); }
+  .sim-item:last-child { border-bottom:none; }
+  .sim-item-icon { font-size:20px; flex-shrink:0; width:28px; text-align:center; margin-top:1px; }
+  .sim-item-text { flex:1; font-size:14px; line-height:1.6; color:var(--text); }
+  .sim-item-text strong { color:white; }
+  .sim-item.sim-ok .sim-item-text { color:var(--muted); }
+  .sim-item.sim-warn .sim-item-text strong { color:var(--orange); }
+  .sim-item.sim-fail .sim-item-text strong { color:var(--red); }
+  .sim-result-card { background:linear-gradient(135deg,rgba(214,40,40,0.12),rgba(247,127,0,0.06)); border:1px solid rgba(214,40,40,0.35); border-radius:16px; padding:22px; margin:20px 0; text-align:center; }
+  .sim-hours { font-family:'Syne',sans-serif; font-size:56px; font-weight:800; background:linear-gradient(135deg,var(--red),var(--orange)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1; }
+  .sim-hours-label { font-size:14px; color:var(--muted); margin-top:4px; }
+  .sim-bar-wrap { background:var(--border); border-radius:99px; height:10px; margin:16px 0 8px; overflow:hidden; }
+  .sim-bar-fill { height:10px; border-radius:99px; background:linear-gradient(90deg,var(--red),var(--orange)); transition:width 1.2s cubic-bezier(0.4,0,0.2,1); }
+  .sim-fix-title { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; color:var(--orange); text-transform:uppercase; letter-spacing:1px; margin:20px 0 12px; }
+  .sim-fix-item { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:8px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:all 0.15s; }
+  .sim-fix-item:active { transform:scale(0.98); background:var(--dark2); }
+  .sim-fix-emoji { font-size:22px; flex-shrink:0; }
+  .sim-fix-text { flex:1; font-size:14px; font-weight:600; color:var(--text); }
+  .sim-fix-arrow { color:var(--muted); font-size:14px; }
+  .sim-share-btn { width:100%; padding:14px; border-radius:12px; border:none; background:linear-gradient(135deg,var(--red),var(--orange)); color:white; font-family:'Syne',sans-serif; font-size:15px; font-weight:700; cursor:pointer; margin-top:16px; }
+  .sim-trygg { background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.25); border-radius:12px; padding:14px; margin-top:14px; display:flex; gap:12px; align-items:center; }
+  @keyframes simFadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .sim-anim { animation:simFadeIn 0.4s ease both; }
 </style>
 </head>
 <body>
@@ -743,6 +776,20 @@
       </div>
       <div class="mot-status-label" id="motStatusLabel">Kom i gang! 🚀</div>
       <div class="mot-status-msg" id="motStatusMsg">Du har ikke startet ennå. Første steg er det viktigste!</div>
+    </div>
+
+    <!-- HVA OM NÅ? -->
+    <div id="simCard" style="background:linear-gradient(135deg,#1a1020,#0f1a2e);border:1px solid rgba(214,40,40,0.4);border-radius:16px;padding:0;margin-bottom:16px;overflow:hidden;cursor:pointer;transition:transform 0.15s;" onclick="runSimulation()" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.98)'" ontouchend="this.style.transform=''">
+      <div style="background:linear-gradient(135deg,rgba(214,40,40,0.2),rgba(247,127,0,0.1));padding:20px 18px;position:relative;overflow:hidden;">
+        <div style="position:absolute;right:-10px;top:-10px;font-size:80px;opacity:0.06;transform:rotate(12deg);pointer-events:none;">⚡</div>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="font-size:36px;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(214,40,40,0.4));">⚡</div>
+          <div>
+            <div id="simCardTitle" style="font-family:Syne,sans-serif;font-size:17px;font-weight:800;color:white;">Hva om strømmen gikk NÅ?</div>
+            <div id="simCardSub" style="font-size:13px;color:var(--muted);margin-top:3px;line-height:1.4;">Trykk for å se hvor lenge du klarer deg – basert på vær, klokke og sjekkliste</div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- SOCIAL SHARE SCORE -->
@@ -1348,6 +1395,13 @@
 </div>
 
 <!-- BADGE MODAL -->
+
+<!-- KRISESIMULATOR MODAL -->
+<div id="simOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:1002;overflow-y:auto;-webkit-overflow-scrolling:touch;" onclick="closeSimulation()">
+  <div style="min-height:100%;padding:0;" onclick="event.stopPropagation()">
+    <div id="simContent" style="max-width:480px;margin:0 auto;padding:0 0 40px;"></div>
+  </div>
+</div>
 
 <!-- FAMILY SYNC MODAL -->
 <div id="syncModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:1001;align-items:center;justify-content:center;padding:16px;" onclick="closeSyncModal()">
@@ -3661,6 +3715,8 @@ function applyLang(skipRender){
   const ssLbl=document.getElementById('shareStatusLabel'); if(ssLbl) ssLbl.textContent=en?'Share your preparedness status':'Del din beredskapsstatus';
   const spBtn=document.getElementById('shareProgressBtn'); if(spBtn) spBtn.textContent=en?'↗️ Share your progress':'↗️ Del fremgangen din';
   const tipLbl=document.getElementById('tipLabel'); if(tipLbl) tipLbl.textContent=en?'💡 Today\'s preparedness tip':'💡 Dagens beredskapstips';
+  const simT=document.getElementById('simCardTitle'); if(simT) simT.textContent=en?'What if the power went out NOW?':'Hva om strømmen gikk NÅ?';
+  const simS=document.getElementById('simCardSub'); if(simS) simS.textContent=en?'Tap to see how long you\'d last – based on weather, time and your checklist':'Trykk for å se hvor lenge du klarer deg – basert på vær, klokke og sjekkliste';
   const ptitle=document.getElementById('progressTitle'); if(ptitle) ptitle.textContent=en?'Preparedness status':'Beredskapsstatus';
   // Settings section
   const setLbl=document.getElementById('settingsLabel'); if(setLbl) setLbl.textContent=en?'⚙️ Settings':'⚙️ Innstillinger';
@@ -4812,6 +4868,288 @@ function dismissWelcomeBack() {
   setTimeout(() => { banner.style.display = 'none'; }, 300);
 }
 // ──────────────────────────────────────────────────────
+
+// ══════════════════════════════════════════════════════
+// KRISESIMULATOR – «Hva om strømmen gikk NÅ?»
+// ══════════════════════════════════════════════════════
+
+async function runSimulation(){
+  if(!profile) return;
+  var en = currentLang === 'en';
+  var overlay = document.getElementById('simOverlay');
+  var content = document.getElementById('simContent');
+  if(!overlay || !content) return;
+
+  // Show loading state
+  overlay.style.display = 'block';
+  content.innerHTML =
+    '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;">'
+    +'<div style="text-align:center;">'
+    +'<div style="font-size:48px;margin-bottom:12px;animation:simFadeIn 0.3s ease both;">⚡</div>'
+    +'<div style="font-family:Syne,sans-serif;font-size:16px;font-weight:700;color:var(--muted);">'
+    +(en?'Simulating power outage...':'Simulerer strømbrudd...')+'</div>'
+    +'</div></div>';
+
+  // ── Samle data ──
+  var now = new Date();
+  var hour = now.getHours();
+  var month = now.getMonth(); // 0-11
+  var dayName = en
+    ? ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][now.getDay()]
+    : ['søndag','mandag','tirsdag','onsdag','torsdag','fredag','lørdag'][now.getDay()];
+  var timeStr = String(hour).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+  var persons = profile.persons;
+  var needs = new Set(profile.needs);
+  var name = profile.name || '';
+
+  // Hent temperatur
+  var temp = null;
+  var lat = 58.16, lon = 7.99;
+  try {
+    if(navigator.geolocation){
+      await new Promise(function(res){
+        navigator.geolocation.getCurrentPosition(
+          function(p){lat=p.coords.latitude;lon=p.coords.longitude;res();},
+          function(){res();},{timeout:3000});
+      });
+    }
+    var wUrl='https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current=temperature_2m,wind_speed_10m,precipitation&timezone=Europe%2FOslo';
+    var wR = await fetch(wUrl);
+    var wD = await wR.json();
+    temp = Math.round(wD.current.temperature_2m);
+  } catch(e){ temp = null; }
+
+  var isWinter = month >= 10 || month <= 2;
+  var isCold = temp !== null ? temp < 5 : isWinter;
+  var isNight = hour >= 22 || hour < 6;
+  var tempStr = temp !== null ? temp + '°C' : (en?'unknown':'ukjent');
+
+  // ── Sjekk hva brukeren har/mangler ──
+  var keyCats = getCats(persons, needs, 'no');
+  var displayCats = getCats(persons, needs, currentLang);
+
+  function has(substring){
+    for(var ci=0;ci<keyCats.length;ci++){
+      for(var ii=0;ii<keyCats[ci].items.length;ii++){
+        var key = keyCats[ci].name+'::'+keyCats[ci].items[ii].name;
+        if(key.toLowerCase().indexOf(substring.toLowerCase()) !== -1 && checkedItems.includes(key)) return true;
+      }
+    }
+    return false;
+  }
+  function displayName(substring){
+    for(var ci=0;ci<displayCats.length;ci++){
+      for(var ii=0;ii<displayCats[ci].items.length;ii++){
+        var key = keyCats[ci].name+'::'+keyCats[ci].items[ii].name;
+        if(key.toLowerCase().indexOf(substring.toLowerCase()) !== -1)
+          return { name: displayCats[ci].items[ii].name, emoji: displayCats[ci].items[ii].emoji, key: key, has: checkedItems.includes(key) };
+      }
+    }
+    return null;
+  }
+
+  // Samle kritiske varer
+  var items = [
+    { id:'lommelykt', sub:'Lommelykt', critical:isNight, impact:4 },
+    { id:'stearinlys', sub:'Stearinlys', critical:isNight, impact:2 },
+    { id:'powerbank', sub:'Powerbank', critical:true, impact:6 },
+    { id:'radio', sub:'Radio', critical:true, impact:5 },
+    { id:'drikkevann', sub:'Drikkevann', critical:true, impact:10 },
+    { id:'hermetikk', sub:'Hermetikkmat', critical:true, impact:5 },
+    { id:'knekkebrød', sub:'Knekkebrød', critical:false, impact:3 },
+    { id:'tepper', sub:'tepper', critical:isCold, impact: isCold?8:2 },
+    { id:'klær', sub:'Varme klær', critical:isCold, impact: isCold?5:1 },
+    { id:'førstehjelpsskrin', sub:'Førstehjelpsskrin', critical:false, impact:3 },
+    { id:'kontanter', sub:'Kontanter', critical:false, impact:2 },
+    { id:'boksåpner', sub:'boksåpner', critical:false, impact:2 },
+  ];
+  if(needs.has('medisin')) items.push({ id:'medisiner', sub:'Faste medisiner', critical:true, impact:10 });
+  if(needs.has('baby')) items.push({ id:'barnemat', sub:'Barnemat', critical:true, impact:8 });
+  if(needs.has('hund')) items.push({ id:'kjæledyrmat', sub:'Kjæledyrmat', critical:false, impact:4 });
+
+  // Beregn score
+  var maxScore = 0, score = 0;
+  var timeline = [];
+  var fixes = [];
+
+  items.forEach(function(it){
+    var d = displayName(it.sub);
+    if(!d) return;
+    maxScore += it.impact;
+    var got = d.has;
+    if(got) score += it.impact;
+
+    var status = got ? 'ok' : (it.critical ? 'fail' : 'warn');
+    var emoji = got ? '✅' : (it.critical ? '❌' : '⚠️');
+
+    var msg = '';
+    if(it.sub === 'Lommelykt' || it.id === 'lommelykt'){
+      if(got) msg = en ? 'You have a <strong>torch</strong> – you can see in the dark.' : 'Du har <strong>lommelykt</strong> – du kan se i mørket.';
+      else if(isNight) msg = en ? 'You have <strong>no torch</strong>. It\'s pitch dark – you can\'t find anything.' : 'Du har <strong>ingen lommelykt</strong>. Det er bekmørkt – du finner ingenting.';
+      else msg = en ? 'You have <strong>no torch</strong>. It\'s still light, but nightfall will be a problem.' : 'Du har <strong>ingen lommelykt</strong>. Det er fortsatt lyst, men kvelden blir et problem.';
+    } else if(it.id === 'stearinlys'){
+      if(got) msg = en ? '<strong>Candles</strong> provide warmth and light.' : '<strong>Stearinlys</strong> gir varme og lys.';
+      else msg = en ? 'No <strong>candles</strong> – you lose a heat and light source.' : 'Ingen <strong>stearinlys</strong> – du mister en varme- og lyskilde.';
+    } else if(it.id === 'powerbank'){
+      if(got) msg = en ? '<strong>Powerbank</strong> keeps your phone alive for communication.' : '<strong>Powerbank</strong> holder telefonen i live for kommunikasjon.';
+      else msg = en ? '<strong>No powerbank</strong>. Your phone dies within hours – no contact with the outside world.' : '<strong>Ingen powerbank</strong>. Telefonen dør i løpet av timer – ingen kontakt med omverdenen.';
+    } else if(it.id === 'radio'){
+      if(got) msg = en ? '<strong>Battery radio</strong> – you receive official crisis information from NRK P1.' : '<strong>Batteriradio</strong> – du mottar offisiell kriseinformasjon fra NRK P1.';
+      else msg = en ? '<strong>No battery radio</strong>. When the phone dies, you have no source of information.' : '<strong>Ingen batteriradio</strong>. Når telefonen dør, har du ingen informasjonskilde.';
+    } else if(it.id === 'drikkevann'){
+      var litres = Math.round(persons * 9);
+      if(got) msg = en ? '<strong>'+litres+'L water</strong> – enough for '+persons+' people for 3 days.' : '<strong>'+litres+'L vann</strong> – nok til '+persons+' personer i 3 dager.';
+      else msg = en ? '<strong>No water supply</strong>. Taps stop working. '+persons+' people need '+litres+'L for 72 hours.' : '<strong>Ingen vannlager</strong>. Kranene slutter å virke. '+persons+' personer trenger '+litres+'L for 72 timer.';
+    } else if(it.id === 'hermetikk'){
+      if(got) msg = en ? '<strong>Canned food</strong> – you can eat without power or cooking.' : '<strong>Hermetikk</strong> – du kan spise uten strøm eller matlaging.';
+      else msg = en ? '<strong>No canned food</strong>. The fridge warms up within hours. After 48h the freezer too.' : '<strong>Ingen hermetikk</strong>. Kjøleskapet varmes opp i løpet av timer. Etter 48t fryseren også.';
+    } else if(it.id === 'tepper'){
+      if(got) msg = isCold ? (en ? '<strong>Warm blankets</strong> – critical at '+tempStr+'.' : '<strong>Varme tepper</strong> – kritisk ved '+tempStr+'.') : (en ? '<strong>Blankets</strong> available.' : '<strong>Tepper</strong> tilgjengelig.');
+      else msg = isCold ? (en ? '<strong>No extra blankets</strong>. At '+tempStr+' the indoor temperature drops fast without heating.' : '<strong>Ingen ekstra tepper</strong>. Ved '+tempStr+' synker innetemperaturen raskt uten oppvarming.') : (en ? 'No extra <strong>blankets</strong> – manageable in current weather.' : 'Ingen ekstra <strong>tepper</strong> – håndterbart i nåværende vær.');
+    } else if(it.id === 'medisiner'){
+      if(got) msg = en ? '<strong>Medication supply</strong> secured for 14 days.' : '<strong>Medisinlager</strong> sikret for 14 dager.';
+      else msg = en ? '<strong>No medication stock</strong>. Pharmacies may be closed – this is critical.' : '<strong>Ingen medisinlager</strong>. Apotek kan være stengt – dette er kritisk.';
+    } else if(it.id === 'barnemat'){
+      if(got) msg = en ? '<strong>Baby food</strong> – your child is taken care of.' : '<strong>Barnemat</strong> – barnet ditt er ivaretatt.';
+      else msg = en ? '<strong>No baby food stock</strong>. Shops may be closed for days.' : '<strong>Ingen barnemat på lager</strong>. Butikker kan være stengt i dagevis.';
+    } else {
+      if(got) msg = '<strong>'+esc(d.name)+'</strong> ✓';
+      else msg = (en?'Missing: ':'Mangler: ')+'<strong>'+esc(d.name)+'</strong>';
+    }
+
+    timeline.push({ status:status, emoji:emoji, msg:msg, impact:it.impact, got:got });
+    if(!got) fixes.push({ name:d.name, emoji:d.emoji, key:d.key, impact:it.impact, critical:it.critical });
+  });
+
+  // Beregn timer
+  var pct72 = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
+  var hours = Math.round(72 * (score / maxScore));
+  if(isCold && !has('tepper') && !has('sovepose')) hours = Math.min(hours, 36);
+  if(!has('Drikkevann')) hours = Math.min(hours, 24);
+  if(needs.has('medisin') && !has('Faste medisiner')) hours = Math.min(hours, 18);
+  hours = Math.max(0, Math.min(72, hours));
+
+  // Sorter fixes etter impact (viktigst først)
+  fixes.sort(function(a,b){ return b.impact - a.impact; });
+  var topFixes = fixes.slice(0, 3);
+
+  // Trygghetspunkt
+  var postnr = profile.postnr || '';
+  var kommune = getKommune(postnr);
+  var tryggPunkt = (kommune && kommune.trygghetspunkter.length > 0) ? kommune.trygghetspunkter[0] : null;
+
+  // ── Bygg HTML ──
+  var html = '';
+
+  // Header
+  html += '<div class="sim-header sim-anim">';
+  html += '<button class="sim-close" onclick="closeSimulation()">✕</button>';
+  html += '<div class="sim-time">⚡ '+(en?'Simulation':'Simulering')+' · '+dayName+' '+timeStr+'</div>';
+  html += '<div class="sim-scenario">'+(en?'The power just went out.':'Strømmen gikk nettopp.')+'</div>';
+  html += '<div class="sim-weather">';
+  if(temp !== null) html += (en?'It is <strong>'+tempStr+'</strong> outside.':'Det er <strong>'+tempStr+'</strong> ute.') + ' ';
+  if(isNight) html += en?'It\'s <strong>dark</strong>.':'Det er <strong>mørkt</strong>.';
+  else html += en?'It\'s still light.':'Det er fortsatt lyst.';
+  html += ' ' + persons + (en?' people in your household.':' personer i husstanden.');
+  if(needs.has('baby')) html += ' '+(en?'Including a <strong>small child</strong>.':'Inkludert et <strong>lite barn</strong>.');
+  if(needs.has('eldre')) html += ' '+(en?'Including an <strong>elderly person</strong>.':'Inkludert en <strong>eldre person</strong>.');
+  if(needs.has('medisin')) html += ' '+(en?'Someone depends on <strong>medication</strong>.':'Noen er avhengig av <strong>medisiner</strong>.');
+  html += '</div>';
+  html += '</div>';
+
+  // Timeline
+  html += '<div class="sim-body">';
+  html += '<div class="sim-timeline-label sim-anim" style="animation-delay:0.15s">'+(en?'Your situation':'Din situasjon')+'</div>';
+
+  // Sort: fails first, then warns, then ok
+  var sorted = timeline.slice().sort(function(a,b){
+    var order = {fail:0,warn:1,ok:2};
+    return (order[a.status]||2) - (order[b.status]||2);
+  });
+
+  sorted.forEach(function(item, i){
+    var delay = 0.2 + i * 0.06;
+    html += '<div class="sim-item sim-'+item.status+' sim-anim" style="animation-delay:'+delay.toFixed(2)+'s">';
+    html += '<div class="sim-item-icon">'+item.emoji+'</div>';
+    html += '<div class="sim-item-text">'+item.msg+'</div>';
+    html += '</div>';
+  });
+
+  // Resultat-kort
+  var rd = 0.2 + sorted.length * 0.06 + 0.1;
+  html += '<div class="sim-result-card sim-anim" style="animation-delay:'+rd.toFixed(2)+'s">';
+  html += '<div class="sim-hours" id="simHoursNum">'+hours+'</div>';
+  html += '<div class="sim-hours-label">'+(en?'of 72 hours':'av 72 timer')+'</div>';
+  html += '<div class="sim-bar-wrap"><div class="sim-bar-fill" id="simBarFill" style="width:0%"></div></div>';
+  html += '<div style="font-size:13px;color:var(--muted);">'
+    + (name ? name+' ' : '')
+    + (en ? 'and household would manage approx. <strong style="color:var(--orange)">'+hours+' of 72 hours</strong>.'
+          : 'og husstanden ville klart ca. <strong style="color:var(--orange)">'+hours+' av 72 timer</strong>.')
+    + '</div>';
+  html += '</div>';
+
+  // Topp 3 ting å fikse
+  if(topFixes.length > 0){
+    html += '<div class="sim-fix-title sim-anim" style="animation-delay:'+(rd+0.15).toFixed(2)+'s">'
+      +(en?'Fix these first':'Fiks dette først')+'</div>';
+    topFixes.forEach(function(fix, i){
+      var fd = rd + 0.2 + i * 0.08;
+      html += '<div class="sim-fix-item sim-anim" style="animation-delay:'+fd.toFixed(2)+'s" onclick="closeSimulation();setTimeout(function(){var nb=document.querySelectorAll(\'nav button\');if(nb[1])nb[1].click();},200);">';
+      html += '<div class="sim-fix-emoji">'+fix.emoji+'</div>';
+      html += '<div class="sim-fix-text">'+esc(fix.name)+(fix.critical?' <span style="color:var(--red);font-size:11px;font-weight:700;">'+( en?'CRITICAL':'KRITISK')+'</span>':'')+'</div>';
+      html += '<div class="sim-fix-arrow">→</div>';
+      html += '</div>';
+    });
+  }
+
+  // Trygghetspunkt
+  if(tryggPunkt){
+    html += '<div class="sim-trygg sim-anim" style="animation-delay:'+(rd+0.5).toFixed(2)+'s">';
+    html += '<span style="font-size:24px;">🏛️</span>';
+    html += '<div style="flex:1;">';
+    html += '<div style="font-family:Syne,sans-serif;font-size:13px;font-weight:700;color:var(--blue);">'+(en?'Nearest safe point':'Nærmeste trygghetspunkt')+'</div>';
+    html += '<div style="font-size:13px;color:var(--muted);margin-top:2px;">'+esc(tryggPunkt.navn)+' · '+esc(tryggPunkt.adresse)+'</div>';
+    html += '</div>';
+    html += '<a href="'+esc(tryggPunkt.gmaps)+'" target="_blank" rel="noopener noreferrer" style="background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:var(--blue);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap;flex-shrink:0;" onclick="event.stopPropagation()">🗺️</a>';
+    html += '</div>';
+  }
+
+  // Del-knapp
+  html += '<button class="sim-share-btn sim-anim" style="animation-delay:'+(rd+0.6).toFixed(2)+'s" onclick="shareSimulation('+hours+')">'
+    +'↗️ '+(en?'Share your result':'Del resultatet ditt')+'</button>';
+
+  html += '</div>'; // end sim-body
+
+  // Render
+  content.innerHTML = html;
+
+  // Animate progress bar
+  setTimeout(function(){
+    var bar = document.getElementById('simBarFill');
+    if(bar) bar.style.width = Math.round(hours/72*100) + '%';
+  }, (rd * 1000) + 200);
+}
+
+function closeSimulation(){
+  var overlay = document.getElementById('simOverlay');
+  if(overlay) overlay.style.display = 'none';
+}
+
+function shareSimulation(hours){
+  var en = currentLang === 'en';
+  var name = profile ? profile.name : '';
+  var text = en
+    ? (name||'I') + ' would survive ' + hours + ' of 72 hours in a power outage ⚡🛡️ How long would you last? Try 72klar! ' + APP_URL
+    : (name||'Jeg') + ' ville klart ' + hours + ' av 72 timer ved strømbrudd ⚡🛡️ Hvor lenge klarer du deg? Prøv 72klar! ' + APP_URL;
+  if(navigator.share){
+    navigator.share({title:'72klar!', text:text, url:APP_URL}).catch(function(){});
+  } else if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(function(){
+      showToastMsg(en?'✓ Copied!':'✓ Kopiert!');
+    }).catch(function(){});
+  }
+  localStorage.setItem('72t_shared','1'); checkBadges();
+}
 
 // ── SPLASH / INFOLAPP ────────────────────────────────
 function showSplash(){
