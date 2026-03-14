@@ -31,7 +31,7 @@
 </style>
 <style>
   :root {
-    --red: #D62828; --orange: #F77F00; --dark: #0A0A0F; --dark2: #14141C;
+    --red: #D62828; --red-text: #E84444; --orange: #F77F00; --dark: #0A0A0F; --dark2: #14141C;
     --card: #1C1C28; --border: #2A2A3A; --text: #F5F5FA; --muted: #A0A0B8;
     --green: #2ECC71; --blue: #3B82F6; --gold: #F59E0B;
   }
@@ -232,7 +232,7 @@
   .expiry-set { font-size:11px; color:var(--muted); white-space:nowrap; flex-shrink:0; }
   .custom-item .item-name { font-style:italic; }
   .custom-del { background:none; border:none; color:var(--muted); font-size:16px; cursor:pointer; padding:4px 6px; flex-shrink:0; opacity:0.5; transition:opacity 0.15s; }
-  .custom-del:hover,.custom-del:active { opacity:1; color:var(--red); }
+  .custom-del:hover,.custom-del:active { opacity:1; color:var(--red-text); }
   .add-custom-btn { width:100%; padding:10px; border:1px dashed var(--border); border-radius:10px; background:none; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; margin-top:4px; transition:all 0.15s; display:flex; align-items:center; justify-content:center; gap:6px; }
   .add-custom-btn:hover,.add-custom-btn:active { border-color:var(--orange); color:var(--orange); }
 
@@ -288,7 +288,7 @@
   .fh-num { background:var(--red); color:white; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-size: 13px; font-weight:800; flex-shrink:0; margin-top:2px; }
   .fh-tip { background:rgba(247,127,0,0.08); border:1px solid rgba(247,127,0,0.2); border-radius:8px; padding:8px 12px; font-size: 14px; color:var(--orange); margin-top:8px; line-height:1.5; }
   /* LIGHT THEME */
-  body.light { --dark:#F5F5F5; --dark2:#EBEBEB; --card:#FFFFFF; --border:#D0D0D8; --text:#1A1A2E; --muted:#6B6B88; color-scheme: light; }
+  body.light { --dark:#F5F5F5; --dark2:#EBEBEB; --card:#FFFFFF; --border:#D0D0D8; --text:#1A1A2E; --muted:#6B6B88; --red-text:#C02020; color-scheme: light; }
   body.light .fh-card { box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
   body.light .item-name { color: #1A1A2E; }
   body.light .item-desc { color: #6B6B88; }
@@ -333,7 +333,7 @@
   .no-text { display:block; }
   .en-text { display:none; }
   .reset-section { margin-top: 8px; padding: 20px 0 8px; border-top: 1px solid var(--border); }
-  .reset-btn { width:100%; padding:14px; border-radius:12px; border:1px solid rgba(214,40,40,0.4); background:rgba(214,40,40,0.08); color:var(--red); font-family:'Syne',sans-serif; font-size: 15px; font-weight:700; cursor:pointer; margin-bottom:10px; transition:all 0.2s; }
+  .reset-btn { width:100%; padding:14px; border-radius:12px; border:1px solid rgba(214,40,40,0.4); background:rgba(214,40,40,0.08); color:var(--red-text); font-family:'Syne',sans-serif; font-size: 15px; font-weight:700; cursor:pointer; margin-bottom:10px; transition:all 0.2s; }
   .reset-btn:active { background:rgba(214,40,40,0.2); }
   .reset-btn-soft { width:100%; padding:12px; border-radius:12px; border:1px solid var(--border); background:none; color:var(--muted); font-family:'DM Sans',sans-serif; font-size: 15px; cursor:pointer; transition:all 0.2s; }
   .reset-btn-soft:active { background:var(--border); }
@@ -520,7 +520,7 @@
   .sim-header { background:linear-gradient(160deg,#1a0a0a 0%,#0f1a2e 100%); padding:24px 20px 20px; position:relative; overflow:hidden; }
   .sim-header::before { content:'⚡'; position:absolute; right:-15px; top:-15px; font-size:120px; opacity:0.04; transform:rotate(15deg); pointer-events:none; }
   .sim-close { position:absolute; top:14px; right:16px; background:rgba(255,255,255,0.1); border:none; color:var(--muted); width:36px; height:36px; border-radius:50%; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:1; }
-  .sim-time { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; color:var(--red); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px; }
+  .sim-time { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; color:var(--red-text); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px; }
   .sim-scenario { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:white; line-height:1.35; margin-bottom:6px; }
   .sim-weather { font-size:14px; color:var(--muted); line-height:1.5; }
   .sim-body { padding:20px; }
@@ -532,7 +532,7 @@
   .sim-item-text strong { color:white; }
   .sim-item.sim-ok .sim-item-text { color:var(--muted); }
   .sim-item.sim-warn .sim-item-text strong { color:var(--orange); }
-  .sim-item.sim-fail .sim-item-text strong { color:var(--red); }
+  .sim-item.sim-fail .sim-item-text strong { color:var(--red-text); }
   .sim-result-card { background:linear-gradient(135deg,rgba(214,40,40,0.12),rgba(247,127,0,0.06)); border:1px solid rgba(214,40,40,0.35); border-radius:16px; padding:22px; margin:20px 0; text-align:center; }
   .sim-hours { font-family:'Syne',sans-serif; font-size:56px; font-weight:800; background:linear-gradient(135deg,var(--red),var(--orange)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1; }
   .sim-hours-label { font-size:14px; color:var(--muted); margin-top:4px; }
@@ -561,9 +561,9 @@
   .crisis-time { font-size:12px; color:rgba(255,255,255,0.5); margin-top:4px; font-family:'DM Sans',sans-serif; }
   .crisis-body { flex:1; padding:18px; }
   .crisis-section { margin-bottom:20px; }
-  .crisis-section-label { font-family:'Syne',sans-serif; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--red); margin-bottom:10px; }
+  .crisis-section-label { font-family:'Syne',sans-serif; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--red-text); margin-bottom:10px; }
   .crisis-step { display:flex; gap:12px; align-items:flex-start; padding:12px 14px; background:var(--card); border:1px solid var(--border); border-radius:12px; margin-bottom:8px; }
-  .crisis-step-num { font-family:'Syne',sans-serif; font-size:14px; font-weight:800; color:var(--red); min-width:24px; }
+  .crisis-step-num { font-family:'Syne',sans-serif; font-size:14px; font-weight:800; color:var(--red-text); min-width:24px; }
   .crisis-step-text { font-size:14px; line-height:1.6; color:var(--text); flex:1; }
   .crisis-step-text strong { color:white; }
   .crisis-resource { display:flex; align-items:center; gap:12px; padding:14px; background:var(--card); border:1px solid var(--border); border-radius:12px; margin-bottom:8px; }
@@ -598,15 +598,13 @@
     background:linear-gradient(145deg,#D62828,#8B0000);
     border:2px solid rgba(255,255,255,0.15);
     color:white; cursor:pointer;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:1px; padding:0;
+    display:flex; align-items:center; justify-content:center;
+    padding:0;
     box-shadow:0 4px 16px rgba(214,40,40,0.4), 0 0 0 0 rgba(214,40,40,0);
     transition:transform 0.15s, box-shadow 0.3s;
     -webkit-tap-highlight-color:transparent;
   }
   #sosBtn:active { transform:scale(0.9); }
-  #sosBtn #sosBtnIcon { font-size:20px; line-height:1; }
-  #sosBtn #sosBtnLabel { font-family:'Syne',sans-serif; font-size:9px; font-weight:800; letter-spacing:1px; line-height:1; }
   #sosBtn.pulse {
     animation:sosPulse 2s ease infinite;
   }
@@ -830,7 +828,7 @@
     <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
       <a href="https://www.varsom.no" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:100px;text-align:center;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);color:var(--blue);border-radius:8px;padding:8px;text-decoration:none;font-weight:600;">🌊 varsom.no ↗</a>
       <a href="https://www.yr.no" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:100px;text-align:center;background:rgba(247,127,0,0.1);border:1px solid rgba(247,127,0,0.3);color:var(--orange);border-radius:8px;padding:8px;text-decoration:none;font-weight:600;">🌤 yr.no ↗</a>
-      <a href="https://www.dsb.no/egenberedskap" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:100px;text-align:center;background:rgba(214,40,40,0.1);border:1px solid rgba(214,40,40,0.3);color:var(--red);border-radius:8px;padding:8px;text-decoration:none;font-weight:600;">🛡 DSB ↗</a>
+      <a href="https://www.dsb.no/egenberedskap" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:100px;text-align:center;background:rgba(214,40,40,0.1);border:1px solid rgba(214,40,40,0.3);color:var(--red-text);border-radius:8px;padding:8px;text-decoration:none;font-weight:600;">🛡 DSB ↗</a>
     </div>
   </div>
   <!-- PWA INSTALL BANNER -->
@@ -851,8 +849,7 @@
 
 <!-- FLOATING SOS BUTTON -->
 <button id="sosBtn" onclick="activateCrisisMode()" style="display:none;" aria-label="Aktiver krisemodus">
-  <span id="sosBtnIcon">🆘</span>
-  <span id="sosBtnLabel">SOS</span>
+  <span id="sosBtnIcon" style="font-size:26px;line-height:1;">🚨</span>
 </button>
 
   <!-- MOTIVASJON -->
@@ -890,12 +887,12 @@
       <div style="display:flex;align-items:center;gap:12px;">
         <span class="crisis-pulse"></span>
         <div style="flex:1;">
-          <div id="crisisSuggestTitle" style="font-family:Syne,sans-serif;font-size:15px;font-weight:800;color:var(--red);">Farevarsel! Aktiver krisemodus?</div>
+          <div id="crisisSuggestTitle" style="font-family:Syne,sans-serif;font-size:15px;font-weight:800;color:var(--red-text);">Farevarsel! Aktiver krisemodus?</div>
           <div id="crisisSuggestSub" style="font-size:12px;color:var(--muted);margin-top:2px;">Trykk for handlingsplan, ressursoversikt og nødkontakter</div>
         </div>
       </div>
     </div>
-    <button id="crisisManualBtn" onclick="activateCrisisMode()" style="display:none;width:100%;padding:12px;border-radius:12px;border:1px solid rgba(214,40,40,0.3);background:rgba(214,40,40,0.06);color:var(--red);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;margin-bottom:14px;transition:all 0.15s;">🔴 <span id="crisisManualLabel">Aktiver krisemodus</span></button>
+    <button id="crisisManualBtn" onclick="activateCrisisMode()" style="display:none;width:100%;padding:12px;border-radius:12px;border:1px solid rgba(214,40,40,0.3);background:rgba(214,40,40,0.06);color:var(--red-text);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;margin-bottom:14px;transition:all 0.15s;">🔴 <span id="crisisManualLabel">Aktiver krisemodus</span></button>
 
     <!-- SOCIAL SHARE SCORE -->
     <div id="socialShareCard" style="display:none;background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:14px;text-align:center;">
@@ -1104,7 +1101,7 @@
     <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;margin-top:8px;">
       <div id="faLearnMore" style="font-size:13px;color:var(--muted);margin-bottom:10px;">Lær mer – ta et kurs</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
-        <a id="fhLinkRK" href="https://www.rodekors.no/aktiviteter/kurs/" target="_blank" rel="noopener noreferrer" style="background:rgba(214,40,40,0.15);border:1px solid rgba(214,40,40,0.3);color:var(--red);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;">❤️ Røde Kors-kurs</a>
+        <a id="fhLinkRK" href="https://www.rodekors.no/aktiviteter/kurs/" target="_blank" rel="noopener noreferrer" style="background:rgba(214,40,40,0.15);border:1px solid rgba(214,40,40,0.3);color:var(--red-text);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;">❤️ Røde Kors-kurs</a>
         <a id="fhLinkH30" href="https://www.hjelp30.no" target="_blank" rel="noopener noreferrer" style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);color:var(--blue);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;">📘 Hjelp 3.0</a>
       </div>
     </div>
@@ -1132,7 +1129,7 @@
             <a href="https://kart.dsb.no/share/e09d2487b99b" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:10px;background:rgba(214,40,40,0.1);border:1px solid rgba(214,40,40,0.3);border-radius:10px;padding:12px 14px;text-decoration:none;">
               <span style="font-size:22px;">🗺️</span>
               <div style="flex:1;">
-                <div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--red);">Finn nærmeste tilfluktsrom</div>
+                <div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--red-text);">Finn nærmeste tilfluktsrom</div>
                 <div style="font-size:12px;color:var(--muted);margin-top:2px;">Åpner DSBs offisielle kart</div>
               </div>
               <span style="color:var(--muted);">↗</span>
@@ -1452,7 +1449,7 @@
         <label id="imExpiryLabel" style="display:block;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;font-weight:600;">📅 Holdbarhetsdato (valgfritt)</label>
         <div style="display:flex;gap:8px;align-items:center;">
           <input type="date" id="imExpiry" style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:15px;font-family:'DM Sans',sans-serif;outline:none;" onchange="saveExpiry()">
-          <button id="imExpiryClear" onclick="clearExpiry()" style="display:none;background:rgba(214,40,40,0.15);border:1px solid rgba(214,40,40,0.3);color:var(--red);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">✕ Fjern</button>
+          <button id="imExpiryClear" onclick="clearExpiry()" style="display:none;background:rgba(214,40,40,0.15);border:1px solid rgba(214,40,40,0.3);color:var(--red-text);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">✕ Fjern</button>
         </div>
       </div>
     </div>
@@ -1505,7 +1502,7 @@
 <div id="crisisOverlay">
   <div class="crisis-header">
     <button class="crisis-exit" onclick="exitCrisisMode()" id="crisisExitBtn">✕ Avslutt</button>
-    <div><span class="crisis-pulse"></span><span style="font-family:Syne,sans-serif;font-size:11px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:2px;" id="crisisActiveLabel">KRISEMODUS AKTIV</span></div>
+    <div><span class="crisis-pulse"></span><span style="font-family:Syne,sans-serif;font-size:11px;font-weight:700;color:var(--red-text);text-transform:uppercase;letter-spacing:2px;" id="crisisActiveLabel">KRISEMODUS AKTIV</span></div>
     <div class="crisis-title" id="crisisTitle">Strømbrudd</div>
     <div class="crisis-time" id="crisisTime"></div>
   </div>
@@ -2413,19 +2410,40 @@ function renderBadges(){
 function checkBadges(){
   var pct;
   try { pct=getPct(); } catch(e){ return; }
+
+  // Badges that are one-time achievements (not revocable)
+  var permanentBadges = {weekly:1, ambassador:1, week7:1};
+
+  // Check for newly earned badges
   const newOnes=[];
   BADGES.forEach(b=>{
     try {
       if(!earnedBadges.includes(b.id)&&b.chk(pct,contacts.length,checkedItems)){earnedBadges.push(b.id);newOnes.push(b);}
     } catch(e){}
   });
-  if(newOnes.length){
+
+  // Check for badges that should be revoked
+  var revoked = false;
+  BADGES.forEach(b=>{
+    if(permanentBadges[b.id]) return; // Never revoke permanent badges
+    if(!earnedBadges.includes(b.id)) return; // Not earned, skip
+    try {
+      if(!b.chk(pct, contacts.length, checkedItems)){
+        earnedBadges = earnedBadges.filter(id => id !== b.id);
+        revoked = true;
+      }
+    } catch(e){}
+  });
+
+  if(newOnes.length || revoked){
     localStorage.setItem('72t_badges',JSON.stringify(earnedBadges));
+  }
+  if(newOnes.length){
     // Queue badge modals one at a time
     let delay=0;
     newOnes.forEach(b=>{
       setTimeout(()=>showBadgeModal(b),delay);
-      delay+=600; // stagger slightly but modal must be closed before next
+      delay+=600;
     });
   }
   renderMotivation(); // renderMotivation already calls renderBadges()
@@ -2707,7 +2725,7 @@ function renderWeatherWarningCard(missing,level){
   if(!missing||!missing.length){ card.style.display='none'; return; }
   card.style.display='block';
   var en=currentLang==='en';
-  var html='<div style="font-family:Syne,sans-serif;font-size:14px;font-weight:800;color:var(--red);margin-bottom:8px;">'
+  var html='<div style="font-family:Syne,sans-serif;font-size:14px;font-weight:800;color:var(--red-text);margin-bottom:8px;">'
     +'⚠️ '+(en?'Weather warning – you are missing:':'Farevarsel – du mangler:')+'</div>';
   missing.forEach(function(item){
     html+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:14px;color:var(--text);">'
@@ -2833,11 +2851,11 @@ function renderExpiryWarnings(){
   var html='';
   if(expired.length){
     html+='<div style="background:rgba(214,40,40,0.1);border:1px solid rgba(214,40,40,0.3);border-radius:12px;padding:14px;margin-bottom:8px;">'
-      +'<div style="font-family:Syne,sans-serif;font-size:13px;font-weight:700;color:var(--red);margin-bottom:8px;">🔴 '
+      +'<div style="font-family:Syne,sans-serif;font-size:13px;font-weight:700;color:var(--red-text);margin-bottom:8px;">🔴 '
       +(en?'Expired':'Utløpt')+'</div>';
     expired.forEach(function(item){
       html+='<div style="font-size:14px;padding:3px 0;color:var(--text);">'+esc(item.name)
-        +' <span style="color:var(--red);font-size:12px;">'
+        +' <span style="color:var(--red-text);font-size:12px;">'
         +(en?item.days+' days ago':item.days+' dager siden')+'</span></div>';
     });
     html+='</div>';
@@ -3140,9 +3158,9 @@ function renderChecklist(){
       el.appendChild(cb);
       el.appendChild(info);
 
-      // Holdbarhetsdato-indikator for holdbare varer
-      if(_isPerishable(id)){
-        if(isC && expiryDates[id]){
+      // Holdbarhetsdato-indikator for avhukede holdbare varer
+      if(isC && _isPerishable(id)){
+        if(expiryDates[id]){
           // Avhuket + dato satt → vis datoen
           var expTag = document.createElement('div');
           expTag.className = 'expiry-set';
@@ -3151,7 +3169,7 @@ function renderChecklist(){
           expTag.onclick = function(e){ e.stopPropagation(); openItemModal(item, id, isC); };
           el.appendChild(expTag);
         } else {
-          // Uhuket, eller avhuket uten dato → vis tappbar 📅-nudge
+          // Avhuket uten dato → vis tappbar 📅-nudge
           var nudge = document.createElement('div');
           nudge.className = 'expiry-nudge';
           nudge.textContent = '📅';
@@ -3789,7 +3807,7 @@ function renderInfoAccordions(){
       +'<div id="'+id+'" style="display:none;font-size:14px;color:var(--muted);line-height:1.8;">'+details+'</div>';
   }
 
-  var _btrygghets=document.getElementById('acc-body-trygghets'); if(_btrygghets) _btrygghets.innerHTML=en?'<p style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:14px;">Municipal gathering points where you can get <strong style="color:var(--text);">information, warmth, water and power</strong> during major crises. Open to all residents.</p><div id="trygghetspunktContainer"></div><div style="margin-top:12px;"><a href="https://kart.dsb.no/share/e09d2487b99b" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:10px;background:rgba(214,40,40,0.1);border:1px solid rgba(214,40,40,0.3);border-radius:10px;padding:12px 14px;text-decoration:none;"><span style="font-size:22px;">🗺️</span><div style="flex:1;"><div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--red);">Find nearest shelter</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Opens DSB\'s official map</div></div><span style="color:var(--muted);">↗</span></a></div>':'<p style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:14px;">Kommunale samlingspunkter der du kan få <strong style="color:var(--text);">informasjon, varme, vann og strøm</strong> ved større kriser. Åpne for alle innbyggere.</p><div id="trygghetspunktContainer"></div><div style="margin-top:12px;"><a href="https://kart.dsb.no/share/e09d2487b99b" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:10px;background:rgba(214,40,40,0.1);border:1px solid rgba(214,40,40,0.3);border-radius:10px;padding:12px 14px;text-decoration:none;"><span style="font-size:22px;">🗺️</span><div style="flex:1;"><div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--red);">Finn nærmeste tilfluktsrom</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Åpner DSBs offisielle kart</div></div><span style="color:var(--muted);">↗</span></a></div>';
+  var _btrygghets=document.getElementById('acc-body-trygghets'); if(_btrygghets) _btrygghets.innerHTML=en?'<p style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:14px;">Municipal gathering points where you can get <strong style="color:var(--text);">information, warmth, water and power</strong> during major crises. Open to all residents.</p><div id="trygghetspunktContainer"></div><div style="margin-top:12px;"><a href="https://kart.dsb.no/share/e09d2487b99b" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:10px;background:rgba(214,40,40,0.1);border:1px solid rgba(214,40,40,0.3);border-radius:10px;padding:12px 14px;text-decoration:none;"><span style="font-size:22px;">🗺️</span><div style="flex:1;"><div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--red-text);">Find nearest shelter</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Opens DSB\'s official map</div></div><span style="color:var(--muted);">↗</span></a></div>':'<p style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:14px;">Kommunale samlingspunkter der du kan få <strong style="color:var(--text);">informasjon, varme, vann og strøm</strong> ved større kriser. Åpne for alle innbyggere.</p><div id="trygghetspunktContainer"></div><div style="margin-top:12px;"><a href="https://kart.dsb.no/share/e09d2487b99b" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:10px;background:rgba(214,40,40,0.1);border:1px solid rgba(214,40,40,0.3);border-radius:10px;padding:12px 14px;text-decoration:none;"><span style="font-size:22px;">🗺️</span><div style="flex:1;"><div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--red-text);">Finn nærmeste tilfluktsrom</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Åpner DSBs offisielle kart</div></div><span style="color:var(--muted);">↗</span></a></div>';
 
   // VANN
   var _bvann=document.getElementById('acc-body-vann'); if(_bvann) _bvann.innerHTML=readMore('info-vann-more',
@@ -4740,10 +4758,10 @@ function renderShelterList(el, shelters, en, isLive){
   if(!shelters.length){ el.innerHTML = '<div style="font-size:12px;color:var(--muted);">'+(en?'No shelters found nearby':'Ingen tilfluktsrom funnet i nærheten')+'</div>'; return; }
   var html = '';
   if(isLive){
-    html += '<div style="font-size:10px;color:var(--green);margin-bottom:8px;">✓ '
+    html += '<div style="font-size:11px;color:var(--green);margin-bottom:8px;">✓ '
       +(en?'Live data – public + private shelters':'Live-data – offentlige + private tilfluktsrom')+'</div>';
   } else {
-    html += '<div style="font-size:10px;color:var(--muted);margin-bottom:8px;">'
+    html += '<div style="font-size:11px;color:var(--muted);margin-bottom:8px;">'
       +(en?'Offline data – public shelters only':'Offline-data – kun offentlige tilfluktsrom')+'</div>';
   }
   shelters.forEach(function(s){
@@ -5007,7 +5025,7 @@ function renderTrygghetspunkter(){
     h += '<div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--blue);margin-bottom:6px;">📍 '+(en?'Postal code ':'Postnummer ')+esc(postnr)+'</div>';
     h += '<div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:10px;">'+(en?'We have not added safety points for your municipality yet. Find them via DSB or your municipality\'s website:':'Vi har ikke lagt inn trygghetspunkter for din kommune ennå. Finn dem via DSB eller kommunens nettside:')+'</div>';
     h += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
-    h += '<a href="https://www.dsb.no/egenberedskap" target="_blank" rel="noopener noreferrer" style="background:rgba(214,40,40,0.12);border:1px solid rgba(214,40,40,0.3);color:var(--red);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;text-decoration:none;">DSB.no ↗</a>';
+    h += '<a href="https://www.dsb.no/egenberedskap" target="_blank" rel="noopener noreferrer" style="background:rgba(214,40,40,0.12);border:1px solid rgba(214,40,40,0.3);color:var(--red-text);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;text-decoration:none;">DSB.no ↗</a>';
     h += '<a href="https://www.kommunekatalogen.no" target="_blank" rel="noopener noreferrer" style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);color:var(--blue);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;text-decoration:none;">'+(en?'Your municipality':'Din kommune')+' ↗</a>';
     h += '</div></div>';
   } else {
@@ -5191,7 +5209,7 @@ function printChecklist(){
   const keyCats_ = getCats(profile_.persons, new Set(profile_.needs), 'no');
   let totalItems=0, doneItems=0, rows='';
   cats_.forEach((cat,ci)=>{
-    rows+='<tr><td colspan="2" style="padding:10px 4px 4px;font-weight:700;font-size:13px;color:#D62828;">'+cat.name+'</td></tr>';
+    rows+='<tr><td colspan="2" style="padding:10px 4px 4px;font-weight:700;font-size:13px;color:var(--red-text);">'+cat.name+'</td></tr>';
     cat.items.forEach((it,ii)=>{
       const kcat=keyCats_[ci]; const kit=kcat?kcat.items[ii]:null;
       const id=kcat&&kit ? kcat.name+'::'+kit.name : cat.name+'::'+it.name;
@@ -5214,7 +5232,7 @@ function printChecklist(){
   if(!w) return;
   var printHtml = '<!DOCTYPE html><html><head><title>72klar!</title>'
     + '<style>body{font-family:Arial,sans-serif;max-width:600px;margin:40px auto;color:#1a1a1a;}'
-    + 'h1{color:#D62828;}table{width:100%;border-collapse:collapse;}'
+    + 'h1{color:var(--red-text);}table{width:100%;border-collapse:collapse;}'
     + '@media print{button{display:none;}}</style></head><body>'
     + '<h1>72klar! ' + (en?'Checklist':'Sjekkliste') + '</h1>'
     + '<p>' + (en?'Household':'Husstand') + ': <strong>' + name_ + '</strong> &nbsp;|&nbsp; '
@@ -6290,7 +6308,7 @@ async function runSimulation(){
           : 'og husstanden kunne opprettholdt forsvarlige forhold i ca. <strong style="color:var(--orange)">'+hours+' av 72 timer</strong>.')
     + '</div>';
   if(hours < 72 && limitingReason){
-    html += '<div style="font-size:12px;color:var(--red);margin-top:8px;padding:8px 10px;background:rgba(214,40,40,0.08);border-radius:8px;line-height:1.5;">'
+    html += '<div style="font-size:12px;color:var(--red-text);margin-top:8px;padding:8px 10px;background:rgba(214,40,40,0.08);border-radius:8px;line-height:1.5;">'
       +(en?'⏱️ Limiting factor (~'+hours+'h): ':'⏱️ Begrensende faktor (~'+hours+'t): ')
       +limitingReason+'</div>';
   }
@@ -6308,7 +6326,7 @@ async function runSimulation(){
       var fd = rd + 0.2 + i * 0.08;
       html += '<div class="sim-fix-item sim-anim" style="animation-delay:'+fd.toFixed(2)+'s" onclick="closeSimulation();setTimeout(function(){var nb=document.querySelectorAll(\'nav button\');if(nb[1])nb[1].click();},200);">';
       html += '<div class="sim-fix-emoji">'+fix.emoji+'</div>';
-      html += '<div class="sim-fix-text">'+esc(fix.name)+(fix.critical?' <span style="color:var(--red);font-size:11px;font-weight:700;">'+( en?'~'+fix.limit+'h':'~'+fix.limit+'t')+'</span>':'')+'</div>';
+      html += '<div class="sim-fix-text">'+esc(fix.name)+(fix.critical?' <span style="color:var(--red-text);font-size:11px;font-weight:700;">'+( en?'~'+fix.limit+'h':'~'+fix.limit+'t')+'</span>':'')+'</div>';
       html += '<div class="sim-fix-arrow">→</div>';
       html += '</div>';
     });
