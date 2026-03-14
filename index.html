@@ -590,6 +590,45 @@
   .crisis-nav-arrow { color:var(--muted); margin-left:auto; }
   @keyframes crisisFade { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
   .crisis-anim { animation:crisisFade 0.35s ease both; }
+
+  /* FLOATING SOS BUTTON */
+  #sosBtn {
+    position:fixed; bottom:78px; right:16px; z-index:99;
+    width:56px; height:56px; border-radius:50%;
+    background:linear-gradient(145deg,#D62828,#8B0000);
+    border:2px solid rgba(255,255,255,0.15);
+    color:white; cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:1px; padding:0;
+    box-shadow:0 4px 16px rgba(214,40,40,0.4), 0 0 0 0 rgba(214,40,40,0);
+    transition:transform 0.15s, box-shadow 0.3s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  #sosBtn:active { transform:scale(0.9); }
+  #sosBtn #sosBtnIcon { font-size:20px; line-height:1; }
+  #sosBtn #sosBtnLabel { font-family:'Syne',sans-serif; font-size:9px; font-weight:800; letter-spacing:1px; line-height:1; }
+  #sosBtn.pulse {
+    animation:sosPulse 2s ease infinite;
+  }
+  #sosBtn.pulse::after {
+    content:''; position:absolute; inset:-4px; border-radius:50%;
+    border:2px solid var(--red); opacity:0;
+    animation:sosRing 2s ease infinite;
+  }
+  @keyframes sosPulse {
+    0%,100% { box-shadow:0 4px 16px rgba(214,40,40,0.4), 0 0 0 0 rgba(214,40,40,0.5); }
+    50% { box-shadow:0 4px 20px rgba(214,40,40,0.6), 0 0 0 8px rgba(214,40,40,0); }
+  }
+  @keyframes sosRing {
+    0% { transform:scale(1); opacity:0.6; }
+    100% { transform:scale(1.4); opacity:0; }
+  }
+  /* Hide SOS when crisis is active or during onboarding */
+  #crisisOverlay.active ~ #sosBtn,
+  body.sos-hidden #sosBtn { display:none!important; }
+  @media (max-width:480px) {
+    #sosBtn { bottom:calc(68px + env(safe-area-inset-bottom)); right:12px; }
+  }
 </style>
 </head>
 <body>
@@ -809,6 +848,12 @@
     <button role="tab" aria-selected="false" aria-controls="info" onclick="switchTab('info',event)"><span class="nav-icon">ℹ️</span><span class="nav-label">Info</span></button>
     <button role="tab" aria-selected="false" aria-controls="forstehjel" onclick="switchTab('forstehjel',event)"><span class="nav-icon">🚑</span><span class="nav-label">1.hjelp</span></button>
   </nav>
+
+<!-- FLOATING SOS BUTTON -->
+<button id="sosBtn" onclick="activateCrisisMode()" style="display:none;" aria-label="Aktiver krisemodus">
+  <span id="sosBtnIcon">🆘</span>
+  <span id="sosBtnLabel">SOS</span>
+</button>
 
   <!-- MOTIVASJON -->
   <div id="motivasjon" role="tabpanel" class="tab active">
@@ -1456,9 +1501,6 @@
 
 <!-- BADGE MODAL -->
 
-<!-- KRISESIMULATOR MODAL -->
-<div id="simOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:1002;overflow-y:auto;-webkit-overflow-scrolling:touch;" onclick="closeSimulation()">
-
 <!-- KRISEMODUS OVERLAY -->
 <div id="crisisOverlay">
   <div class="crisis-header">
@@ -1469,6 +1511,9 @@
   </div>
   <div class="crisis-body" id="crisisBody"></div>
 </div>
+
+<!-- KRISESIMULATOR MODAL -->
+<div id="simOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:1002;overflow-y:auto;-webkit-overflow-scrolling:touch;" onclick="closeSimulation()">
   <div style="min-height:100%;padding:0;" onclick="event.stopPropagation()">
     <div id="simContent" style="max-width:480px;margin:0 auto;padding:0 0 40px;"></div>
   </div>
@@ -1564,11 +1609,28 @@ let selectedPersons = 1, customNum = 6, selectedNeeds = new Set();
 var catKeyMap = {}, itemKeyMap = {}; // Shared key maps for fast toggle
 
 // ── PRIORITET FOR "UKENS OPPGAVE" ──
-const CAT_PRIORITY = {
-  'Vann & Drikke':1, 'Mat':2, 'Helse & Førstehjelp':3,
-  'Lys & Energi':4, 'Varme & Hygiene':5, 'Grab-bag':6,
-  'Dokumenter & Annet':7, 'Baby & Småbarn':8, 'Eldre i husstanden':8, 'Kjæledyr':8
-};
+function getSeasonalPriority(){
+  var m = new Date().getMonth(); // 0-11
+  // Nov-Mar: varme/lys prioriteres høyt
+  if(m >= 10 || m <= 2) return {
+    'Vann & Drikke':1, 'Lys & Energi':2, 'Varme & Hygiene':3,
+    'Helse & Førstehjelp':4, 'Mat':5, 'Grab-bag':6,
+    'Dokumenter & Annet':7, 'Baby & Småbarn':8, 'Eldre i husstanden':8, 'Kjæledyr':8
+  };
+  // Apr, Sep-Oct: balansert
+  if(m === 3 || m >= 8) return {
+    'Vann & Drikke':1, 'Mat':2, 'Helse & Førstehjelp':3,
+    'Lys & Energi':4, 'Varme & Hygiene':5, 'Grab-bag':6,
+    'Dokumenter & Annet':7, 'Baby & Småbarn':8, 'Eldre i husstanden':8, 'Kjæledyr':8
+  };
+  // Mai-Aug: vann/mat prioriteres, varme ned
+  return {
+    'Vann & Drikke':1, 'Mat':2, 'Helse & Førstehjelp':3,
+    'Lys & Energi':5, 'Varme & Hygiene':6, 'Grab-bag':4,
+    'Dokumenter & Annet':7, 'Baby & Småbarn':8, 'Eldre i husstanden':8, 'Kjæledyr':8
+  };
+}
+const CAT_PRIORITY = getSeasonalPriority();
 
 // ── MAPPING: VÆRTYPE → SJEKKLISTE-KATEGORIER ──
 const WEATHER_ITEM_MAP = {
@@ -1923,6 +1985,7 @@ function scheduleNotifDayClear(){
 
 // ── STATUS / FAREVARSEL ──
 var statusDetailOpen = false;
+window._fareLevel = 0; // Initialized; updated by fetchFarevarsel
 function openStatusDetail(){
   var d=document.getElementById('statusDetail');
   var arrow=document.getElementById('statusArrow');
@@ -2047,8 +2110,10 @@ async function fetchFarevarsel(){
       det+=(_fen?'<span style="color:var(--muted);font-size:12px;">⚠️ For official warnings, check varsom.no and yr.no</span>':'<span style="color:var(--muted);font-size:12px;">⚠️ For offisielle farevarsler, sjekk varsom.no og yr.no</span>');
       if(body) body.innerHTML=det;
       // Koble farevarsel til manglende punkter
+      window._fareLevel = level;
       if(level>=1&&profile){ var _miss2=getMissingForWeather(weatherTypes); renderWeatherWarningCard(_miss2,level); }
       else { renderWeatherWarningCard(null,0); }
+      if(level>=2) suggestCrisisMode(level);
     } catch(e){
       txt.textContent=_fen?'Preparedness: Unknown':'Beredskap: Ukjent'; txt.style.color='';
       if(body) body.innerHTML=_fen?'Could not fetch weather warnings. Check <a href="https://www.varsom.no" target="_blank" rel="noopener noreferrer" style="color:var(--blue);">varsom.no</a> directly.':'Kunne ikke hente farevarsel. Sjekk <a href="https://www.varsom.no" target="_blank" rel="noopener noreferrer" style="color:var(--blue);">varsom.no</a> direkte.';
@@ -2460,6 +2525,13 @@ function quickSimHours(items){
   limits.push(qHas('Radio')?72:phone);
   if(needs.has('medisin')) limits.push(qHas('Faste medisiner')?72:18);
   if(needs.has('baby')) limits.push(qHas('Barnemat')?72:10);
+  // Warmth: simple seasonal estimate (full sim uses actual temp)
+  var m = new Date().getMonth();
+  var isColdSeason = m >= 10 || m <= 2;
+  if(isColdSeason){
+    var hasWarmth = qHas('tepper') || qHas('Varme klær');
+    limits.push(hasWarmth ? 48 : 18);
+  }
   return Math.max(0, Math.min(72, Math.min.apply(null,limits)));
 }
 
@@ -3109,7 +3181,12 @@ function renderChecklist(){
 
       var ccb = document.createElement('div');
       ccb.className = 'checkbox' + (cIsC ? ' checked-anim' : '');
+      ccb.setAttribute('role', 'checkbox');
+      ccb.setAttribute('aria-checked', cIsC ? 'true' : 'false');
+      ccb.setAttribute('aria-label', ci.name);
+      ccb.setAttribute('tabindex', '0');
       ccb.innerHTML = cIsC ? '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><polyline points="3,9 7,13 15,5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '';
+      ccb.onkeydown = function(e){ if(e.key===' '||e.key==='Enter'){e.preventDefault();ccb.click();} };
       ccb.onclick = function(e){
         e.stopPropagation();
         toggleCustomItem(cId);
@@ -4398,6 +4475,297 @@ const TRYGGHETSPUNKTER = {
   ],
 };
 
+// Tilfluktsrom – DSB/Geonorge offentlige tilfluktsrom (556 stk, NLOD-lisens)
+const TILFLUKTSROM=[
+  [59.4049,10.4621,400,'Trimv. 09 - Borre Idrettspark (off)'],  [59.4172,10.4839,390,'Torget 6'],  [59.4177,10.4791,370,'Vestre Braarudgt. 6b - Åsheim'],
+  [59.4157,10.4838,215,'Vognmannsgt. 1 - Trygdegården'],  [59.4894,10.3155,800,'Langgt. 14'],  [59.0571,10.0295,159,'Badeparken 7 - Bøkeskogen eldresenter'],
+  [59.0535,10.0367,265,'Byskogv. 5 - Byskogen Bo- og aktivitetssenter'],  [59.0562,10.0478,128,'Øvre Dr. Holms vei 44 - KUF-huset'],  [59.0778,10.05,220,'Nordbyveien 27 - Hagatun grendehus'],
+  [59.049,10.0114,220,'Rosendalsgt. 17 - Langestrand skole'],  [59.0494,10.0412,850,'Ahlefeldtsgt. 1 - Mesterfjellet'],  [59.2007,10.4422,425,'Skallestadv. 38 - Hårkollhallen'],
+  [59.2251,10.4095,42,'Tinghaugv. 14 - Nøtterøy kulturhus, nedre rom'],  [59.225,10.4094,225,'Tinghaugv. 14 - Nøtterøy kulturhus, øvre rom'],  [59.2628,10.3906,415,'Harpunv. 3 - Optura A/S (off.)'],
+  [59.1341,10.1876,195,'Sportsv. 31 - Off. Bugården u-skole'],  [59.1329,10.2198,1170,'Dronningensgt. 24 - Off.  Forsmannssenteret'],  [59.1182,10.234,293,'Lyhmannsv. 2 - Off. Framnes Eldresenter'],
+  [59.1317,10.2643,1233,'Maurveien 14 - Off. Gjekstad (garasjeanlegg)'],  [59.1344,10.2294,400,'Gokstadv. 5 - Off.'],  [59.1296,10.2145,600,'Høstsgt. 3 - Off.'],
+  [59.1114,10.2229,200,'Hystadv. 167 - Off.  Jotun A/S'],  [59.1157,10.24,300,'Rødslia 28 - I krysset ved Fagerstadveien'],  [59.1287,10.2197,400,'Sandefjordsv. 3 - Off. Sandefjord Rådhus'],
+  [59.2686,10.4102,1500,'Haugar'],  [59.2668,10.3568,150,'Larvev. 31 - Hogsnes Grendehus, rom 1 (off)'],  [59.2668,10.3568,150,'Larvev. 31 - Hogsnes Grendehus, rom 2 (off)'],
+  [59.2707,10.4019,962,'Slottsfjelltunnelen (off)'],  [59.2695,10.4622,215,'Trimveien 14 - ved Slagenhallen'],  [68.438,17.4293,800,'Dronningensgate 52'],
+  [58.4517,6.0011,215,'Torget 6'],  [58.4556,6.0025,240,'Jernbaneveien 22'],  [58.4478,6.0066,88,'Sokndalsveien 26'],
+  [58.7366,5.6555,270,'Røyrvika 10'],  [58.7854,5.6975,60,'Bedriftsvegen 6'],  [58.7749,5.6271,180,'Kleppevarden 2'],
+  [63.1511,10.2837,30,'Horghallvegen 25, HORGHALLEN'],  [63.1067,10.2266,50,'Tømmesdalsvegen 70, HOVIN SKOLE/SAMF.HUS'],  [63.2848,10.2769,60,'Per Bortens veg 21, MELHUS SKYSSTASJON'],
+  [63.2977,9.8476,200,'STATENS HUS ORKANGER'],  [63.3051,9.8497,33,'TORGSENTERET, ORKANGER'],  [63.3019,9.8484,40,'Orkdalsveien 82'],
+  [62.5718,11.369,16,'Sollihagaen 17, RØROS KJØLESERVICE'],  [62.5771,11.3912,20,'Lorentz Lossius gata 45, RØROSMUSEET'],  [63.7253,9.687,170,'Teletunet, Opphaug, Offentlig'],
+  [70.3725,31.1039,315,'Kaigaten 8 OFF T-ROM hotellet'],  [58.1491,7.9824,136,'BANEHEIVEIEN'],  [58.148,7.922,195,'BYDALSVEIEN 19'],
+  [58.183,8.084,65,'FREDRIK FRANSSONSVEI 4'],  [58.2002,8.032,235,'GROSTØLVEIEN 4 E'],  [58.1215,7.9366,500,'GRÅGÅSVEIEN 43'],
+  [58.1551,7.973,170,'RAVNEDALSVEIEN 34'],  [58.1811,8.0889,50,'HÅNESVEIEN 61'],  [58.1514,8.0257,390,'INDUSTRIGATA  6'],
+  [58.1758,8.0953,170,'JORDBÆRVEIEN 2'],  [58.1293,7.9464,184,'KARUSSVEIEN 7'],  [58.1254,7.954,465,'KIRSTEN FLAGSTADSVEI  30'],
+  [58.1429,7.9955,243,'KONGENSGATE 2'],  [58.1483,7.9918,191,'KRISTIAN 4. DES GATE 35-37'],  [58.0891,7.9992,120,'LINDEBØSKOGEN'],
+  [58.1774,8.0433,95,'MAGNUS BARFOTSVEI 7'],  [58.1486,7.9558,360,'MALMVEIEN 4'],  [58.1472,7.9905,330,'MARKENSGATE 42'],
+  [58.0759,8.0013,200,'MÆBØ'],  [58.1486,7.9701,300,'MØLLEVANNSVEIEN 50'],  [58.1343,8.0765,220,'ODDERHEI 1'],
+  [58.1666,8.0109,230,'PRESTHEIA 10'],  [58.1338,7.961,170,'RØDSTRUPEVEIEN 17'],  [58.1734,8.1261,170,'SKIBÅSEN 2'],
+  [58.1356,7.9359,70,'SLETTHEIVEIEN 63 B'],  [58.1547,8.0815,234,'STRØMMEVEIEN 85-87'],  [58.1454,8.0592,130,'VARDÅSVEIEN 115/117'],
+  [58.1716,8.0885,150,'VIGVOLLÅSEN 16'],  [58.1017,7.9478,150,'VOIE RINGVEI 108'],  [58.1528,8.0091,120,'ØSTERVEIEN 30 B'],
+  [58.077,8.0014,220,'ØSTERØYA 8'],  [58.1486,8.021,190,'ØSTRE RINGVEI 8'],  [58.1482,8.0061,100,'ØSTRE STRANDGATE 67'],
+  [58.1788,8.0913,360,'ØVRE BRATTBAKKEN 1'],  [58.0963,7.8143,235,'TANGVALL'],  [58.0963,7.8143,133,'TANGVALL'],
+  [58.2758,7.9773,235,'SKOLEVEGEN 9'],  [58.2577,7.9645,75,'Drivenesvegen 24'],  [58.032,7.4345,100,'BURÅSVEIEN 59'],
+  [58.0295,7.4608,150,'HOLBÆK ERIKSENSGATE 10'],  [58.0251,7.4724,60,'SOMMERKROVEIEN 18'],  [58.0309,7.4901,400,'SELJEVEIEN 60'],
+  [58.0931,6.6962,30,'STÅLESEN BYGG AS-AUTOHALLEN Vanse'],  [58.2833,6.6438,100,'SVEGESKOGEN 17'],  [58.2965,6.6656,220,'Urgata 2'],
+  [58.2952,6.669,190,'RAULIVEIEN 2'],  [58.1214,7.0583,35,'ROSFJORD'],  [66.3128,14.1489,160,'Myraveien 2 (Brannstasjonen)'],
+  [66.2855,14.0543,230,'Kveldssolgata 99 (Hauknes skole - offentlig)'],  [67.275,14.4868,415,'Alstadveien 19, Alstad Ungdomsskole'],  [67.2752,14.4,160,'Salten gummiservice A/S, Tømrerveien 8'],
+  [67.2749,14.3784,600,'Gråholten'],  [67.2847,14.3817,340,'Torvet, Sjøgaten, Bodø'],  [69.9737,23.3011,520,'Holstbakken   Alta'],
+  [67.2837,14.4051,1154,'Rensås Syd, Bodø'],  [67.298,14.3952,300,'Dreyfushammaren, Burøyveien, Bodø'],  [67.283,14.4001,500,'Rensås Nord, Parkveien, Bodø'],
+  [67.2626,15.3752,450,'Gymnaset, Gymnasveien 5, Fauske'],  [66.3146,14.1322,410,'Strandgata 20'],  [66.326,14.1809,320,'Selfors Barneskole'],
+  [66.3408,14.1386,240,'Ytteren Somatiske sykehjem - off.'],  [58.852,5.7338,600,'Flintergata 6'],  [58.8614,5.7433,420,'Roald Amundsens gate 28A'],
+  [58.8698,5.731,155,'Nikkelveien 13'],  [58.8847,5.7459,20,'Sjøveien 4'],  [58.843,5.7562,80,'Iglemyrveien 3'],
+  [63.7392,11.2821,138,'Moafjæra 1d'],  [63.4751,10.915,110,'Wergelandsveien 27'],  [58.8255,5.7266,98,'Haugen 25'],
+  [58.873,5.7255,225,'Somaveien 4'],  [58.8256,5.7135,570,'Olabakken 2'],  [58.8839,5.7266,241,'Luramyrveien 61'],
+  [58.8413,5.7261,230,'Samuel J. Sandveds vei 16'],  [58.8849,5.7346,200,'Smørbukkveien 11'],  [58.4534,6.0063,150,'Damsgårdsgaten 4A'],
+  [59.8796,8.6146,235,'Sam Eydesgt. 163, IINGOLFLAND SKOLE'],  [58.9295,5.8514,200,'Kaiveien 23'],  [58.9302,5.8513,200,'Kaiveien 25'],
+  [66.0224,12.6354,100,'Skansen kjøpesenter, T. Kveldulvsons gate 24'],  [65.4681,12.2111,120,'Skole/Samfunnshus, Skolegata 1'],  [59.5538,11.3337,736,'Mysenhallen/ Smedgata 19'],
+  [59.6689,9.6518,300,'Karsches gate 3  "Tilflukt"'],  [60.17,10.2434,172,'Soknedalsveien 7'],  [59.7571,10.1311,537,'Betzy Kjelsbergs vei 182'],
+  [59.7456,10.2216,1200,'Prins Oscarsgate / Brantenborg.'],  [59.7488,10.0124,600,'Nedre Tverrgate 1 - Nedre Eiker Samfunnshus'],  [59.771,9.9085,385,'Stasjonsgata 24'],
+  [59.7732,9.9084,320,'Hellefoss veien 2'],  [59.77,9.899,220,'Skotselvveien 29'],  [64.4669,11.4943,14,'Havnegt.16'],
+  [64.4648,11.4949,25,'Abel Meyers gate 3'],  [64.4692,11.5036,60,'Overh.vn.8'],  [64.4665,11.4951,70,'Kirkegt.5'],
+  [64.4685,11.4793,78,'Strandvn.7'],  [64.4676,11.4973,15,'Abel Meyers gate 21'],  [64.4741,11.5219,2000,'Jarl Hildrums veg 6, Kleppen'],
+  [69.6682,29.9526,400,'Sundelinveien 72 (Sandnes Skole)'],  [65.4678,12.2058,340,'Rådhuset, Sivert Nilsensgate 24'],  [58.4596,8.7475,230,'Gåsungen Barnehage - Gåsåsen 20'],
+  [58.335,8.2329,35,'Birkenes kommunehus - Smedens Kjerr 30'],  [58.5191,8.3531,20,'Herefoss Skole - Torsbumoen 14'],  [58.7146,9.2152,240,'Risør Idrettshall - Caspersens vei 25'],
+  [58.7201,9.2169,470,'Risør videregående skole - Sirisveien 8 Blokk A'],  [58.4401,8.7062,90,'Bjorbekktunet - Off - Bjorbekk - Johan Landmarksve'],  [58.4584,8.7121,26,'Meny - Off - Stoa - Åsbieveien 2'],
+  [58.4583,8.72,90,'Idrettens Hus - Off - Kåre Eriksen A/S - Åsbievn 1'],  [58.1709,8.245,264,'Høvågheimen Bo og aktivitetsenter - Høvåg'],  [58.2499,8.3786,28,'Lillesand rådhus - Østregate 2'],
+  [58.3429,8.5904,1300,'Kulturhuset - Hestetorget,Storgaten 33'],  [58.2689,8.505,228,'Eide Skole - Johan Markussens vei 90'],  [58.3379,8.5927,50,'Oddensenteret (kjeller) - Vesterled 4'],
+  [58.5151,8.6328,400,'Froland Idrettshall - Mjølhusmoen - Rislandsvn 10'],  [58.6266,8.9287,106,'Dønnestadgården - Bibliotekveien 4'],  [58.4619,8.7661,2400,'Arendalstunnelen - Parkeringstunnell -Torvet/Barb'],
+  [58.471,8.7911,1800,'Birkenlundhallen - Kirkefjell 11'],  [63.431,10.399,630,'Westermannsveita 4 Tidl. Nordre gate 1'],  [59.5832,11.1609,265,'Dr.Randersgate 5, Askim'],
+  [59.5827,11.1613,260,'Dr. Randersgate 2, Askim'],  [59.5903,11.1286,260,'Rom skole/ Gramveien 63A, Askim'],  [70.1726,28.5584,90,'endresens vei 4, Varangerbotn'],
+  [59.421,10.6701,1079,'Melløs stadion, Nordahl Griegsgt 22'],  [59.4338,10.6548,1000,'Blinken/ Jeløgata 3'],  [59.4278,10.6687,400,'Malakoff vg. skole, Dyreveien 9'],
+  [59.4294,10.6302,250,'Reier skole/Brageveien 9'],  [59.4333,10.6817,300,'Krapfoss skole /Anton Krogsveldsvei 4'],  [59.4375,10.6679,450,'Parkeringshus Piasenteret/ Møllergata 1'],
+  [61.2218,6.075,168,'Wilh Bugges Veg 5'],  [59.4204,5.2639,122,'Haugevegen 31'],  [70.9957,25.9804,78,'Storbukt Skole   Honningsvåg'],
+  [70.657,23.7054,448,'Baksalen Skole  Hammerfest'],  [70.6918,23.7005,400,'Reindalen skole'],  [70.6373,23.6772,228,'Bokollektivet  Rypefjord'],
+  [70.6638,23.6928,622,'Sivilforsvarets lager Nybakken 9   Hammerfest'],  [70.0522,24.9565,211,'Porsanger Rådhus   Lakselv'],  [70.0485,24.9671,170,'Flerbrukshallen Lakselv'],
+  [70.0521,24.9525,280,'Helsetun     Lakselv'],  [70.9761,25.9794,570,'Idrettsanlegg   Honningsvåg'],  [61.1181,10.4618,130,'Brubakken 2'],
+  [60.7948,10.6901,550,'Storgata 10'],  [60.7831,10.6486,65,'Mattisrudsvingen 9'],  [60.8338,10.0555,30,'Rosteinvegen 7'],
+  [60.7151,10.6052,550,'Prøvenvegen 65'],  [61.1558,10.3917,50,'Jørstadmovegen 690'],  [61.1281,10.4518,250,'Gudbrandsdalsvegen 190'],
+  [61.123,10.4709,150,'Nordsetervegen 45'],  [61.1179,10.4627,300,'Jul Pettersens gate 2'],  [61.1162,10.4623,616,'Kirkegata 74'],
+  [61.2362,7.6918,650,'v/ Seimsdalstunnellen'],  [61.3112,7.8057,550,'Storevegen 13 (Lykkja )'],  [65.8384,13.1964,30,'Petter Dassgt 15'],
+  [65.8364,13.19,40,'Strandgt. 31-33 (offentlig)'],  [59.4204,5.2651,122,'Erling Skjalgssons gate 25'],  [59.3982,5.3037,220,'Spannavegen 135'],
+  [59.4369,5.2577,200,'Kvalamarka 26'],  [59.4096,5.3296,265,'Skjoldavegen 318'],  [59.4047,5.2981,235,'Spannavegen 75'],
+  [59.4795,11.6591,220,'Marker rådhus/ Storgata 60'],  [59.2801,11.1077,2000,'Kulås/ Sandesundveien 10C'],  [59.2712,11.0897,900,'Spikern/ Alvimveien 19'],
+  [59.2834,11.109,300,'Sagahuset/ Sandesundveien 1'],  [59.267,11.1696,477,'Skjeberg rådhus/ Rådhusveien 17'],  [59.2887,11.0878,89,'Dahles bilforretn/ Herbergveien 4'],
+  [59.2858,11.147,40,'Hafslundsøy skole/ Hagastuveien 60'],  [59.2901,11.0861,100,'Borg bil/ Glomveien 5'],  [59.2948,11.074,183,'Tingvollheimen aldersheim/ Tuneveien 70'],
+  [65.8354,13.1951,388,'Håreksgt. 13'],  [65.8367,13.1905,25,'Strandgata 36 (offentlig)'],  [65.8371,13.1915,15,'C.M. Havigsgt. 28 (offentlig)'],
+  [65.8378,13.1935,310,'Fearnleysgt. 14 (Mosjøen viderg.skole- off.)'],  [65.8661,13.1998,220,'Stortingmannsv. 20 (Kulstad skole - Off.)'],  [65.8216,13.2176,172,'Olderskog skole - Skule Svendsv. 17'],
+  [65.8409,13.1998,100,'Skjervgata 43 - Rådhuset i Vefsn (off.)'],  [59.4282,5.267,222,'Torjus Gards veg 7'],  [59.4689,5.2847,220,'Tittelsnesvegen 332'],
+  [60.4093,5.2283,500,'Florvågvegen 3, Løfjell, Kleppestø'],  [60.5449,5.293,65,'Kvassnesv. 52                Pb. 157'],  [59.7818,5.4873,100,'Bu og rehab. senter'],
+  [60.6587,6.4347,233,'Strandavegen 334'],  [60.6279,6.4197,698,'Miltzowsgt. 2'],  [60.6165,6.5366,100,'Tjørnahaugane 60'],
+  [60.4602,5.4382,360,'Elvavegen 2,  Ytre Arna'],  [60.391,5.3175,758,'Håkonsgaten 5'],  [60.3866,5.3485,600,'Kalfarveien 76'],
+  [60.3966,5.3118,500,'Nykirkealmenning ovenfor nr 19'],  [60.3959,5.3164,1400,'Holbergsalm. v/Strandgt 96'],  [60.3882,5.311,650,'Dokkeskjærskaien 1'],
+  [60.3894,5.322,3500,'Sydnestunnelen'],  [60.3983,5.3055,850,'Nordnes, v/ Haugeveien 32'],  [60.3323,5.3086,150,'Bønesberget 1'],
+  [60.3149,5.2713,150,'Søreidtunet 2'],  [60.3056,5.3083,175,'Nordåsbrotet 2'],  [60.3718,5.3604,2000,'Haukelandsveien   30'],
+  [60.3794,5.3388,2000,'Kronstadhøyden - vis a vis Møllendalsv  nr 8'],  [60.354,5.3605,422,'Vilhelm Bjerknes vei 22'],  [60.3594,5.354,1300,'Fageråsveien, vis a vis Fageråsv 20'],
+  [60.3648,5.3461,240,'Kanalveien 54'],  [60.4642,5.3597,755,'Flaktveitsvingane 17'],  [60.3827,5.3323,750,'Florida-Nygårdsparken, Jahnebakken 5'],
+  [60.3925,5.3341,1800,'St. Jørgen - St. Jakob, Danckert Krohnsgt'],  [60.3798,5.3231,1050,'St. Markus, Damsgårdsveien 70'],  [60.404,5.3215,1500,'Rothaugen, Nye Sandviksv v/ 69a'],
+  [60.4084,5.4788,230,'Hølbekken 1, Arnatveit'],  [60.3811,5.2171,455,'Olsvikåsen 49, Olsvik'],  [69.4722,25.5189,465,'Rådhusgata 4'],
+  [63.48,10.9336,2000,'Fossliåsen'],  [59.2903,11.1041,350,'Lande skole/ Triangelveien 5'],  [63.3945,10.416,200,'Siriusveien 10'],
+  [59.2843,11.1105,200,'Torvet 4-6'],  [59.2854,11.0794,42,'Finn Sørli/ Hundskinnveien 92'],  [62.4438,6.2146,87,'Erikmarka 3'],
+  [62.471,6.1538,500,'Keiser Wilhelms gate 11'],  [62.4458,6.3634,123,'Blindheimsgeilane 1'],  [62.4737,6.1587,300,'Storgata 16'],
+  [62.4741,6.2279,500,'Gangstøvikvegen 27'],  [62.4721,6.1752,383,'Fjellgata 45'],  [60.7944,11.0723,315,'Torggata 52'],
+  [60.7933,11.0797,216,'Parkgata 33'],  [60.7954,11.0664,270,'Morteruds gate 22 - 24'],  [60.7949,11.0654,320,'Storhamargata 23 B-C'],
+  [60.8007,11.0848,80,'Rollsløkkvegen 19'],  [60.7979,11.0489,50,'Aslak Bolts gate 42'],  [60.7938,11.0739,158,'Torggata 31'],
+  [60.8042,11.1327,49,'Finsalvegen 3'],  [60.8423,11.0948,35,'Elvesletta 25'],  [60.798,11.1075,15,'Midtstranda 1'],
+  [63.3727,10.3458,200,'Øvre Flatåsveg 2 A'],  [63.3732,10.3332,45,'Øvre Flatåsveg 16'],  [63.4115,10.4527,280,'Gamle Jonsvannsveien 12'],
+  [68.8601,18.3546,459,'Infanteriveien 11, Setermoen brannstasjon'],  [59.6534,9.6399,225,'Gesellveien 5'],  [59.2112,10.9412,1250,'Lykkeberg/ St.Croix gate 31'],
+  [59.2129,10.9486,1345,'Damyr/ Sportsveien 18'],  [59.2146,10.9341,5384,'St. hansfjellet/ Farmansgate 16'],  [59.2007,10.9611,716,'Kongstenhallen'],
+  [59.2042,10.9362,750,'Smertu/ Løypeveien 18'],  [59.2143,10.9024,1200,'Gressvik/ Storveien 103A'],  [59.2162,10.9062,97,'Aktivitetshuset/ Gressvik torg 13'],
+  [59.2677,10.9912,100,'Rolvsøyahallen'],  [59.8277,10.4476,165,'Bleikerveien 64  (Asker Tennisklubb)'],  [69.2313,17.9881,756,'Kulturhuset'],
+  [60.8436,11.0432,65,'Øvermarka 24'],  [60.8818,10.9398,55,'Nygata 9'],  [60.8854,10.9391,343,'Brugata 3'],
+  [60.7151,11.2042,52,'Ljøstadvegen 15'],  [59.7401,10.2006,1372,'Strømsø torg  7'],  [69.1472,18.1559,313,'Sørreisa Rådhus/Helsesenter'],
+  [69.1544,18.1562,173,'Øyjordneset'],  [69.091,17.6904,175,'Dyrøy sykehjem, Brøstabotn'],  [59.7483,10.203,1200,'Bergstien 37'],
+  [70.0746,29.7503,465,'Oscars gate 4'],  [68.4424,17.4067,372,'Garderobehuset, Narvik stadion, Lillevikveien 9'],  [59.2906,5.2882,120,'Fotvegen 16'],
+  [68.4228,17.3491,445,'Ankenes Bo- og serviceservice Krobakken 5'],  [59.7605,10.0358,63,'Neptunveien 3-5'],  [59.293,5.2262,18,'Austre Veaveg 217'],
+  [68.8137,16.5435,400,'Hagebyen skole'],  [68.7987,16.5391,400,'Rådhuset Harstad OFFENTLIG'],  [59.7919,10.2586,281,'Stokkeveien 2'],
+  [68.7799,16.5588,850,'Kanebogen skole OFFENTLIG'],  [68.208,14.4652,320,'Kong Øysteinhall, Rækøyveien 40. Kabelvåg'],  [68.2377,14.5674,3300,'VåganHallen, Løkthaugveien 10. Svolvær'],
+  [60.1705,10.2682,83,'Vesterngata 18'],  [59.6521,6.357,90,'Skulegata 29'],  [59.6454,6.3103,125,'Saudavegen 279'],
+  [59.6578,6.3802,150,'Rustå 31'],  [59.656,6.3633,85,'Åbødalsveien 79'],  [70.078,29.7398,814,'Karl Rasmussens plass 1'],
+  [59.6511,6.3576,600,'Skulegata 23'],  [59.6401,6.3055,78,'Sjøen 45'],  [59.6552,6.3639,40,'Åbødalsveien 77'],
+  [68.6962,15.4073,100,'Sortlandshallen'],  [59.001,5.6197,300,'Torvmyrveien 4A'],  [59.0089,5.6501,270,'Torvmyrveien 40'],
+  [58.9409,5.5781,2000,'Storevardvegen'],  [58.9684,5.7378,2080,'Kirkebakken 18'],  [58.9514,5.6959,200,'Morgedalsveien 60'],
+  [58.9471,5.7001,220,'Jupiterveien 30C'],  [58.9583,5.7397,500,'Lagårdsveien 77'],  [58.8968,5.7229,5000,'Nedre Storaberget 1'],
+  [58.973,5.7258,4000,'Nedre Strandgate'],  [58.9447,5.6981,380,'Olav Liljekransstien 20'],  [58.9462,5.6971,380,'Hallingstien 38'],
+  [58.9721,5.7311,3930,'Skagenkaien 29'],  [58.9861,5.6781,3140,'Eskelandsveien 35'],  [59.2912,5.3033,72,'Avaldsnesvegen 72'],
+  [59.2806,5.3001,66,'Austre Karmøyveg 120'],  [59.4213,5.2707,608,'Lotheparkvegen'],  [68.5708,14.9245,150,'Turist og konferansesenteret, Børøya'],
+  [60.1656,10.2548,420,'Søndre Torv 7 B'],  [60.182,10.1961,417,'Valhallveien 15'],  [60.1574,10.2624,170,'Ringeriksgata 13'],
+  [60.1533,10.2529,100,'Dronning Åstas gate 12'],  [60.1804,10.2597,385,'Krokenveien 19'],  [59.7484,10.1937,330,'Wergelands gate 9'],
+  [60.2363,5.4522,150,'Søfteland'],  [69.3141,16.1181,550,'Rådhus. Idrett og Svømmehall'],  [60.1756,5.3821,136,'Askviknes Sykehjem'],
+  [60.1889,5.4697,500,'Os'],  [59.2091,9.5961,150,'Betanien Hospital'],  [59.2023,9.6172,390,'Gampedalen'],
+  [59.2064,9.6066,325,'Nedre Hjellegt 9'],  [59.2122,9.6054,498,'Schweigaards gate 11'],  [59.1857,9.6165,400,'Tamburlunden Gråtenmoen Terrasse 16'],
+  [59.1367,9.6602,500,'Bånnåsen 21'],  [59.1375,9.6447,1120,'Helleberget, Huken, Crøgerlia 21'],  [59.1156,9.6533,490,'Klevstrand'],
+  [59.1421,9.6448,540,'Lysthusåsen, Kleiva 4'],  [59.1418,9.6575,130,'Politihuset, Rådhusgt 5'],  [59.1356,9.6605,2000,'Sentrumstunellen/Porsgrunntunnelen'],
+  [59.1459,9.6649,140,'Slottsbrugt 25'],  [59.0542,9.691,1040,'Trosvik, Brevik'],  [58.8736,9.4148,1000,'Renseanlegget, Ytre Strandvei 15'],
+  [58.8907,9.3562,220,'Årø skole, Nøkkeldalen 4'],  [58.871,9.3883,55,'Kalstad KBO, Kalstadveien 16E'],  [59.8793,8.5914,728,'Potekjeller tomta, Bøenstomten 10'],
+  [59.8786,8.5895,200,'Rjukan politikammer, Sam Eydes gate 71'],  [59.5696,9.2112,420,'Heddal u/skole, Rogneståvegen 6'],  [59.5608,9.2542,1900,'Ravnsflog, Tinnesgata 18'],
+  [59.5613,9.2616,700,'Storgt 59'],  [59.0429,9.6928,180,'Stathelle Service Senter'],  [68.7728,16.1791,1138,'Kvæfjordhallen, Husebyveien 3'],
+  [59.9467,10.6192,465,'Nils Leuchsvei 40'],  [59.9166,10.5008,1550,'Rødskiferveien 1 Kolsås Senter'],  [59.9475,10.6018,225,'Østerndalen 23 Grini næringspark'],
+  [59.9254,10.739,1130,'St. Hanshaugen, Ullevålsveien'],  [67.2583,15.3523,197,'Tareveien 7 Tennishallen'],  [67.2598,15.4446,255,'Tinkeliheia 1, (Finneid nærmiljøsenter)'],
+  [59.9188,10.7349,1750,'Tullinsgate 2'],  [67.3103,14.4471,214,'Løpsmark Skole Nonshaugen 87, 8015 Bodø'],  [67.2907,14.5881,400,'Bjørndalsveien 14 (Mørkvedmarka skole)'],
+  [60.6246,6.3888,80,'Peter Bondes veg 78'],  [59.5978,10.71,320,'Risilveien 71, Vestbyhallen'],  [59.6688,10.6348,590,'Frognhallen, Belsjøveien 2'],
+  [60.6165,6.5366,100,'Tjørnahaugane 60'],  [59.6642,10.7909,240,'Moerveien 1- Skoleveien 1 Ås Rådhus'],  [59.7588,10.8413,258,'Allbrukshus Langhus, Galmle Vevelstadvei 34'],
+  [58.9552,5.692,240,'Rektor Oldens gate 2'],  [59.9105,10.7487,300,'Fred Olsensgt 11'],  [59.8345,10.7924,7060,'Holmlia bad, Holmlia sentervei 34'],
+  [59.9376,10.7598,250,'Bentsegt 21-25'],  [59.9303,10.6067,230,'Grav Gårdsvei 5'],  [60.8079,11.0327,40,'K.O. Bjerklis veg 9'],
+  [59.9045,10.5867,233,'Peter Lorangesvei 1, Stabekk Bosenter'],  [59.943,10.5081,553,'Skollerudveien 7, Helset hallen'],  [59.8531,10.4848,5500,'Vogellund 7, Holmenhallen'],
+  [59.9353,10.6041,250,'Veståsen 18, Katolsk kapell'],  [59.9182,10.5844,1336,'Gml Ringeriksvei 44'],  [59.9299,10.6148,260,'Bjerkelundsveien 18 A'],
+  [59.9405,10.5078,233,'Nedre Toppenhaug 56'],  [59.8946,10.5126,4200,'Hamangskråningen, Brynsveien 2 Sandvika'],  [59.9451,10.5042,243,'Sleiverudåsen 3'],
+  [59.9284,10.7176,2800,'T-banen - Valkyrien stasjon'],  [59.8488,10.8296,5600,'Klemetsrud, Lofsrudveien 6'],  [59.9089,10.7856,404,'Jordalsgt 11'],
+  [59.9283,10.7149,555,'Majorstuveien 38'],  [59.9225,10.7503,4300,'Maridalsveien 14'],  [59.9306,10.782,472,'Olav Schousvei 2-8 plan A'],
+  [59.9219,10.7008,385,'Nobelsgt 30'],  [59.9299,10.7521,486,'Vøyensvingen 4'],  [59.9301,10.7515,260,'Kingosgt 17'],
+  [59.9125,10.7513,2000,'T-banen - Jernbanetorget, nedgang Hotell clarion'],  [59.9136,10.7419,570,'Akersgata 41'],  [59.9087,10.7349,3000,'Akershus festning - Akershusstranda'],
+  [59.9179,10.7093,250,'Fredrik Stangsgt 37'],  [59.9262,10.7208,160,'Bogstadveien 30'],  [59.9258,10.7779,2500,'T-banen - Carl Berners plass'],
+  [59.9137,10.7691,3100,'T-banen - Enerhaugen - Åkebergveien'],  [59.9311,10.7709,330,'Fagerheimgt 22'],  [59.9079,10.7138,460,'Filipstadveien 15'],
+  [59.9135,10.7585,2000,'T-banen - Grønland stasjon'],  [59.9235,10.7254,700,'Hegdehaugsveien 36'],  [59.9151,10.733,3000,'T-banen - Nationalteater stasjon'],
+  [59.9116,10.738,750,'Tollbugata 40 / Nedre Vollgate 11'],  [59.9226,10.7269,400,'T-banen - Oscarsgate 19'],  [59.9232,10.7379,1000,'Schwensensgt 3/5'],
+  [59.9128,10.7419,7000,'T-banen - Stortinget stasjon'],  [59.9297,10.7585,760,'Thorvald Meyersgate 7'],  [59.924,10.773,520,'Trondheimsveien 80'],
+  [59.9561,11.0485,3340,'Torvet 6, Lillestrøm'],  [60.0137,11.0163,4600,'Tæruddalen 85, Tærudhallen'],  [59.9233,10.967,4000,'Nordlifaret 50, Skårerhallen'],
+  [60.1417,11.1737,70,'Storgata 11 - Offentlig'],  [59.9553,11.0716,580,'Vigernesgt, Vigernes skole'],  [59.9421,11.1315,100,'Engaveien 6 - Vitåsen (Garderåsen)'],
+  [59.9485,11.0119,300,'Strømsveien 74, Gamle rådhus'],  [60.141,11.1781,500,'Sveavegen 1-25 - Jessheimtunet - Offentlig'],  [68.2392,13.7518,444,'Bøstad skole, Vikingveien 459. Vestvågøy'],
+  [63.4321,10.4023,650,'Kjøpmannsgata 34'],  [59.6662,9.6488,357,'Hyttegata 2 "Bjørneparken"'],  [60.0562,6.5469,95,'Eidesbråtet 1'],
+  [59.7732,10.8034,2400,'Flåtestadveien 5a Fjellhallen'],  [69.9755,23.2727,2000,'Komsa Fjellanlegg Alta Kommune'],  [64.4965,11.143,300,'Statlandvegen 13, Nord Statland'],
+  [60.888,11.5213,35,'Jon Sunds veg 18'],  [60.8786,11.5769,73,'Munkedamsvegen 5'],  [60.8864,11.5609,1540,'Torggata 1'],
+  [63.1105,7.7799,100,'Industrivegen 17'],  [63.746,11.2998,66,'Håkon den godes gate 30'],  [63.7491,11.3095,80,'Trekanten 2, Levanger'],
+  [62.6746,8.562,388,'Romsdalsvegen 2'],  [62.6728,8.5724,91,'Ringvegen 13'],  [59.9124,10.6391,400,'Strandveien 6 Lysaker'],
+  [59.7297,10.2314,700,'Tangen. Havnegata'],  [59.836,10.433,450,'Strøket 15A (Trekanten)'],  [58.8751,9.4164,300,'Tangen verft, Gamle Kragerøvei 12'],
+  [61.2335,7.0936,55,'Ulvahaugen 2'],  [61.5907,5.0015,80,'industrivegen 24'],  [61.9348,5.1134,120,'Gate 1 110'],
+  [61.9363,5.1141,197,'Gate 1 129'],  [61.602,5.1325,155,'Slettevollsholten 11'],  [61.6001,5.035,111,'Strangata 52'],
+  [61.4552,5.9025,160,'Rennekleiva 2'],  [61.4497,5.8365,795,'Liavegen 35'],  [60.8562,7.1101,40,'Flåmsdalsvegen16'],
+  [63.4334,10.3966,220,'Olav Tryggvasons gate 28'],  [59.892,10.526,700,'Otto Svedrups plass 4 - tidl. Øvre Torv 1'],  [63.4286,10.4036,800,'Nedre Bakklandet 11 - 41'],
+  [59.941,11.0022,1740,'Strømsveien 9 Vassøyholtet'],  [63.4211,10.392,500,'Olav Kyrres gate 6 -Revmatismebygget - St. Olavs H'],  [63.3596,10.3808,780,'Østre Rosten 39 - Rostenhallen'],
+  [63.4368,10.4955,513,'Hasselbakken 5A og 5 C'],  [62.599,9.6926,330,'Oppdal Helsesenter'],  [63.6877,9.6659,200,'T - Senteret, Offentlig T-rom'],
+  [58.9624,5.7417,820,'Paradisveien 22'],  [59.9306,10.782,1210,'Olav Schousvei 2-8 plan B'],  [59.1182,11.3901,1000,'Skippergata/ Johan Stangsplass 1'],
+  [59.1226,11.3785,760,'Rødsfjellet/ Peder Ankersgt 7B'],  [59.1277,11.3943,1000,'Oskleiva 18'],  [59.4784,11.6576,75,'Marker U. skole/ Skolegata 21,Ørje'],
+  [59.6155,11.077,114,'Nordmyrveien 4/ Spydeberg'],  [59.6199,11.0814,200,'Allaktivitetshuset Spydeberg/ Stasjonsgata 33'],  [59.2953,10.7622,118,'Grendehusveien 2J/ Saltnes'],
+  [59.3516,10.8713,32,'Råde Herredshus/ Skråtorpveien 2A'],  [59.4193,10.6969,2000,'Øreåsen/Årvollskogen 97'],  [59.4888,10.8712,50,'Helse og sosialsenter'],
+  [59.5539,11.3243,90,'Citadel/ Jernbanegata 4, Mysen'],  [59.5531,11.3389,114,'Opsahlveien 1, Mysen'],  [59.4266,11.3428,124,'Rakkestad og Degernes brannkas/ Storgt 13'],
+  [67.2822,14.5418,100,'Hunstadsenteret Hunstad Øst, offentlig'],  [60.9861,9.2375,100,'Jernbanevegen 7'],  [61.132,10.4629,252,'Hammersengvegen 62'],
+  [58.4733,8.789,120,'Gullfakse Barnehage - Nordbødalen 12'],  [68.1482,13.6115,40,'Rådhuset, Leknes'],  [69.0684,18.5248,288,'Skogbrukets hus, fagerlidal 18'],
+  [59.3813,5.3182,185,'Hestmyrvegen 10'],  [62.7395,7.1828,856,'Fannestrandvegen 49 b'],  [62.7391,7.1603,2000,'Kirkebakken 4A'],
+  [62.4716,6.158,1000,'Keiser Wilhelms gate 25'],  [62.7427,7.2292,70,'Kometvegen 5'],  [62.7718,7.2873,100,'Årøsetervegen 17'],
+  [62.7869,7.5307,150,'Høglivegen 8'],  [62.7877,7.5376,80,'Baklivegen 4'],  [70.3738,31.0967,95,'Hospitalgata 6 "gamle sykehus"'],
+  [62.5766,7.1202,70,'Skorgeneset 31 / Møre og Romsdal Kornsilo'],  [62.5582,7.1314,48,'Tresfjordvegen 215'],  [62.6168,7.09,40,'Skulevegen 4'],
+  [62.6213,7.0898,100,'Brugata 10'],  [62.6011,6.9312,65,'Nybøvegen 2'],  [62.5212,7.1266,60,'Skulebakken 1'],
+  [62.5224,7.1269,75,'Neremsvegen 4'],  [62.6104,7.0984,35,'Remmemsvegen 85'],  [62.5682,7.6883,50,'Vollan 1'],
+  [62.5014,7.5659,40,'Sørsidevegen 747'],  [62.5682,7.6862,481,'Vollan 8A'],  [62.9063,6.9207,20,'Prestgardsvegen 140'],
+  [62.9052,6.9157,90,'Lundhaugvegen 34'],  [62.8544,7.1639,90,'Torget 13A'],  [62.8541,7.1643,55,'Torget 14'],
+  [62.8354,7.2354,20,'Malmefjordvegen 18'],  [62.8554,7.1888,22,'Myrbostadvegen 72'],  [62.3368,5.8768,578,'Brendhaugen 7'],
+  [62.9759,7.1637,60,'Stemsvegen 13'],  [64.8636,11.2421,210,'Engasveien 27 (Rørvik samfunnshus )'],  [62.5266,6.1226,75,'Valderøyvegen 1129'],
+  [62.4404,6.191,143,'Sloghaugvegen 3'],  [62.4378,6.1837,167,'Molværsvegen 74'],  [62.4275,6.3157,83,'Solavågseidet 76'],
+  [62.1808,6.0831,181,'Langmyra 2'],  [62.1829,6.085,100,'Torvmyrane 5'],  [62.2005,6.1247,257,'Vikegata 17'],
+  [60.3072,5.2816,333,'Aurdalslia 30, Aurdalslia skole'],  [60.7308,10.604,300,'Enggata 37'],  [62.5757,11.3752,200,'Peder Hiorts gate 18 B, RØROS SKOLE'],
+  [58.8402,5.7234,222,'Jærveien 107'],  [63.4377,10.4302,450,'Mellomveien 5'],  [63.7837,11.4551,9,'Melkeveien 1'],
+  [63.7864,11.4698,42,'Magnus den godes vei 9'],  [63.7748,11.7464,49,'Hellbakkvegen 6'],  [63.7901,11.4695,109,'Gamle fergeveg 2'],
+  [63.7458,11.2969,42,'Kirkegata 29'],  [63.7456,11.2981,75,'Håkon den godes gate 17/19'],  [62.4642,6.3637,120,'Nedregårdsvegen 1'],
+  [64.0238,11.4911,30,'Tingvold Park hotell, Gamle Kongeveg 47'],  [64.0175,11.5143,205,'Guldbergaunet, Svedjanvegen'],  [64.011,11.4994,150,'Nedre Sannan'],
+  [64.0133,11.5,70,'Skolegata 22'],  [62.673,8.5658,274,'Åkersgata 4/Ticogården'],  [62.3714,6.0276,108,'Kjøpmannsgata 15'],
+  [62.37,6.0289,58,'Strandgata 72-74'],  [62.3735,6.0294,20,'Strandgata 106-114'],  [62.1461,6.0686,270,'Gymnasvegen 2'],
+  [62.199,6.1344,62,'Dalevegen 24'],  [62.3406,5.8522,448,'Sjøgata 3'],  [62.4547,6.3581,22,'Spjelkavikvegen 130'],
+  [62.44,6.2111,40,'Skulevegen 16'],  [62.5007,6.1347,81,'Valderhaug 4'],  [62.1711,6.039,50,'Morkafura 8'],
+  [69.6508,18.954,7000,'Fjellanlegg - Tromsø parkering'],  [59.6067,10.4051,375,'Tømmeråsv. 3 - Svelvik Samfunnshus (off)'],  [58.0282,7.4769,0,'Mikkelsmyrveien 3B'],
+  [69.7278,30.0418,150,'Dr. Wessels gate 7']
+];
+
+// Finn nærmeste tilfluktsrom (offline, offentlige)
+function findNearestTilfluktsrom(lat, lon, maxCount){
+  maxCount = maxCount || 3;
+  function dist(la1,lo1,la2,lo2){
+    var R=6371; var dLat=(la2-la1)*Math.PI/180; var dLon=(lo2-lo1)*Math.PI/180;
+    var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+    return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+  }
+  var results = TILFLUKTSROM.map(function(t){
+    return { lat:t[0], lon:t[1], cap:t[2], addr:t[3], dist: dist(lat,lon,t[0],t[1]) };
+  });
+  results.sort(function(a,b){ return a.dist - b.dist; });
+  return results.slice(0, maxCount);
+}
+
+// Live oppslag mot DSBs ArcGIS for ALLE tilfluktsrom (offentlige + private)
+async function fetchLiveTilfluktsrom(lat, lon, radiusKm){
+  radiusKm = radiusKm || 10;
+  try {
+    var url = 'https://services.arcgis.com/XOrnUMjMGJJdMQWf/arcgis/rest/services/Tilfluktsrom/FeatureServer/0/query'
+      + '?where=1%3D1&outFields=ROMNR,PLASSER,ADRESSE,ROMTYPE'
+      + '&geometry=' + lon + ',' + lat
+      + '&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects'
+      + '&distance=' + (radiusKm * 1000)
+      + '&units=esriSRUnit_Meter&inSR=4326&outSR=4326&f=json';
+    var ctrl = new AbortController();
+    var timer = setTimeout(function(){ ctrl.abort(); }, 6000);
+    var r = await fetch(url, {signal:ctrl.signal});
+    clearTimeout(timer);
+    var d = await r.json();
+    if(!d.features) return null;
+    return d.features.map(function(f){
+      var p = f.attributes || {};
+      var g = f.geometry || {};
+      return {
+        lat: g.y, lon: g.x,
+        cap: p.PLASSER || 0,
+        addr: p.ADRESSE || '',
+        type: p.ROMTYPE || '',
+        nr: p.ROMNR || 0
+      };
+    }).sort(function(a,b){
+      // Sort by distance
+      var dA = Math.abs(a.lat-lat)+Math.abs(a.lon-lon);
+      var dB = Math.abs(b.lat-lat)+Math.abs(b.lon-lon);
+      return dA - dB;
+    });
+  } catch(e){ return null; }
+}
+
+// Kombinert: viser offline-data umiddelbart, oppdaterer med live-data
+async function getNearestShelters(lat, lon, maxCount, containerEl){
+  maxCount = maxCount || 5;
+  var en = currentLang === 'en';
+  // 1. Vis offline-data (offentlige) umiddelbart
+  var offline = findNearestTilfluktsrom(lat, lon, maxCount);
+  if(containerEl) renderShelterList(containerEl, offline, en, false);
+  // 2. Forsøk live-oppslag for alle (offentlige + private)
+  var live = await fetchLiveTilfluktsrom(lat, lon, 15);
+  if(live && live.length > 0){
+    // Dedupliser: fjern offline-resultater som også finnes i live
+    var liveTop = live.slice(0, maxCount);
+    if(containerEl) renderShelterList(containerEl, liveTop, en, true);
+    return liveTop;
+  }
+  return offline;
+}
+
+function renderShelterList(el, shelters, en, isLive){
+  if(!shelters || !shelters.length){ el.innerHTML = ''; return; }
+  // Filter out shelters with 0 or missing capacity
+  shelters = shelters.filter(function(s){ return s.cap > 0; });
+  if(!shelters.length){ el.innerHTML = '<div style="font-size:12px;color:var(--muted);">'+(en?'No shelters found nearby':'Ingen tilfluktsrom funnet i nærheten')+'</div>'; return; }
+  var html = '';
+  if(isLive){
+    html += '<div style="font-size:10px;color:var(--green);margin-bottom:8px;">✓ '
+      +(en?'Live data – public + private shelters':'Live-data – offentlige + private tilfluktsrom')+'</div>';
+  } else {
+    html += '<div style="font-size:10px;color:var(--muted);margin-bottom:8px;">'
+      +(en?'Offline data – public shelters only':'Offline-data – kun offentlige tilfluktsrom')+'</div>';
+  }
+  shelters.forEach(function(s){
+    var distStr = s.dist ? (s.dist < 1 ? Math.round(s.dist*1000)+'m' : s.dist.toFixed(1)+'km') : '';
+    var mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination='+s.lat+','+s.lon;
+    html += '<a href="'+mapsUrl+'" target="_blank" rel="noopener noreferrer" '
+      +'style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:6px;text-decoration:none;color:inherit;">'
+      +'<span style="font-size:20px;">🏠</span>'
+      +'<div style="flex:1;">'
+      +'<div style="font-weight:700;font-size:13px;color:var(--text);">'+esc(s.addr)+'</div>'
+      +'<div style="font-size:11px;color:var(--muted);margin-top:2px;">'
+      +s.cap+(en?' spaces':' plasser')
+      +(s.type ? ' · '+(s.type==='Offentlig'?(en?'Public':'Offentlig'):(en?'Private':'Privat')) : '')
+      +(distStr ? ' · '+distStr : '')
+      +'</div></div>'
+      +'<span style="color:var(--blue);font-size:12px;font-weight:600;">🗺️→</span>'
+      +'</a>';
+  });
+  el.innerHTML = html;
+}
+
+
 // Postnummerregister – Bring/Posten offisielt register (mars 2026)
 // 359 kommuner, 706 ranges, dekker 5122 postnumre
 const _KN=['Alstahaug','Alta','Alvdal','Alver','Andøy','Aremark','Arendal','Asker','Askvoll','Askøy','Aukra','Aure','Aurland','Aurskog-Høland','Austevoll','Austrheim','Averøy','Balsfjord','Bamble','Bardu','Beiarn','Bergen','Berlevåg','Bindal','Birkenes','Bjerkreim','Bjørnafjorden','Bodø','Bokn','Bremanger','Brønnøy','Bygland','Bykle','Båtsfjord','Bærum','Bø','Bømlo','Deatnu Tana','Dovre','Drammen','Drangedal','Dyrøy','Dønna','Eidfjord','Eidskog','Eidsvoll','Eigersund','Elverum','Enebakk','Engerdal','Etne','Etnedal','Evenes','Evje og Hornnes','Farsund','Fauske','Fedje','Fitjar','Fjaler','Fjord','Flakstad','Flatanger','Flekkefjord','Flesberg','Flå','Folldal','Fredrikstad','Frogn','Froland','Frosta','Frøya','Fyresdal','Færder','Gamvik','Gausdal','Gildeskål','Giske','Gjemnes','Gjerdrum','Gjerstad','Gjesdal','Gjøvik','Gloppen','Gol','Gran','Grane','Gratangen','Grimstad','Grong','Grue','Gulen','Guovdageaidnu Kautokeino','Gáivuotna Kåfjord','Hadsel','Halden','Hamar','Hamarøy','Hammerfest','Haram','Hareid','Harstad','Hasvik','Hattfjelldal','Haugesund','Heim','Hemnes','Hemsedal','Herøy (Møre og Romsdal)','Herøy (Nordland)','Hitra','Hjartdal','Hjelmeland','Hol','Hole','Holmestrand','Holtålen','Horten','Hurdal','Hustadvika','Hvaler','Hyllestad','Hå','Hægebostad','Høyanger','Høylandet','Ibestad','Inderøy','Indre Fosen','Indre Østfold','Iveland','Jan Mayen','Jevnaker','Karasjohka Karasjok','Karlsøy','Karmøy','Kinn','Klepp','Kongsberg','Kongsvinger','Kragerø','Kristiansand','Kristiansund','Krødsherad','Kvam','Kvinesdal','Kvinnherad','Kviteseid','Kvitsøy','Kvæfjord','Kvænangen','Larvik','Lavangen','Lebesby','Leirfjord','Leka','Lesja','Levanger','Lier','Lierne','Lillehammer','Lillesand','Lillestrøm','Lindesnes','Lom','Loppa','Lund','Lunner','Lurøy','Luster','Lyngdal','Lyngen','Lærdal','Lødingen','Lørenskog','Løten','Malvik','Marker','Masfjorden','Melhus','Meløy','Meråker','Midt-Telemark','Midtre Gauldal','Modalen','Modum','Molde','Moskenes','Moss','Målselv','Måsøy','Namsos','Namsskogan','Nannestad','Narvik','Nes','Nesbyen','Nesna','Nesodden','Nissedal','Nittedal','Nome','Nord-Aurdal','Nord-Fron','Nord-Odal','Nordkapp','Nordre Follo','Nordre Land','Nordreisa','Nore og Uvdal','Notodden','Nærøysund','Oppdal','Orkland','Os','Osen','Oslo','Osterøy','Overhalla','Porsanger Porsángu Porsanki','Porsgrunn','Rakkestad','Rana','Randaberg','Rauma','Rendalen','Rennebu','Rindal','Ringebu','Ringerike','Ringsaker','Risør','Rollag','Råde','Rælingen','Rødøy','Røros','Røst','Røyrvik','Salangen','Saltdal','Samnanger','Sande','Sandefjord','Sandnes','Sarpsborg','Sauda','Sel','Selbu','Seljord','Senja','Sigdal','Siljan','Sirdal','Skaun','Skien','Skiptvet','Skjervøy','Skjåk','Smøla','Snåsa','Sogndal','Sokndal','Sola','Solund','Sortland','Stad','Stange','Stavanger','Steigen','Steinkjer','Stjørdal','Stor-Elvdal','Stord','Storfjord','Strand','Stranda','Stryn','Sula','Suldal','Sunndal','Sunnfjord','Surnadal','Svalbard','Sveio','Sykkylven','Sømna','Søndre Land','Sør-Aurdal','Sør-Fron','Sør-Odal','Sør-Varanger','Sørfold','Sørreisa','Time','Tingvoll','Tinn','Tjeldsund','Tokke','Tolga','Tromsø','Trondheim','Trysil','Træna','Tvedestrand','Tydal','Tynset','Tysnes','Tysvær','Tønsberg','Ullensaker','Ullensvang','Ulstein','Ulvik','Unjargga Nesseby','Utsira','Vadsø','Vaksdal','Valle','Vang','Vanylven','Vardø','Vefsn','Vega','Vegårshei','Vennesla','Verdal','Vestby','Vestnes','Vestre Slidre','Vestre Toten','Vestvågøy','Vevelstad','Vik','Vindafjord','Vinje','Volda','Voss','Vågan','Vågå','Våler (Innlandet)','Våler (Østfold)','Værøy','Åfjord','Ål','Ålesund','Åmli','Åmot','Årdal','Ås','Åseral','Åsnes','Øksnes','Ørland','Ørsta','Østre Toten','Øvre Eiker','Øyer','Øygarden','Øystre Slidre'];
@@ -4831,6 +5199,14 @@ function printChecklist(){
       totalItems++; if(done) doneItems++;
       rows+='<tr style="border-bottom:1px solid #eee;"><td style="padding:8px 4px;font-size:20px;">'+(done?'&#9989;':'&#11036;')+'</td><td style="padding:8px;font-size:14px;">'+esc(it.name)+'</td></tr>';
     });
+    // Custom items for this category
+    var catKeyName_=keyCats_[ci]?keyCats_[ci].name:cat.name;
+    var customs_=customItems[catKeyName_]||[];
+    customs_.forEach(function(ci_){
+      var cId='_custom::'+catKeyName_+'::'+ci_.name;
+      var cDone=checked_.includes(cId);
+      rows+='<tr style="border-bottom:1px solid #eee;"><td style="padding:8px 4px;font-size:20px;">'+(cDone?'&#9989;':'&#11036;')+'</td><td style="padding:8px;font-size:14px;font-style:italic;">📌 '+esc(ci_.name)+'</td></tr>';
+    });
   });
   const pct=totalItems>0?Math.round((doneItems/totalItems)*100):0;
   const name_=esc(profile_?profile_.name:'');
@@ -5212,6 +5588,9 @@ function suggestCrisisMode(level){
       : (en ? '🟠 Severe weather warning – activate crisis mode?' : '🟠 Oransje farevarsel – aktiver krisemodus?');
     if(sub) sub.textContent = en ? 'Tap for action plan, resource overview and emergency contacts' : 'Trykk for handlingsplan, ressursoversikt og nødkontakter';
   }
+  // Pulse SOS button
+  var sos = document.getElementById('sosBtn');
+  if(sos) sos.classList.add('pulse');
 }
 
 function activateCrisisMode(){
@@ -5221,7 +5600,9 @@ function activateCrisisMode(){
   document.body.style.overflow = 'hidden';
   var overlay = document.getElementById('crisisOverlay');
   if(overlay) overlay.classList.add('active');
-  // Hide suggestion banner
+  // Hide SOS button and suggestion banner
+  var sos = document.getElementById('sosBtn');
+  if(sos) sos.style.display = 'none';
   var banner = document.getElementById('crisisSuggestBanner');
   if(banner) banner.style.display = 'none';
   renderCrisisMode();
@@ -5232,10 +5613,14 @@ function activateCrisisMode(){
 
 function exitCrisisMode(){
   _crisisActive = false;
+  _crisisStartTime = null;
   document.body.style.overflow = '';
   var overlay = document.getElementById('crisisOverlay');
   if(overlay) overlay.classList.remove('active');
   if(window._crisisTimer) clearInterval(window._crisisTimer);
+  // Restore SOS button
+  var sos = document.getElementById('sosBtn');
+  if(sos && profile) sos.style.display = 'flex';
   // Dismiss suggest for today
   localStorage.setItem('72t_crisis_dismissed_'+new Date().toDateString(), '1');
 }
@@ -5477,12 +5862,20 @@ function renderCrisisMode(){
     html += '</div>';
   }
 
+  // ── SECTION 4b: TILFLUKTSROM ──
+  html += '<div class="crisis-section">';
+  d++;
+  html += '<div class="crisis-section-label crisis-anim" style="animation-delay:'+(d*0.08)+'s">'+(en?'Emergency shelters nearby':'Tilfluktsrom i nærheten')+'</div>';
+  d++;
+  html += '<div id="crisisShelterList" class="crisis-anim" style="animation-delay:'+(d*0.08)+'s"><div style="font-size:12px;color:var(--muted);">'+(en?'Locating...':'Søker...')+'</div></div>';
+  html += '</div>';
+
   // ── SECTION 5: QUICK LINKS ──
   html += '<div class="crisis-section">';
   d++;
   html += '<div class="crisis-section-label crisis-anim" style="animation-delay:'+(d*0.08)+'s">'+(en?'Quick access':'Hurtigtilgang')+'</div>';
   d++;
-  html += '<button class="crisis-nav-btn crisis-anim" style="animation-delay:'+(d*0.08)+'s" onclick="exitCrisisMode();setTimeout(function(){var nb=document.querySelectorAll(\'nav button\');if(nb[3])nb[3].click();},200);"><span class="crisis-nav-icon">🚑</span><div style="flex:1;font-weight:700;">'+(en?'First aid guides':'Førstehjelp-veiledninger')+'</div><span class="crisis-nav-arrow">→</span></button>';
+  html += '<button class="crisis-nav-btn crisis-anim" style="animation-delay:'+(d*0.08)+'s" onclick="exitCrisisMode();setTimeout(function(){var nb=document.querySelectorAll(\'nav button\');if(nb[4])nb[4].click();},200);"><span class="crisis-nav-icon">🚑</span><div style="flex:1;font-weight:700;">'+(en?'First aid guides':'Førstehjelp-veiledninger')+'</div><span class="crisis-nav-arrow">→</span></button>';
   d++;
   html += '<button class="crisis-nav-btn crisis-anim" style="animation-delay:'+(d*0.08)+'s" onclick="exitCrisisMode();setTimeout(function(){var nb=document.querySelectorAll(\'nav button\');if(nb[1])nb[1].click();},200);"><span class="crisis-nav-icon">✅</span><div style="flex:1;font-weight:700;">'+(en?'Your checklist':'Din sjekkliste')+'</div><span class="crisis-nav-arrow">→</span></button>';
   html += '</div>';
@@ -5495,6 +5888,22 @@ function renderCrisisMode(){
     +'</div>';
 
   body.innerHTML = html;
+
+  // Async: hent tilfluktsrom basert på geolocation
+  var shelterEl = document.getElementById('crisisShelterList');
+  if(shelterEl){
+    // Try geolocation, fallback to default
+    var sLat = 58.16, sLon = 7.99;
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(
+        function(pos){ getNearestShelters(pos.coords.latitude, pos.coords.longitude, 5, shelterEl); },
+        function(){ getNearestShelters(sLat, sLon, 5, shelterEl); },
+        {timeout:4000}
+      );
+    } else {
+      getNearestShelters(sLat, sLon, 5, shelterEl);
+    }
+  }
 }
 
 function _fmtDate(d, en){
@@ -5506,12 +5915,23 @@ function _fmtDate(d, en){
 
 // Show/hide crisis button on motivasjon tab
 function updateCrisisUI(){
-  var btn = document.getElementById('crisisManualBtn');
   var en = currentLang === 'en';
+  // SOS floating button
+  var sos = document.getElementById('sosBtn');
+  if(sos){
+    sos.style.display = (profile && !_crisisActive) ? 'flex' : 'none';
+    sos.setAttribute('aria-label', en ? 'Activate crisis mode' : 'Aktiver krisemodus');
+    // Pulse when farevarsel is active
+    if(window._fareLevel >= 2){
+      sos.classList.add('pulse');
+    } else {
+      sos.classList.remove('pulse');
+    }
+  }
+  // Old inline button (kept as secondary entry point)
+  var btn = document.getElementById('crisisManualBtn');
   if(btn){
-    btn.style.display = profile ? 'block' : 'none';
-    var lbl = document.getElementById('crisisManualLabel');
-    if(lbl) lbl.textContent = en ? 'Activate crisis mode' : 'Aktiver krisemodus';
+    btn.style.display = 'none'; // Hidden – SOS button replaces it
   }
 }
 
