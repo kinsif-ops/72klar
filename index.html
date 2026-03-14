@@ -516,6 +516,69 @@
     to   { opacity:1; transform:translateY(0); }
   }
 
+  /* SPLASH TOUR CAROUSEL */
+  .splash-tour-wrap { margin:0 -20px 20px; overflow:hidden; position:relative; }
+  .splash-tour {
+    display:flex; transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    touch-action:pan-y; user-select:none; -webkit-user-select:none;
+  }
+  .splash-slide {
+    min-width:100%; padding:0 28px; display:flex; flex-direction:column; align-items:center;
+  }
+  .splash-slide-label { font-family:'Syne',sans-serif; font-size:15px; font-weight:800; color:var(--text); margin-top:14px; text-align:center; }
+  .splash-slide-desc { font-size:12px; color:var(--muted); text-align:center; line-height:1.5; margin-top:4px; max-width:280px; }
+
+  /* Tour dots */
+  .splash-tour-dots { display:flex; justify-content:center; gap:8px; padding:14px 0 4px; }
+  .splash-dot {
+    width:8px; height:8px; border-radius:50%; background:var(--border); cursor:pointer;
+    transition:all 0.25s;
+  }
+  .splash-dot.active { background:var(--orange); width:22px; border-radius:4px; }
+
+  /* Mock phone frame */
+  .splash-phone {
+    width:220px; background:var(--card); border:1px solid var(--border);
+    border-radius:16px; padding:14px 12px; position:relative;
+    box-shadow:0 8px 32px rgba(0,0,0,0.3);
+  }
+  .splash-phone.sp-dark { background:var(--dark2); }
+  .splash-phone.sp-crisis { background:linear-gradient(135deg,#1a0000,#0f0000); border-color:rgba(214,40,40,0.3); }
+
+  /* Mock phone inner elements */
+  .sp-status { font-family:'Syne',sans-serif; font-size:13px; font-weight:800; color:var(--text); margin-bottom:4px; }
+  .sp-bar { height:4px; background:var(--border); border-radius:2px; overflow:hidden; margin-bottom:10px; }
+  .sp-bar-fill { height:100%; background:linear-gradient(90deg,var(--orange),var(--green)); border-radius:2px; transition:width 0.5s; }
+  .sp-bar-fill.sp-bar-red { background:linear-gradient(90deg,var(--red),var(--orange)); }
+
+  .sp-item {
+    display:flex; align-items:center; gap:6px; padding:5px 0; font-size:11px; color:var(--muted);
+    border-bottom:1px solid rgba(255,255,255,0.04);
+  }
+  .sp-item.sp-checked { color:var(--text); }
+  .sp-cb { width:16px; height:16px; border-radius:4px; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:9px; flex-shrink:0; }
+  .sp-cb.sp-on { background:var(--green); border-color:var(--green); color:white; font-weight:700; }
+  .sp-qty { margin-left:auto; font-size:9px; color:var(--muted); }
+  .sp-tag { margin-left:auto; font-size:8px; color:var(--orange); background:rgba(247,127,0,0.1); padding:1px 5px; border-radius:4px; }
+
+  .sp-sim-item { font-size:10px; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.04); line-height:1.5; }
+  .sp-sim-item.sp-fail { color:var(--red-text); }
+  .sp-sim-item.sp-ok { color:var(--green); }
+  .sp-sim-item.sp-warn { color:var(--orange); }
+  .sp-sim-item strong { font-weight:700; }
+
+  .sp-crisis-step { font-size:10px; color:var(--text); padding:4px 0; line-height:1.5; }
+  .sp-crisis-step strong { color:var(--red-text); font-weight:800; }
+
+  .sp-location { display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:10px; color:var(--text); }
+  .sp-location span { font-size:16px; }
+  .sp-location strong { font-size:11px; }
+
+  .sp-fh-card {
+    background:rgba(214,40,40,0.06); border:1px solid rgba(214,40,40,0.15);
+    border-radius:8px; padding:7px 10px; margin-bottom:5px; font-size:10px; color:var(--text);
+  }
+
   /* KRISESIMULATOR */
   .sim-header { background:linear-gradient(160deg,#1a0a0a 0%,#0f1a2e 100%); padding:24px 20px 20px; position:relative; overflow:hidden; }
   .sim-header::before { content:'⚡'; position:absolute; right:-15px; top:-15px; font-size:120px; opacity:0.04; transform:rotate(15deg); pointer-events:none; }
@@ -640,43 +703,114 @@
   </div>
 
   <div class="splash-body">
-    <div class="splash-section-label" id="splashWhatLabel">Hva er 72klar?</div>
 
-    <div class="splash-features">
-      <div class="splash-feat">
-        <div class="splash-feat-icon">✅</div>
-        <div class="splash-feat-text">
-          <strong id="splashF1T">Personlig sjekkliste</strong>
-          <span id="splashF1S">Tilpasset din husstand – antall personer, barn, eldre, kjæledyr og medisiner</span>
+    <!-- VISUELL OMVISNING -->
+    <div class="splash-section-label" id="splashTourLabel">Se hva appen kan</div>
+    <div class="splash-tour-wrap">
+      <div class="splash-tour" id="splashTour">
+
+        <!-- Slide 1: Sjekkliste -->
+        <div class="splash-slide">
+          <div class="splash-phone">
+            <div class="sp-status">✅ 47% klar</div>
+            <div class="sp-bar"><div class="sp-bar-fill" style="width:47%"></div></div>
+            <div class="sp-item sp-checked"><span class="sp-cb sp-on">✓</span>💧 Drikkevann<span class="sp-qty">27L</span></div>
+            <div class="sp-item sp-checked"><span class="sp-cb sp-on">✓</span>🥫 Hermetikkmat<span class="sp-tag">📅 2026-11</span></div>
+            <div class="sp-item"><span class="sp-cb"></span>🔋 Powerbank</div>
+            <div class="sp-item"><span class="sp-cb"></span>📻 Batteriradio</div>
+            <div class="sp-item sp-checked"><span class="sp-cb sp-on">✓</span>🔦 Lommelykt</div>
+          </div>
+          <div class="splash-slide-label" id="splashSlide1T">Personlig sjekkliste</div>
+          <div class="splash-slide-desc" id="splashSlide1D">Tilpasset din husstand med mengder, holdbarhetsdatoer og påminnelser</div>
         </div>
+
+        <!-- Slide 2: Krisesimulator -->
+        <div class="splash-slide">
+          <div class="splash-phone sp-dark">
+            <div style="text-align:center;padding:8px 0 4px;">
+              <div style="font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--red-text),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-family:Syne,sans-serif;">31t</div>
+              <div style="font-size:10px;color:var(--muted);">av 72 timer</div>
+              <div class="sp-bar" style="margin:6px 0;"><div class="sp-bar-fill sp-bar-red" style="width:43%"></div></div>
+            </div>
+            <div class="sp-sim-item sp-fail">❌ <strong>Ingen powerbank</strong> – telefonen dør om 8t</div>
+            <div class="sp-sim-item sp-ok">✅ <strong>27L vann</strong> – holder i 3 dager</div>
+            <div class="sp-sim-item sp-warn">⚠️ <strong>Ingen batteriradio</strong></div>
+          </div>
+          <div class="splash-slide-label" id="splashSlide2T">Krisesimulator</div>
+          <div class="splash-slide-desc" id="splashSlide2D">«Hva om strømmen gikk NÅ?» – basert på vær, klokke og din sjekkliste</div>
+        </div>
+
+        <!-- Slide 3: Krisemodus -->
+        <div class="splash-slide">
+          <div class="splash-phone sp-crisis">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+              <div class="crisis-pulse" style="width:8px;height:8px;"></div>
+              <span style="font-size:9px;font-weight:700;color:var(--red-text);text-transform:uppercase;letter-spacing:1px;">Krisemodus aktiv</span>
+            </div>
+            <div class="sp-crisis-step"><strong>1.</strong> Pust. Du er forberedt.</div>
+            <div class="sp-crisis-step"><strong>2.</strong> Finn lommelykten ✅</div>
+            <div class="sp-crisis-step"><strong>3.</strong> Sjekk alle i husstanden</div>
+            <div style="margin-top:6px;padding:6px 8px;background:rgba(46,204,113,0.1);border-radius:6px;font-size:10px;">
+              💧 Vann: 27L → holder til søn 14:00
+            </div>
+          </div>
+          <div class="splash-slide-label" id="splashSlide3T">Krisemodus</div>
+          <div class="splash-slide-desc" id="splashSlide3D">Handlingsplan, ressursnedtelling og nødkontakter – når det virkelig gjelder</div>
+        </div>
+
+        <!-- Slide 4: Ukens oppgave -->
+        <div class="splash-slide">
+          <div class="splash-phone">
+            <div style="font-size:9px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">🎯 Denne ukens oppgave</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <span style="font-size:22px;">🔋</span>
+              <div><div style="font-weight:800;font-size:13px;">Powerbank</div><div style="font-size:10px;color:var(--orange);">1 stk</div></div>
+            </div>
+            <div style="display:flex;gap:6px;margin-bottom:6px;">
+              <div style="flex:1;background:rgba(247,127,0,0.1);border-radius:6px;padding:6px;text-align:center;"><div style="font-weight:800;font-size:12px;color:var(--orange);">200–400 kr</div><div style="font-size:8px;color:var(--muted);">ca. pris</div></div>
+              <div style="flex:1;background:rgba(59,130,246,0.1);border-radius:6px;padding:6px;text-align:center;"><div style="font-weight:700;font-size:10px;color:var(--blue);">🏪 Elkjøp</div><div style="font-size:8px;color:var(--muted);">hvor</div></div>
+            </div>
+            <div style="background:rgba(214,40,40,0.08);border-radius:6px;padding:6px 8px;font-size:10px;">⚡ Gir <strong style="color:var(--orange);">+40 timer</strong> i simulatoren</div>
+          </div>
+          <div class="splash-slide-label" id="splashSlide4T">Hva du trenger – konkret</div>
+          <div class="splash-slide-desc" id="splashSlide4D">Pris, butikk og hvor mange timer det gir deg i krisesimulatoren</div>
+        </div>
+
+        <!-- Slide 5: Trygghetspunkter + tilfluktsrom -->
+        <div class="splash-slide">
+          <div class="splash-phone">
+            <div style="font-size:9px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">📍 I nærheten</div>
+            <div class="sp-location"><span>🏛️</span><div><strong>Kvadraturen skole</strong><div style="font-size:9px;color:var(--muted);">Tollbodgata 14 · 1.2 km</div></div></div>
+            <div class="sp-location"><span>🏠</span><div><strong>Tilfluktsrom Markens gate</strong><div style="font-size:9px;color:var(--muted);">400 plasser · 0.8 km</div></div></div>
+            <div class="sp-location"><span>🏠</span><div><strong>Tilfluktsrom Dronningens gt</strong><div style="font-size:9px;color:var(--muted);">250 plasser · 1.4 km</div></div></div>
+          </div>
+          <div class="splash-slide-label" id="splashSlide5T">Trygghetspunkter & tilfluktsrom</div>
+          <div class="splash-slide-desc" id="splashSlide5D">Finn nærmeste samlingspunkt og tilfluktsrom med kart</div>
+        </div>
+
+        <!-- Slide 6: Førstehjelp -->
+        <div class="splash-slide">
+          <div class="splash-phone">
+            <div style="font-size:9px;font-weight:700;color:var(--red-text);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🚑 Førstehjelp</div>
+            <div class="sp-fh-card">❤️ HLR – Hjerte-lunge-redning</div>
+            <div class="sp-fh-card">🩸 Alvorlig blødning</div>
+            <div class="sp-fh-card">🔥 Brannskade</div>
+            <div class="sp-fh-card">🧠 Psykologisk førstehjelp</div>
+            <div style="font-size:9px;color:var(--muted);margin-top:6px;text-align:center;">Steg-for-steg · Fungerer offline</div>
+          </div>
+          <div class="splash-slide-label" id="splashSlide6T">Førstehjelp steg-for-steg</div>
+          <div class="splash-slide-desc" id="splashSlide6D">HLR, blødning, brannskade og psykologisk førstehjelp – alltid tilgjengelig</div>
+        </div>
+
       </div>
-      <div class="splash-feat">
-        <div class="splash-feat-icon">⚠️</div>
-        <div class="splash-feat-text">
-          <strong id="splashF2T">Farevarsler i sanntid</strong>
-          <span id="splashF2S">Offisielle varsler fra Meteorologisk institutt, koblet til hva du mangler</span>
-        </div>
-      </div>
-      <div class="splash-feat">
-        <div class="splash-feat-icon">🏛️</div>
-        <div class="splash-feat-text">
-          <strong id="splashF3T">Trygghetspunkter</strong>
-          <span id="splashF3S">Finn nærmeste kommunale samlingspunkt med vann, varme og strøm</span>
-        </div>
-      </div>
-      <div class="splash-feat">
-        <div class="splash-feat-icon">🚑</div>
-        <div class="splash-feat-text">
-          <strong id="splashF4T">Førstehjelp & psykisk helse</strong>
-          <span id="splashF4S">Steg-for-steg veiledning – HLR, blødning, brannskade og psykologisk førstehjelp</span>
-        </div>
-      </div>
-      <div class="splash-feat">
-        <div class="splash-feat-icon">📲</div>
-        <div class="splash-feat-text">
-          <strong id="splashF5T">Fungerer offline</strong>
-          <span id="splashF5S">Installer som app – fungerer uten nett, akkurat når du trenger den mest</span>
-        </div>
+      <!-- Dots -->
+      <div class="splash-tour-dots" id="splashTourDots">
+        <div class="splash-dot active" onclick="goToSlide(0)"></div>
+        <div class="splash-dot" onclick="goToSlide(1)"></div>
+        <div class="splash-dot" onclick="goToSlide(2)"></div>
+        <div class="splash-dot" onclick="goToSlide(3)"></div>
+        <div class="splash-dot" onclick="goToSlide(4)"></div>
+        <div class="splash-dot" onclick="goToSlide(5)"></div>
       </div>
     </div>
 
@@ -6445,17 +6579,20 @@ function renderSplashLang(){
   if(lb) lb.textContent = en ? '🌐 NO' : '🌐 EN';
   var el;
   el=document.getElementById('splashTagline'); if(el) el.textContent=en?'Ready to take care of yourself – for 72 hours':'Klar til å klare deg selv – i 72 timer';
-  el=document.getElementById('splashWhatLabel'); if(el) el.textContent=en?'What is 72klar?':'Hva er 72klar?';
-  el=document.getElementById('splashF1T'); if(el) el.textContent=en?'Personal checklist':'Personlig sjekkliste';
-  el=document.getElementById('splashF1S'); if(el) el.textContent=en?'Tailored to your household – number of people, children, elderly, pets and medication':'Tilpasset din husstand – antall personer, barn, eldre, kjæledyr og medisiner';
-  el=document.getElementById('splashF2T'); if(el) el.textContent=en?'Live weather alerts':'Farevarsler i sanntid';
-  el=document.getElementById('splashF2S'); if(el) el.textContent=en?'Official alerts from the Met Office, linked to what you\'re missing':'Offisielle varsler fra Meteorologisk institutt, koblet til hva du mangler';
-  el=document.getElementById('splashF3T'); if(el) el.textContent=en?'Safe points':'Trygghetspunkter';
-  el=document.getElementById('splashF3S'); if(el) el.textContent=en?'Find the nearest municipal gathering point with water, warmth and power':'Finn nærmeste kommunale samlingspunkt med vann, varme og strøm';
-  el=document.getElementById('splashF4T'); if(el) el.textContent=en?'First aid & mental health':'Førstehjelp & psykisk helse';
-  el=document.getElementById('splashF4S'); if(el) el.textContent=en?'Step-by-step guidance – CPR, bleeding, burns and psychological first aid':'Steg-for-steg veiledning – HLR, blødning, brannskade og psykologisk førstehjelp';
-  el=document.getElementById('splashF5T'); if(el) el.textContent=en?'Works offline':'Fungerer offline';
-  el=document.getElementById('splashF5S'); if(el) el.textContent=en?'Install as an app – works without internet, exactly when you need it most':'Installer som app – fungerer uten nett, akkurat når du trenger den mest';
+  el=document.getElementById('splashTourLabel'); if(el) el.textContent=en?'See what the app can do':'Se hva appen kan';
+  // Tour slides
+  el=document.getElementById('splashSlide1T'); if(el) el.textContent=en?'Personal checklist':'Personlig sjekkliste';
+  el=document.getElementById('splashSlide1D'); if(el) el.textContent=en?'Tailored to your household with quantities, expiry dates and reminders':'Tilpasset din husstand med mengder, holdbarhetsdatoer og påminnelser';
+  el=document.getElementById('splashSlide2T'); if(el) el.textContent=en?'Crisis simulator':'Krisesimulator';
+  el=document.getElementById('splashSlide2D'); if(el) el.textContent=en?'"What if the power went out NOW?" – based on weather, time and your checklist':'«Hva om strømmen gikk NÅ?» – basert på vær, klokke og din sjekkliste';
+  el=document.getElementById('splashSlide3T'); if(el) el.textContent=en?'Crisis mode':'Krisemodus';
+  el=document.getElementById('splashSlide3D'); if(el) el.textContent=en?'Action plan, resource countdown and emergency contacts – when it really matters':'Handlingsplan, ressursnedtelling og nødkontakter – når det virkelig gjelder';
+  el=document.getElementById('splashSlide4T'); if(el) el.textContent=en?'What you need – specifically':'Hva du trenger – konkret';
+  el=document.getElementById('splashSlide4D'); if(el) el.textContent=en?'Price, store and how many hours it gives you in the crisis simulator':'Pris, butikk og hvor mange timer det gir deg i krisesimulatoren';
+  el=document.getElementById('splashSlide5T'); if(el) el.textContent=en?'Safe points & shelters':'Trygghetspunkter & tilfluktsrom';
+  el=document.getElementById('splashSlide5D'); if(el) el.textContent=en?'Find nearest gathering point and emergency shelter with map':'Finn nærmeste samlingspunkt og tilfluktsrom med kart';
+  el=document.getElementById('splashSlide6T'); if(el) el.textContent=en?'First aid step by step':'Førstehjelp steg-for-steg';
+  el=document.getElementById('splashSlide6D'); if(el) el.textContent=en?'CPR, bleeding, burns and psychological first aid – always available':'HLR, blødning, brannskade og psykologisk førstehjelp – alltid tilgjengelig';
   el=document.getElementById('splashWhyLabel'); if(el) el.textContent=en?'Why 72 hours?':'Hvorfor 72 timer?';
   el=document.getElementById('splashStat1'); if(el) el.textContent=en?'Self-sufficient':'Klare deg selv';
   el=document.getElementById('splashStat2'); if(el) el.textContent=en?'Completely free':'Helt gratis';
@@ -6465,6 +6602,60 @@ function renderSplashLang(){
   el=document.getElementById('splashContinueText'); if(el) el.textContent=en?'Get started':'Kom i gang';
   el=document.getElementById('splashNote'); if(el) el.textContent=en?'No account, no ads, no data stored outside your device.':'Ingen konto, ingen reklame, ingen data lagres utenfor din enhet.';
 }
+
+// ── SPLASH TOUR CAROUSEL ──
+var _splashSlide = 0;
+var _splashSlideCount = 6;
+
+function goToSlide(idx){
+  _splashSlide = Math.max(0, Math.min(idx, _splashSlideCount - 1));
+  var tour = document.getElementById('splashTour');
+  if(tour) tour.style.transform = 'translateX(-' + (_splashSlide * 100) + '%)';
+  var dots = document.querySelectorAll('.splash-dot');
+  dots.forEach(function(d, i){ d.classList.toggle('active', i === _splashSlide); });
+}
+
+(function(){
+  // Touch swipe for carousel
+  var startX = 0, startY = 0, isDrag = false;
+  document.addEventListener('DOMContentLoaded', function(){
+    var wrap = document.querySelector('.splash-tour-wrap');
+    if(!wrap) return;
+    wrap.addEventListener('touchstart', function(e){
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      isDrag = true;
+    }, {passive:true});
+    wrap.addEventListener('touchend', function(e){
+      if(!isDrag) return;
+      isDrag = false;
+      var dx = e.changedTouches[0].clientX - startX;
+      var dy = e.changedTouches[0].clientY - startY;
+      if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40){
+        if(dx < 0) goToSlide(_splashSlide + 1);
+        else goToSlide(_splashSlide - 1);
+      }
+    }, {passive:true});
+    // Mouse drag for desktop
+    wrap.addEventListener('mousedown', function(e){ startX = e.clientX; isDrag = true; });
+    wrap.addEventListener('mouseup', function(e){
+      if(!isDrag) return;
+      isDrag = false;
+      var dx = e.clientX - startX;
+      if(Math.abs(dx) > 40){
+        if(dx < 0) goToSlide(_splashSlide + 1);
+        else goToSlide(_splashSlide - 1);
+      }
+    });
+    // Auto-advance every 4s (stops on interaction)
+    var autoTimer = setInterval(function(){
+      if(_splashSlide < _splashSlideCount - 1) goToSlide(_splashSlide + 1);
+      else clearInterval(autoTimer);
+    }, 4000);
+    wrap.addEventListener('touchstart', function(){ clearInterval(autoTimer); }, {passive:true, once:true});
+    wrap.addEventListener('mousedown', function(){ clearInterval(autoTimer); }, {once:true});
+  });
+})();
 // ──────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', function() {
