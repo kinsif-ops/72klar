@@ -1037,6 +1037,58 @@
       </div>
     </div>
 
+    <!-- COMMUNITY STATS -->
+    <div id="communityCard" style="display:none;background:linear-gradient(135deg,#0f1a2e,#1a1a2e);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:1px;" id="communityLabel">🏘️ Din kommune</div>
+      </div>
+      <div id="communityContent">
+        <div id="communityStats" style="display:none;">
+          <div style="display:flex;gap:12px;margin-bottom:10px;">
+            <div style="flex:1;text-align:center;">
+              <div id="communityCount" style="font-family:Syne,sans-serif;font-size:24px;font-weight:800;color:var(--text);">–</div>
+              <div style="font-size:11px;color:var(--muted);" id="communityCountLabel">husstander</div>
+            </div>
+            <div style="flex:1;text-align:center;">
+              <div id="communityAvg" style="font-family:Syne,sans-serif;font-size:24px;font-weight:800;color:var(--orange);">–</div>
+              <div style="font-size:11px;color:var(--muted);" id="communityAvgLabel">gjennomsnitt</div>
+            </div>
+            <div style="flex:1;text-align:center;">
+              <div id="communityYou" style="font-family:Syne,sans-serif;font-size:24px;font-weight:800;color:var(--green);">–</div>
+              <div style="font-size:11px;color:var(--muted);" id="communityYouLabel">du</div>
+            </div>
+          </div>
+          <div id="communityBar" style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;position:relative;margin-bottom:6px;">
+            <div id="communityBarAvg" style="position:absolute;height:100%;background:var(--orange);border-radius:3px;transition:width 0.5s;width:0%;"></div>
+            <div id="communityBarYou" style="position:absolute;height:100%;width:3px;background:var(--green);border-radius:3px;transition:left 0.5s;left:0%;"></div>
+          </div>
+          <div id="communityMsg" style="font-size:11px;color:var(--muted);text-align:center;"></div>
+        </div>
+        <!-- Opt-in -->
+        <div id="communityOptIn" style="display:none;text-align:center;">
+          <div style="font-size:13px;color:var(--text);margin-bottom:6px;line-height:1.5;" id="communityOptInText">Bidra til kommunestatistikken? Helt anonymt – kun kommune og prosent deles.</div>
+          <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;">
+            <button onclick="communityOptInAccept()" style="background:linear-gradient(135deg,var(--blue),#6366f1);border:none;color:white;border-radius:8px;padding:8px 16px;font-family:Syne,sans-serif;font-size:12px;font-weight:700;cursor:pointer;" id="communityOptInYes">👍 Ja, bidra</button>
+            <button onclick="communityOptInDecline()" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:8px 16px;font-size:12px;cursor:pointer;" id="communityOptInNo">Nei takk</button>
+          </div>
+        </div>
+        <!-- Les mer -->
+        <div style="text-align:center;margin-top:12px;">
+          <button onclick="var d=document.getElementById('communityReadMore');d.style.display=d.style.display==='none'?'block':'none';" style="background:none;border:none;color:var(--blue);font-size:12px;cursor:pointer;text-decoration:underline;" id="communityReadMoreBtn">Les mer om hva vi deler</button>
+        </div>
+        <div id="communityReadMore" style="display:none;margin-top:12px;padding:14px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:10px;text-align:left;">
+          <div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px;" id="communityRM_title">🔒 Slik fungerer det</div>
+          <div style="font-size:12px;color:var(--text);line-height:1.7;" id="communityRM_body">
+            Appen sender <strong>kun</strong> to ting: kommunenavnet ditt og beredskapsprosenten din. Ingenting annet.<br><br>
+            <strong>Vi sender ikke:</strong> navn, adresse, enhet, IP, hva du har huket av, husstandsinfo, eller noe som kan identifisere deg.<br><br>
+            <strong>Serveren lagrer:</strong> «Kristiansand: 234 husstander, sum 14 298» – og beregner snittet. Det er alt.<br><br>
+            <strong>Hvorfor?</strong> Fordi beredskap er smittsomt. Når folk ser at naboene forbereder seg, gjør de det selv. Statistikken motiverer hele kommunen – ikke bare deg.
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:8px;" id="communityRM_freq">Sendes maks én gang per uke. Du kan trekke samtykket når som helst i innstillinger.</div>
+        </div>
+      </div>
+    </div>
+
     <div class="daily-tip">
       <div id="tipLabel" class="tip-label">💡 Dagens beredskapstips</div>
       <div class="tip-text" id="dailyTipText"></div>
@@ -1058,8 +1110,6 @@
         <button onclick="openChallengeModal()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline;"><span id="challengeOrTake">Eller ta 7-dagersutfordringen →</span></button>
       </div>
     </div>
-
-    <div class="weekly-reminder" id="weeklyReminderBox"></div>
 
     <div class="badges-section-title">🏅 Dine merker</div>
     <div class="badges-grid" id="badgesGrid"></div>
@@ -2372,7 +2422,7 @@ function startApp(){
   document.getElementById('headerSub').textContent=_saEn?'Hi, '+p.name+'! Ready for 72 hours.':'Hei, '+p.name+'! Klar for 72 timer.';
   const nl=[];if(needs.has('baby'))nl.push(_saEn?'baby':'baby');if(needs.has('eldre'))nl.push(_saEn?'elderly':'eldre');if(needs.has('hund'))nl.push(_saEn?'pet':'kjæledyr');if(needs.has('medisin'))nl.push(_saEn?'medication':'medisiner');
   document.getElementById('householdSummary').textContent='📊 '+n+(_saEn?' person'+( n>1?'s':''):' person'+(n>1?'er':''))+' · '+Math.round(n*9)+(_saEn?' L water':' L vann')+' · '+n*3+(_saEn?' portions/day':' porsjoner/dag')+(nl.length?' · '+nl.join(', '):'');
-  renderDailyTip(); renderWeeklyReminder(); renderChecklist(); fetchFarevarsel(); showNewFeaturesBanner(); recordActivity(); renderContacts(); renderMotivation(); renderWeeklyFocus(); renderExpiryWarnings(); renderNotifNudge(); updateSimCard(); updateCrisisUI(); checkExpiryNotifications(); checkInactivityReminder(); show7DayBanner(); renderTrygghetspunkter(); showWelcomeBack(); initMilestoneTracker();
+  renderDailyTip(); renderChecklist(); fetchFarevarsel(); showNewFeaturesBanner(); recordActivity(); renderContacts(); renderMotivation(); renderWeeklyFocus(); renderExpiryWarnings(); renderNotifNudge(); updateSimCard(); updateCrisisUI(); renderCommunityCard(); checkExpiryNotifications(); checkInactivityReminder(); show7DayBanner(); renderTrygghetspunkter(); showWelcomeBack(); initMilestoneTracker();
 }
 function _goToOnboarding(){
   document.getElementById('app').style.display='none';
@@ -2407,6 +2457,7 @@ function resetAll(){
        '72t_expiry_tip_shown',
        '72t_notif_nudge_dismissed',
        '72t_custom',
+       '72t_community_optin','72t_community_sent',
        '72k_notif','72k_notif_start','72k_notif_shown','72k_notif_today',
        '72k_mile_25','72k_mile_50','72k_mile_75','72k_mile_100']
     .forEach(k=>localStorage.removeItem(k));
@@ -2444,7 +2495,7 @@ function renderWeeklyReminder(){
     box.innerHTML='<div class="wr-icon">📅</div><div class="wr-body"><strong>'+(en?'Weekly check':'Ukentlig sjekk')+'</strong><span>'+(en?'Check that food and water are within expiry date, and that your powerbank is charged!':'Sjekk at mat og vann er innen holdbarhetsdato, og at powerbanken er ladet!')+'</span><br><button class="wr-done-btn" onclick="markWeeklyDone()">✓ '+(en?'Done for this week':'Gjort for denne uken')+'</button></div>';
   }
 }
-function markWeeklyDone(){localStorage.setItem('72t_weekly_done',Date.now().toString());renderWeeklyReminder();checkBadges();}
+function markWeeklyDone(){localStorage.setItem('72t_weekly_done',Date.now().toString());checkBadges();}
 
 // MOTIVATION
 // Safe version that doesn't crash if profile isn't ready yet
@@ -4337,7 +4388,6 @@ function applyLang(skipRender){
   if(profile && !skipRender){
     renderChecklist();
     renderDailyTip();
-    renderWeeklyReminder();
     renderMotivation();
     renderWeeklyFocus();
     renderExpiryWarnings();
@@ -4345,6 +4395,7 @@ function applyLang(skipRender){
     updateSimCard();
     renderTrygghetspunkter();
     renderContacts();
+    renderCommunityCard();
   }
   updateNotifUI();
   updateOnlineStatus();
@@ -5284,6 +5335,123 @@ function recommendToMunicipality(){
   const subject=encodeURIComponent('Tips: 72klar! – gratis beredskapsapp for innbyggere');
   const body=encodeURIComponent('Hei,\n\nJeg vil gjerne anbefale appen 72klar! ('+APP_URL+') til kommunen.\n\nAppen er gratis, krever ingen installasjon og hjelper innbyggere med å bli selvhjulpne i 72 timer ved en krisesituasjon – i tråd med DSBs anbefalinger.\n\nDen inneholder:\n– Tilpasset sjekkliste basert på husstandsstørrelse\n– Nødkontakter og kriseinformasjon\n– Gamification som motiverer til å fullføre forberedelsene\n\nVille kommunen vurdere å anbefale denne til innbyggerne?\n\nMed vennlig hilsen');
   window.open('mailto:postmottak@kommune.no?subject='+subject+'&body='+body);
+}
+
+// ── COMMUNITY STATS (anonymisert kommunestatistikk) ──
+var COMMUNITY_API = 'https://72klar-stats.workers.dev'; // Cloudflare Worker endpoint
+
+function renderCommunityCard(){
+  var card = document.getElementById('communityCard');
+  if(!card || !profile) return;
+  var kommune = getKommune(profile.postnr);
+  if(!kommune){ card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  var en = currentLang === 'en';
+  // Labels
+  var el;
+  el=document.getElementById('communityLabel'); if(el) el.textContent = en ? '🏘️ Your municipality' : '🏘️ Din kommune';
+  el=document.getElementById('communityCountLabel'); if(el) el.textContent = en ? 'households' : 'husstander';
+  el=document.getElementById('communityAvgLabel'); if(el) el.textContent = en ? 'average' : 'gjennomsnitt';
+  el=document.getElementById('communityYouLabel'); if(el) el.textContent = en ? 'you' : 'du';
+  el=document.getElementById('communityOptInText'); if(el) el.textContent = en
+    ? 'Contribute to community stats? Completely anonymous – only municipality and percentage shared.'
+    : 'Bidra til kommunestatistikken? Helt anonymt – kun kommune og prosent deles.';
+  el=document.getElementById('communityOptInYes'); if(el) el.textContent = en ? '👍 Yes, contribute' : '👍 Ja, bidra';
+  el=document.getElementById('communityOptInNo'); if(el) el.textContent = en ? 'No thanks' : 'Nei takk';
+  // Les mer
+  el=document.getElementById('communityReadMoreBtn'); if(el) el.textContent = en ? 'Read more about what we share' : 'Les mer om hva vi deler';
+  el=document.getElementById('communityRM_title'); if(el) el.textContent = en ? '🔒 How it works' : '🔒 Slik fungerer det';
+  el=document.getElementById('communityRM_body'); if(el) el.innerHTML = en
+    ? 'The app sends <strong>only</strong> two things: your municipality name and your preparedness percentage. Nothing else.<br><br><strong>We do not send:</strong> name, address, device, IP, what you checked off, household info, or anything that could identify you.<br><br><strong>The server stores:</strong> "Kristiansand: 234 households, sum 14,298" – and calculates the average. That\'s it.<br><br><strong>Why?</strong> Because preparedness is contagious. When people see their neighbours preparing, they do it themselves. The statistics motivate the whole municipality – not just you.'
+    : 'Appen sender <strong>kun</strong> to ting: kommunenavnet ditt og beredskapsprosenten din. Ingenting annet.<br><br><strong>Vi sender ikke:</strong> navn, adresse, enhet, IP, hva du har huket av, husstandsinfo, eller noe som kan identifisere deg.<br><br><strong>Serveren lagrer:</strong> «Kristiansand: 234 husstander, sum 14 298» – og beregner snittet. Det er alt.<br><br><strong>Hvorfor?</strong> Fordi beredskap er smittsomt. Når folk ser at naboene forbereder seg, gjør de det selv. Statistikken motiverer hele kommunen – ikke bare deg.';
+  el=document.getElementById('communityRM_freq'); if(el) el.textContent = en
+    ? 'Sent maximum once per week. You can withdraw consent at any time in settings.'
+    : 'Sendes maks én gang per uke. Du kan trekke samtykket når som helst i innstillinger.';
+
+  var optedIn = localStorage.getItem('72t_community_optin');
+  if(optedIn === null){
+    // Not decided yet – show opt-in
+    document.getElementById('communityOptIn').style.display = 'block';
+    document.getElementById('communityStats').style.display = 'none';
+  } else if(optedIn === '1'){
+    document.getElementById('communityOptIn').style.display = 'none';
+    document.getElementById('communityStats').style.display = 'block';
+    fetchCommunityStats(kommune.name);
+    maybeSendCommunityStats(kommune.name);
+  } else {
+    // Opted out – hide card entirely
+    card.style.display = 'none';
+  }
+}
+
+function communityOptInAccept(){
+  localStorage.setItem('72t_community_optin', '1');
+  renderCommunityCard();
+}
+function communityOptInDecline(){
+  localStorage.setItem('72t_community_optin', '0');
+  renderCommunityCard();
+}
+
+function maybeSendCommunityStats(kommuneName){
+  // Send max once per week
+  var lastSent = localStorage.getItem('72t_community_sent');
+  var now = Date.now();
+  if(lastSent && (now - parseInt(lastSent)) < 7 * 24 * 3600 * 1000) return;
+  var pct;
+  try { pct = getPct(); } catch(e){ return; }
+  // Send anonymously
+  fetch(COMMUNITY_API + '/submit', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({kommune: kommuneName, pct: pct})
+  }).then(function(r){
+    if(r.ok) localStorage.setItem('72t_community_sent', String(now));
+  }).catch(function(){});
+}
+
+function fetchCommunityStats(kommuneName){
+  var statsEl = document.getElementById('communityStats');
+  if(!statsEl) return;
+  var en = currentLang === 'en';
+  fetch(COMMUNITY_API + '/stats?kommune=' + encodeURIComponent(kommuneName))
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(!data || !data.count) return;
+      var myPct;
+      try { myPct = getPct(); } catch(e){ myPct = 0; }
+      var avg = Math.round(data.sum / data.count);
+      // Render
+      document.getElementById('communityCount').textContent = data.count;
+      document.getElementById('communityAvg').textContent = avg + '%';
+      document.getElementById('communityYou').textContent = myPct + '%';
+      document.getElementById('communityBarAvg').style.width = avg + '%';
+      document.getElementById('communityBarYou').style.left = 'calc(' + myPct + '% - 1.5px)';
+      // Message
+      var msg = document.getElementById('communityMsg');
+      if(msg){
+        var kn = esc(kommuneName);
+        if(myPct > avg + 10){
+          msg.innerHTML = en
+            ? '🏆 You are above average in ' + kn + '!'
+            : '🏆 Du ligger over snittet i ' + kn + '!';
+          msg.style.color = 'var(--green)';
+        } else if(myPct >= avg - 5){
+          msg.innerHTML = en
+            ? '📊 You are at the average in ' + kn
+            : '📊 Du ligger på snittet i ' + kn;
+          msg.style.color = 'var(--muted)';
+        } else {
+          msg.innerHTML = en
+            ? '📈 ' + kn + ' average is ' + avg + '% – check a few more items!'
+            : '📈 Snittet i ' + kn + ' er ' + avg + '% – huk av noen flere punkter!';
+          msg.style.color = 'var(--orange)';
+        }
+      }
+    }).catch(function(){
+      // Offline or API not deployed yet – hide stats
+      document.getElementById('communityStats').style.display = 'none';
+    });
 }
 
 // ── SOCIAL SHARE SCORE ──
