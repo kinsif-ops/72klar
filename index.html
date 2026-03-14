@@ -1010,6 +1010,7 @@
           <div style="flex:1;">
             <div id="simCardTitle" style="font-family:Syne,sans-serif;font-size:17px;font-weight:800;color:white;">Hva om strømmen gikk NÅ?</div>
             <div id="simCardSub" style="font-size:13px;color:var(--muted);margin-top:3px;line-height:1.4;">Trykk for å se hvor lenge du klarer deg</div>
+            <div id="simBattery" style="display:none;font-size:11px;margin-top:5px;line-height:1.4;"></div>
           </div>
           <div style="color:var(--muted);font-size:14px;flex-shrink:0;">▸</div>
         </div>
@@ -2422,7 +2423,7 @@ function startApp(){
   document.getElementById('headerSub').textContent=_saEn?'Hi, '+p.name+'! Ready for 72 hours.':'Hei, '+p.name+'! Klar for 72 timer.';
   const nl=[];if(needs.has('baby'))nl.push(_saEn?'baby':'baby');if(needs.has('eldre'))nl.push(_saEn?'elderly':'eldre');if(needs.has('hund'))nl.push(_saEn?'pet':'kjæledyr');if(needs.has('medisin'))nl.push(_saEn?'medication':'medisiner');
   document.getElementById('householdSummary').textContent='📊 '+n+(_saEn?' person'+( n>1?'s':''):' person'+(n>1?'er':''))+' · '+Math.round(n*9)+(_saEn?' L water':' L vann')+' · '+n*3+(_saEn?' portions/day':' porsjoner/dag')+(nl.length?' · '+nl.join(', '):'');
-  renderDailyTip(); renderChecklist(); fetchFarevarsel(); showNewFeaturesBanner(); recordActivity(); renderContacts(); renderMotivation(); renderWeeklyFocus(); renderExpiryWarnings(); renderNotifNudge(); updateSimCard(); updateCrisisUI(); renderCommunityCard(); checkExpiryNotifications(); checkInactivityReminder(); show7DayBanner(); renderTrygghetspunkter(); showWelcomeBack(); initMilestoneTracker();
+  renderDailyTip(); renderChecklist(); fetchFarevarsel(); showNewFeaturesBanner(); recordActivity(); renderContacts(); renderMotivation(); renderWeeklyFocus(); renderExpiryWarnings(); renderNotifNudge(); updateSimCard(); updateCrisisUI(); renderCommunityCard(); checkExpiryNotifications(); checkInactivityReminder(); show7DayBanner(); renderTrygghetspunkter(); showWelcomeBack(); initMilestoneTracker(); initBatteryMonitor();
 }
 function _goToOnboarding(){
   document.getElementById('app').style.display='none';
@@ -2764,7 +2765,108 @@ function updateSimCard(){
   el.style.webkitBackgroundClip = 'text';
   el.style.webkitTextFillColor = 'transparent';
   el.style.backgroundClip = 'text';
+  // Update battery display
+  updateBatteryDisplay();
 }
+
+// ── BATTERY MONITOR & AUTO CRISIS DETECTION ──
+var _batteryLevel = null;
+var _batteryCharging = null;
+var _crisisAutoSuggested = false;
+
+function initBatteryMonitor(){
+  if(!('getBattery' in navigator)) return;
+  navigator.getBattery().then(function(bat){
+    function update(){
+      _batteryLevel = Math.round(bat.level * 100);
+      _batteryCharging = bat.charging;
+      updateBatteryDisplay();
+      checkAutoCrisis();
+    }
+    update();
+    bat.addEventListener('levelchange', update);
+    bat.addEventListener('chargingchange', update);
+  }).catch(function(){});
+}
+
+function updateBatteryDisplay(){
+  var el = document.getElementById('simBattery');
+  if(!el || _batteryLevel === null) return;
+  el.style.display = 'block';
+  var en = currentLang === 'en';
+  var hasPB = checkedItems.some(function(k){ return k.toLowerCase().indexOf('powerbank') !== -1; });
+  var phoneHours = _batteryCharging ? '∞' : Math.round(_batteryLevel * 0.12); // ~12h at 100% typical
+  var color = _batteryLevel > 50 ? 'var(--green)' : (_batteryLevel > 20 ? 'var(--orange)' : 'var(--red-text)');
+  var icon = _batteryCharging ? '🔌' : '🔋';
+
+  var text = icon + ' <span style="color:' + color + ';font-weight:700;">' + _batteryLevel + '%</span>';
+  if(!_batteryCharging){
+    text += ' · ' + (en ? 'est. ~' + phoneHours + 'h without charger' : 'ca. ~' + phoneHours + 't uten lader');
+    if(hasPB) text += ' <span style="color:var(--green);">(+powerbank)</span>';
+  } else {
+    text += ' · ' + (en ? 'Charging' : 'Lader');
+  }
+
+  // Offline indicator
+  if(!navigator.onLine){
+    text += ' · <span style="color:var(--red-text);font-weight:700;">' + (en ? '📡 Offline' : '📡 Ingen nett') + '</span>';
+  }
+
+  el.innerHTML = text;
+}
+
+// Auto crisis detection: offline + low battery + evening/night
+function checkAutoCrisis(){
+  if(!profile || _crisisActive || _crisisAutoSuggested) return;
+  if(_batteryLevel === null) return;
+
+  var isOffline = !navigator.onLine;
+  var isLowBattery = _batteryLevel <= 25 && !_batteryCharging;
+  var hour = new Date().getHours();
+  var isDarkHours = hour >= 18 || hour <= 6;
+
+  // Need at least 2 of 3 signals
+  var signals = (isOffline ? 1 : 0) + (isLowBattery ? 1 : 0) + (isDarkHours ? 1 : 0);
+
+  // Strong signal: offline + low battery (regardless of time)
+  var strongSignal = isOffline && isLowBattery;
+
+  if(signals >= 2 || strongSignal){
+    _crisisAutoSuggested = true; // Only suggest once per session
+    showAutoCrisisBanner();
+  }
+}
+
+function showAutoCrisisBanner(){
+  var en = currentLang === 'en';
+  var banner = document.getElementById('crisisSuggestBanner');
+  if(!banner) return;
+  // Don't override existing farevarsel suggestion
+  if(banner.style.display === 'block') return;
+
+  var reasons = [];
+  if(!navigator.onLine) reasons.push(en ? '📡 No internet' : '📡 Ingen nett');
+  if(_batteryLevel <= 25) reasons.push((en ? '🔋 Battery ' : '🔋 Batteri ') + _batteryLevel + '%');
+  var hour = new Date().getHours();
+  if(hour >= 18 || hour <= 6) reasons.push(en ? '🌙 Dark outside' : '🌙 Mørkt ute');
+
+  banner.style.display = 'block';
+  var title = document.getElementById('crisisSuggestTitle');
+  var sub = document.getElementById('crisisSuggestSub');
+  if(title) title.textContent = en
+    ? '⚠️ It looks like you may be in a real situation'
+    : '⚠️ Det ser ut som du kan være i en reell situasjon';
+  if(sub) sub.innerHTML = reasons.join(' · ') + '<br><span style="color:var(--text);font-weight:600;margin-top:4px;display:inline-block;">'
+    + (en ? 'Tap to activate crisis mode' : 'Trykk for å aktivere krisemodus') + '</span>';
+
+  // Pulse the SOS button
+  var sos = document.getElementById('sosBtn');
+  if(sos) sos.classList.add('pulse');
+}
+
+// Listen for online/offline changes
+window.addEventListener('online', function(){ updateBatteryDisplay(); });
+window.addEventListener('offline', function(){ updateBatteryDisplay(); checkAutoCrisis(); });
 
 function _calcSimImpact(itemKey){
   if(!profile) return 0;
@@ -6073,13 +6175,21 @@ function renderCrisisMode(){
   var hasRadio = qHas('Radio');
   var commHrs = hasRadio ? 72 : (hasPB ? 48 : 8);
   var phoneEnd = new Date(now.getTime() + (hasPB?48:8) * 3600000);
+  // Real battery level if available
+  var batInfo = '';
+  if(_batteryLevel !== null){
+    var realPhoneHrs = _batteryCharging ? null : Math.round(_batteryLevel * 0.12);
+    batInfo = en
+      ? ' Phone now: ' + _batteryLevel + '%' + (_batteryCharging ? ' (charging)' : (realPhoneHrs ? ' (~' + realPhoneHrs + 'h left)' : '')) + '.'
+      : ' Telefon nå: ' + _batteryLevel + '%' + (_batteryCharging ? ' (lader)' : (realPhoneHrs ? ' (~' + realPhoneHrs + 't igjen)' : '')) + '.';
+  }
   resources.push({
     icon:'📱', name:en?'Communication':'Kommunikasjon',
     detail: hasRadio
-      ? (en?'Battery radio + '+(hasPB?'powerbank':'phone')+'. Information secured for 72h.' : 'Batteriradio + '+(hasPB?'powerbank':'telefon')+'. Informasjon sikret i 72t.')
+      ? (en?'Battery radio + '+(hasPB?'powerbank':'phone')+'. Information secured for 72h.' : 'Batteriradio + '+(hasPB?'powerbank':'telefon')+'. Informasjon sikret i 72t.') + batInfo
       : hasPB
-        ? (en?'Powerbank extends phone to ~48h. No radio – save battery for NRK app.' : 'Powerbank forlenger telefon til ~48t. Ingen radio – spar batteri til NRK-appen.')
-        : (en?'Phone dies in ~8h. No radio. Save battery: airplane mode, lowest brightness, critical calls only.' : 'Telefon dør om ~8t. Ingen radio. Spar batteri: flymodus, lavest lysstyrke, kun kritiske samtaler.'),
+        ? (en?'Powerbank extends phone to ~48h. No radio – save battery for NRK app.' : 'Powerbank forlenger telefon til ~48t. Ingen radio – spar batteri til NRK-appen.') + batInfo
+        : (en?'Phone dies in ~8h. No radio. Save battery: airplane mode, lowest brightness, critical calls only.' : 'Telefon dør om ~8t. Ingen radio. Spar batteri: flymodus, lavest lysstyrke, kun kritiske samtaler.') + batInfo,
     hours:commHrs, status: hasRadio?'ok':(hasPB?'warn':'fail')
   });
 
