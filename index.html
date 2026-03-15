@@ -6900,6 +6900,24 @@ async function runSimulation(){
   html += '<button class="sim-share-btn sim-anim" style="animation-delay:'+(rd+0.6).toFixed(2)+'s" onclick="shareSimulation('+hours+')">'
     +'↗️ '+(en?'Share your result':'Del resultatet ditt')+'</button>';
 
+  // Fortelling-knapp
+  html += '<button class="sim-anim" style="animation-delay:'+(rd+0.8).toFixed(2)+'s;display:block;width:100%;margin-top:10px;padding:14px;border-radius:12px;border:1px solid rgba(139,92,246,0.4);background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(99,102,241,0.08));color:var(--text);font-family:Syne,sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-align:center;" onclick="event.stopPropagation();showNarrative()">'
+    +'📖 '+(en?'Read your night without power':'Les din natt uten strøm')+'</button>';
+
+  // Store sim data for narrative
+  window._simData = {
+    now:now, hour:hour, month:month, dayName:dayName,
+    temp:outdoorTemp, tempStr:tempStr, persons:persons, needs:needs,
+    name:name, isCold:isCold, isNight:isNight, hours:hours,
+    hoursTo10C:hoursTo10C, heatLossRate:heatLossRate, indoorStart:indoorStart,
+    hasWater:!!(dVann&&dVann.has), hasFood:hasFood, hasLight:hasLight,
+    hasPB:!!(dPB&&dPB.has), hasRadio:hasRadio, hasWarmth:hasWarmth,
+    hasTepper:!!(dTepper&&dTepper.has), hasKlær:!!(dKlær&&dKlær.has),
+    hasLykt:!!(dLykt&&dLykt.has), hasLys:!!(dLys&&dLys.has),
+    waterL: dVann&&dVann.has ? Math.round(persons*9) : 0,
+    fixes:fixes, batteryLevel:_batteryLevel
+  };
+
   html += '</div>'; // end sim-body
 
   // Render
@@ -6940,6 +6958,205 @@ function shareSimulation(hours){
     }).catch(function(){});
   }
   localStorage.setItem('72t_shared','1'); checkBadges();
+}
+
+// ── «DIN NATT UTEN STRØM» – PERSONALISERT FORTELLING ──
+function showNarrative(){
+  var d = window._simData;
+  if(!d) return;
+  var content = document.getElementById('simContent');
+  if(!content) return;
+  var en = currentLang === 'en';
+
+  var events = [];
+  var dayNames = en
+    ? ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+    : ['søndag','mandag','tirsdag','onsdag','torsdag','fredag','lørdag'];
+
+  function fmtTime(hoursFromNow){
+    var date = new Date(d.now.getTime() + hoursFromNow * 3600000);
+    var day = dayNames[date.getDay()];
+    var h = String(date.getHours()).padStart(2,'0');
+    var m = String(date.getMinutes()).padStart(2,'0');
+    return '<strong>' + day.charAt(0).toUpperCase() + day.slice(1) + ' ' + h + ':' + m + '</strong>';
+  }
+
+  var persLabel = en
+    ? (d.persons === 1 ? 'you' : 'the ' + d.persons + ' of you')
+    : (d.persons === 1 ? 'du' : 'dere ' + d.persons);
+
+  // ── HOUR 0: Power goes out ──
+  var h0 = en
+    ? 'The power goes out. The house is still ' + d.indoorStart + '°C. '
+    : 'Strømmen går. Huset er fortsatt ' + d.indoorStart + '°C. ';
+  if(d.isNight && d.hasLight){
+    h0 += en ? 'You find the torch and light candles. ' : 'Du finner lommelykten og tenner stearinlys. ';
+  } else if(d.isNight && !d.hasLight){
+    h0 += en ? 'It\'s pitch dark. You fumble for your phone and turn on the flashlight – draining the battery.' : 'Det er bekmørkt. Du famler etter telefonen og skrur på lommelykten – den tapper batteriet.';
+  }
+  if(d.persons > 1){
+    h0 += en ? ' You check that everyone is okay.' : ' Du sjekker at alle har det bra.';
+    if(d.needs.has('baby')) h0 += en ? ' The baby wakes up.' : ' Babyen våkner.';
+  }
+  events.push({h:0, text:h0});
+
+  // ── HOUR 1: Phone and info ──
+  if(d.hasPB){
+    events.push({h:1, text: en
+      ? 'You connect the phone to your powerbank. You check NRK.no – no estimate for when power returns.'
+      : 'Du kobler telefonen til powerbanken. Du sjekker NRK.no – ingen anslag for når strømmen kommer tilbake.'});
+  } else {
+    var bat = d.batteryLevel !== null ? (en ? 'Phone at ' + d.batteryLevel + '%. ' : 'Telefonen er på ' + d.batteryLevel + '%. ') : '';
+    events.push({h:1, text: en
+      ? bat + 'You have no powerbank. You put the phone in airplane mode to save battery. No more scrolling – every percent counts.'
+      : bat + 'Du har ingen powerbank. Du setter telefonen i flymodus for å spare batteri. Ingen mer scrolling – hvert prosent teller.'});
+  }
+
+  // ── HOUR 4: Temperature ──
+  if(d.isCold && d.heatLossRate > 0){
+    var tempAt4 = Math.round(d.indoorStart - d.heatLossRate * 4);
+    var w4 = en ? 'Indoor temperature has dropped to ' + tempAt4 + '°C. ' : 'Innetemperaturen har sunket til ' + tempAt4 + '°C. ';
+    if(d.hasWarmth){
+      w4 += en ? 'You wrap ' + persLabel + ' in blankets and sleeping bags. It helps.' : 'Du pakker ' + persLabel + ' inn i tepper og soveposer. Det hjelper.';
+    } else {
+      w4 += en ? 'You have no extra blankets. ' + (d.persons > 1 ? 'You huddle together.' : 'You put on all the clothes you own.') : 'Du har ingen ekstra tepper. ' + (d.persons > 1 ? 'Dere kryper sammen.' : 'Du tar på deg alle klærne du eier.');
+    }
+    events.push({h:4, text:w4});
+  }
+
+  // ── HOUR 6: Fridge ──
+  events.push({h:6, text: en
+    ? 'The fridge has been off for 6 hours. The food inside is starting to spoil. ' + (d.hasFood ? 'You have emergency food – canned goods, crackers, nuts. You eat fridge food first to avoid waste.' : 'You have no emergency food. You eat what\'s left in the fridge before it goes bad.')
+    : 'Kjøleskapet har vært av i 6 timer. Maten inni begynner å bli dårlig. ' + (d.hasFood ? 'Du har nødmat – hermetikk, knekkebrød, nøtter. Du spiser kjøleskapsmat først for å unngå svinn.' : 'Du har ingen nødmat. Du spiser det som er igjen i kjøleskapet før det blir dårlig.')});
+
+  // ── HOUR 8: Phone dies (no powerbank) ──
+  if(!d.hasPB){
+    events.push({h:8, text: en
+      ? 'Your phone dies. ' + (d.hasRadio ? 'You turn on the battery radio. NRK P1 is broadcasting emergency information.' : 'You have no radio. You are now completely cut off from information.')
+      : 'Telefonen dør. ' + (d.hasRadio ? 'Du skrur på batteriradoien. NRK P1 sender kriseinformasjon.' : 'Du har ingen radio. Du er nå fullstendig avskåret fra informasjon.'),
+      critical:!d.hasRadio});
+    if(!d.hasRadio){
+      events.push({h:9, text: en
+        ? 'Silence. No phone, no radio, no internet. Just the wind outside. ' + (d.persons > 1 ? (d.needs.has('baby') ? 'The children ask when the power is coming back. You don\'t know.' : 'Someone asks when this will be over. You have no answer.') : 'You realize how dependent you were on that small screen.')
+        : 'Stillhet. Ingen telefon, ingen radio, ingen internett. Bare vinden utenfor. ' + (d.persons > 1 ? (d.needs.has('baby') ? 'Barna spør når strømmen kommer tilbake. Du vet ikke.' : 'Noen spør når dette er over. Du har ikke noe svar.') : 'Du innser hvor avhengig du var av den lille skjermen.')});
+    }
+  }
+
+  // ── Nightfall ──
+  var nightH = d.isNight ? 12 : Math.max(8, 22 - d.hour);
+  if(nightH > 6 && nightH < 30){
+    if(!d.hasLight){
+      events.push({h:Math.min(nightH, 14), text: en
+        ? 'Darkness falls. Without torch or candles, you cannot move safely. ' + (d.persons > 1 ? 'The children are scared.' : 'You sit still and wait.')
+        : 'Mørket faller. Uten lommelykt eller stearinlys kan du ikke bevege deg trygt. ' + (d.persons > 1 ? 'Barna er redde.' : 'Du sitter stille og venter.')});
+    } else {
+      events.push({h:Math.min(nightH, 14), text: en
+        ? 'Night comes. You light candles and gather ' + persLabel + ' in one room to conserve heat.'
+        : 'Natten kommer. Du tenner stearinlys og samler ' + persLabel + ' i ett rom for å holde på varmen.'});
+    }
+  }
+
+  // ── Temperature crisis ──
+  if(d.isCold && d.hoursTo10C < 72 && d.hoursTo10C > 6){
+    events.push({h:d.hoursTo10C, text: en
+      ? 'Indoor temperature reaches 10°C. ' + (!d.hasWarmth ? (d.needs.has('eldre') ? 'The elderly person is at serious risk of hypothermia.' : 'It\'s genuinely cold. Your breath makes clouds inside your own living room.') : 'The blankets are keeping ' + persLabel + ' warm enough – barely.')
+      : 'Innetemperaturen når 10°C. ' + (!d.hasWarmth ? (d.needs.has('eldre') ? 'Den eldre personen har alvorlig risiko for hypotermi.' : 'Det er genuint kaldt. Pusten lager synlige skyer inne i stuen din.') : 'Teppene holder ' + persLabel + ' varme nok – så vidt.'),
+      critical:!d.hasWarmth});
+  }
+
+  // ── HOUR 24: Water ──
+  if(!d.hasWater){
+    events.push({h:24, text: en
+      ? '24 hours without water. The taps don\'t work. ' + (d.persons > 1 ? 'The children are quiet – too quiet.' : 'Your head is pounding.') + ' Dehydration is affecting everything.'
+      : '24 timer uten vann. Kranene virker ikke. ' + (d.persons > 1 ? 'Barna er stille – for stille.' : 'Du har dundrende hodepine.') + ' Dehydrering påvirker alt.',
+      critical:true});
+  }
+
+  // ── HOUR 36: Food gone ──
+  if(!d.hasFood && d.hours >= 30){
+    events.push({h:36, text: en
+      ? 'The freezer food is gone. There is nothing left to eat.'
+      : 'Frysematen er borte. Det er ingenting igjen å spise.'});
+  }
+
+  // ── HOUR 48: Powerbank dies ──
+  if(d.hasPB && !d.hasRadio){
+    events.push({h:48, text: en
+      ? 'The powerbank is empty. Your phone is dead. Without a radio, you are now in the dark – literally and figuratively.'
+      : 'Powerbanken er tom. Telefonen er død. Uten batteriradio er du nå i mørket – bokstavelig og billedlig.',
+      critical:true});
+  }
+
+  // ── Final hour ──
+  if(d.hours < 72){
+    events.push({h:Math.round(d.hours), text: en
+      ? '<strong>This is your limit.</strong> After ~' + Math.round(d.hours) + ' hours, your situation becomes untenable.'
+      : '<strong>Her er din grense.</strong> Etter ~' + Math.round(d.hours) + ' timer blir situasjonen uholdbar.',
+      critical:true});
+  } else {
+    events.push({h:72, text: en
+      ? '72 hours have passed. The power comes back. Cold, tired, but safe. Because you were prepared.'
+      : '72 timer har gått. Strømmen kommer tilbake. Kalde, slitne, men trygge. Fordi dere var forberedt.',
+      success:true});
+  }
+
+  events.sort(function(a,b){ return a.h - b.h; });
+
+  // ── Render ──
+  var html = '<div style="max-width:440px;margin:0 auto;padding:20px 16px;" onclick="event.stopPropagation()">';
+  html += '<button onclick="closeSimulation()" style="position:fixed;top:16px;right:16px;z-index:10;background:rgba(255,255,255,0.1);border:none;color:white;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;">✕</button>';
+
+  html += '<div style="text-align:center;padding:24px 0 20px;">';
+  html += '<div style="font-size:40px;margin-bottom:8px;">📖</div>';
+  html += '<div style="font-family:Syne,sans-serif;font-size:22px;font-weight:800;color:var(--text);">'+(en?'Your night without power':'Din natt uten strøm')+'</div>';
+  html += '<div style="font-size:12px;color:var(--muted);margin-top:6px;">'+(en?'Based on your actual situation right now':'Basert på din faktiske situasjon akkurat nå')+'</div>';
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:4px;">'+d.tempStr+' · '+d.persons+(en?' people':' pers.')+( d.needs.has('baby')?' · Baby':'')+(d.needs.has('eldre')?(en?' · Elderly':' · Eldre'):'')+'</div>';
+  html += '</div>';
+
+  events.forEach(function(ev, i){
+    var delay = (0.2 + i * 0.15).toFixed(2);
+    var borderColor = ev.critical ? 'var(--red-text)' : (ev.success ? 'var(--green)' : 'var(--border)');
+    var bgColor = ev.critical ? 'rgba(214,40,40,0.06)' : (ev.success ? 'rgba(46,204,113,0.06)' : 'rgba(255,255,255,0.02)');
+    var dotColor = ev.critical ? 'var(--red-text)' : (ev.success ? 'var(--green)' : 'var(--muted)');
+
+    html += '<div class="sim-anim" style="animation-delay:'+delay+'s;display:flex;gap:14px;position:relative;">';
+    html += '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:20px;">';
+    html += '<div style="width:10px;height:10px;border-radius:50%;background:'+dotColor+';flex-shrink:0;margin-top:16px;"></div>';
+    if(i < events.length - 1) html += '<div style="width:1px;flex:1;background:var(--border);min-height:20px;"></div>';
+    html += '</div>';
+    html += '<div style="flex:1;border-left:2px solid '+borderColor+';background:'+bgColor+';border-radius:0 10px 10px 0;padding:12px 14px;margin-bottom:12px;">';
+    html += '<div style="font-size:11px;color:var(--muted);margin-bottom:4px;">'+fmtTime(ev.h)+' <span style="opacity:0.5;">· +'+ev.h+'t</span></div>';
+    html += '<div style="font-size:13px;color:var(--text);line-height:1.65;">'+ev.text+'</div>';
+    html += '</div></div>';
+  });
+
+  // ── CTA ──
+  if(d.hours < 72 && d.fixes.length > 0){
+    var ctaD = (0.2 + events.length * 0.15 + 0.3).toFixed(2);
+    html += '<div class="sim-anim" style="animation-delay:'+ctaD+'s;margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(46,204,113,0.1),rgba(39,174,96,0.05));border:1px solid rgba(46,204,113,0.3);border-radius:14px;text-align:center;">';
+    html += '<div style="font-family:Syne,sans-serif;font-size:16px;font-weight:800;color:var(--green);margin-bottom:12px;">'+(en?'This doesn\'t have to happen.':'Dette trenger ikke å skje.')+'</div>';
+    html += '<div style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5;">'+(en?'Three things that would rewrite your story:':'Tre ting som ville skrevet om fortellingen din:')+'</div>';
+
+    d.fixes.slice(0, 3).forEach(function(fix){
+      var info = null;
+      var piKeys = Object.keys(PURCHASE_INFO);
+      for(var pi=0;pi<piKeys.length;pi++){
+        if(fix.name && fix.name.toLowerCase().indexOf(piKeys[pi].toLowerCase()) !== -1){ info = PURCHASE_INFO[piKeys[pi]]; break; }
+        if(fix.key && fix.key.toLowerCase().indexOf(piKeys[pi].toLowerCase()) !== -1){ info = PURCHASE_INFO[piKeys[pi]]; break; }
+      }
+      html += '<div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;text-align:left;cursor:pointer;" onclick="closeSimulation();setTimeout(function(){var nb=document.querySelectorAll(\'nav button\');if(nb[1])nb[1].click();},200);">';
+      html += '<span style="font-size:22px;">'+fix.emoji+'</span>';
+      html += '<div style="flex:1;"><div style="font-weight:700;font-size:13px;color:var(--text);">'+esc(fix.name)+'</div>';
+      if(info) html += '<div style="font-size:11px;color:var(--muted);margin-top:2px;">'+info.price+' kr · '+(en?info.store.en:info.store.no)+'</div>';
+      html += '</div>';
+      html += '<div style="font-size:11px;font-weight:700;color:var(--red-text);">~'+fix.limit+'t</div></div>';
+    });
+    html += '</div>';
+  }
+
+  html += '</div>';
+  content.innerHTML = html;
+  content.parentElement.scrollTop = 0;
 }
 
 // ── SPLASH / INFOLAPP ────────────────────────────────
