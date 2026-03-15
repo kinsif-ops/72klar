@@ -1487,6 +1487,126 @@
         </div>
       </div>
 
+      <!-- SIRENER OG NØDVARSEL -->
+      <div class="acc-item" id="acc-sirener">
+        <button class="acc-head" aria-expanded="false" onclick="toggleAcc('sirener')">
+          <span class="acc-icon">🚨</span>
+          <span class="acc-title">Sirener og nødvarsel</span>
+          <span class="acc-arrow">▾</span>
+        </button>
+        <div class="acc-body" id="acc-body-sirener">
+          <div style="font-size:14px;line-height:1.8;">
+            <strong style="color:var(--red-text);">Sirenebetydning:</strong><br>
+            📢 <strong>3 serier med 1 minutts opphold</strong> = «Viktig melding – søk informasjon» → Hør NRK P1<br>
+            📢 <strong>Korte tut i ca. 1 minutt</strong> = «Fare for angrep – søk dekning» → Kjeller, tilfluktsrom eller rom midt i bygget<br>
+            📢 <strong>Sammenhengende i ½ minutt</strong> = Faren er over<br><br>
+            <strong>Nødvarsel på mobil:</strong><br>
+            Ved akutt fare kan myndighetene sende nødvarsel direkte til mobilen din (krever 4G/5G-dekning). Varselet kommer automatisk med høy lyd – du trenger ikke aktivere noe.
+          </div>
+        </div>
+      </div>
+
+      <!-- NØDTOALETT OG VANNKILDER -->
+      <div class="acc-item" id="acc-nodtoalett">
+        <button class="acc-head" aria-expanded="false" onclick="toggleAcc('nodtoalett')">
+          <span class="acc-icon">🚽</span>
+          <span class="acc-title">Nødtoalett og alternative vannkilder</span>
+          <span class="acc-arrow">▾</span>
+        </button>
+        <div class="acc-body" id="acc-body-nodtoalett">
+          <div style="font-size:14px;line-height:1.8;">
+            <strong>Nødtoalett uten vann:</strong><br>
+            Tre en dobbel bærepose rundt toalettsetet eller en bøtte. Knytt igjen med dobbel knute etter bruk. Kast i vanlig restavfall.<br><br>
+            <strong>Varmtvannsberederen din:</strong><br>
+            Inneholder 50–300 liter vann. Trekk ut støpselet først, så tapp fra dreneringskranen i bunnen. Vannet kan brukes til hygiene og rengjøring (ikke drikking).<br><br>
+            <strong>Regnvann:</strong><br>
+            Kan samles fra tak til hygiene. Men vær klar over at det kan være forurenset ved atomnedfall eller kjemiske utslipp – søk informasjon fra myndighetene først.
+          </div>
+        </div>
+      </div>
+
+      <!-- REDUSER VARMETAP -->
+      <div class="acc-item" id="acc-varmetap">
+        <button class="acc-head" aria-expanded="false" onclick="toggleAcc('varmetap')">
+          <span class="acc-icon">🌡️</span>
+          <span class="acc-title">Reduser varmetap uten strøm</span>
+          <span class="acc-arrow">▾</span>
+        </button>
+        <div class="acc-body" id="acc-body-varmetap">
+          <div style="font-size:14px;line-height:1.8;">
+            <strong>Når strømmen går og det er kaldt:</strong><br>
+            🚪 Lukk dører mellom rom – hold varmen i færre rom<br>
+            🪟 Heng tepper eller gardiner foran vinduer – reduserer varmetap dramatisk<br>
+            🛏️ Samle alle i ett rom – kroppene deres varmer opp rommet<br>
+            🧥 Lag på lag med klær – ull innerst, vindtett ytterst<br>
+            ☕ Drikk varmt – matlaging med stormkjøkken eller gass<br><br>
+            <strong style="color:var(--orange);">OBS brannsikkerhet:</strong> Ikke bruk gass- eller parafinvarme uten ventilasjon. Sjekk at ildsted og pipe er godkjent. Les mer på sikkerhverdag.no.
+          </div>
+        </div>
+      </div>
+
+      <!-- KILDEKRITIKK -->
+      <div class="acc-item" id="acc-kildekritikk">
+        <button class="acc-head" aria-expanded="false" onclick="toggleAcc('kildekritikk')">
+          <span class="acc-icon">🔍</span>
+          <span class="acc-title">Kildekritikk i kriser</span>
+          <span class="acc-arrow">▾</span>
+        </button>
+        <div class="acc-body" id="acc-body-kildekritikk">
+          <div style="font-size:14px;line-height:1.8;">
+            I krisesituasjoner spres feilinformasjon raskt – både ved misforståelser og med vilje for å destabilisere samfunnet.<br><br>
+            ✅ Stol på <strong>myndighetenes kanaler</strong> og <strong>redaktørstyrte medier</strong> (NRK, VG, Aftenposten etc.)<br>
+            ⚠️ Vær ekstra på vakt mot informasjon som <strong>gjør deg sint, redd eller overrasket</strong><br>
+            🔎 Sjekk hvem som <strong>står bak</strong> informasjonen du får<br>
+            📷 Husk at tekst, lyd, bilde og video <strong>kan manipuleres</strong> (AI-generert)<br>
+            🤔 Tenk over hva du <strong>deler videre</strong> – du kan ubevisst spre feilinformasjon
+          </div>
+        </div>
+      </div>
+
+      <!-- NØDNUMMER FOR ALLE -->
+      <div class="acc-item" id="acc-nodnummer">
+        <button class="acc-head" aria-expanded="false" onclick="toggleAcc('nodnummer')">
+          <span class="acc-icon">📞</span>
+          <span class="acc-title">Nødnummer og nød-SMS</span>
+          <span class="acc-arrow">▾</span>
+        </button>
+        <div class="acc-body" id="acc-body-nodnummer">
+          <div style="font-size:14px;line-height:1.8;">
+            <strong>🔴 110</strong> – Brann<br>
+            <strong>🔵 112</strong> – Politi (øyeblikkelig hjelp)<br>
+            <strong>🟢 113</strong> – Medisinsk nødtelefon (akutt, står om liv)<br>
+            <strong>📱 1412</strong> – Nødtelefon for døve og hørselshemmede<br><br>
+            <strong>Nød-SMS:</strong> Døve, hørselshemmede og talehemmede kan kontakte nødetatene via SMS. Du må først registrere nummeret ditt på <strong>nodsms.no</strong>.<br><br>
+            <strong>Tips:</strong> Skriv de viktigste numrene på papir (inkl. legevakt, veterinær, naboer) – du trenger dem hvis du må låne andres telefon.
+          </div>
+        </div>
+      </div>
+
+      <!-- BEREDSKAPSVENN -->
+      <div class="acc-item" id="acc-beredskapsvenn">
+        <button class="acc-head" aria-expanded="false" onclick="toggleAcc('beredskapsvenn')">
+          <span class="acc-icon">🤝</span>
+          <span class="acc-title">Finn din beredskapsvenn</span>
+          <span class="acc-arrow">▾</span>
+        </button>
+        <div class="acc-body" id="acc-body-beredskapsvenn">
+          <div style="font-size:14px;line-height:1.8;">
+            <strong>Samarbeid er beredskap.</strong> Finn ut hvem som kan trenge din hjelp, og hvem du kan få hjelp av.<br><br>
+            Dere kan hjelpe hverandre med:<br>
+            🏥 Førstehjelp ved skader<br>
+            🏠 Overnatting hvis noen må evakuere<br>
+            🌐 Oversettelse og forklaring av informasjon fra myndighetene<br>
+            🔧 Praktisk hjelp med utstyr og verktøy<br>
+            🛒 Innkjøp, bæring og transport<br>
+            🔄 Bytte eller lån av utstyr og varer<br>
+            📱 Lån av mobiltelefon (helst på et annet mobilnett enn ditt)<br>
+            🍲 Felles matlaging<br><br>
+            <strong>Snakk med naboer, venner og familie i dag</strong> – ikke vent til krisen.
+          </div>
+        </div>
+      </div>
+
       
     </div><!-- end acc-list -->
 
@@ -2320,6 +2440,7 @@ function getCats(n, needs, lang) {
       {name:T("Knekkebrød / tørrmat","Crackers / dry food"),desc:()=>T("Lang holdbarhet, enkelt å spise","Long shelf life, easy to eat"),qty:()=>Math.ceil(n*1.5)+T(' pakker',' packs'),emoji:"🍞"},
       {name:T("Nøtter og tørket frukt","Nuts and dried fruit"),desc:()=>T("Energirikt nødnæring","Energy-rich emergency nutrition"),qty:()=>Math.ceil(n*0.5)+' kg',emoji:"🥜"},
       {name:T("Manuell boksåpner","Manual can opener"),desc:()=>T("Fungerer uten strøm","Works without power"),qty:()=>T("1 stk","1 pc"),emoji:"🔧"},
+      {name:T("Kokeapparat / stormkjøkken","Camping stove / cookstove"),desc:()=>T("For matlaging uten strøm. Grill, gassbrenner eller stormkjøkken. Husk ekstra gassbeholder eller brennstoff. Bruk kun godkjent utstyr innendørs.","For cooking without power. Grill, gas burner or camping stove. Remember extra gas canister or fuel. Only use approved equipment indoors."),qty:()=>T("1 stk + brennstoff","1 pc + fuel"),emoji:"🔥"},
     ]},
     {name:T("💊 Helse & Førstehjelp","💊 Health & First Aid"), items:[
       {name:T("Førstehjelpsskrin","First aid kit"),desc:()=>T("Bør inneholde: Plaster i ulike størrelser · Sterile bandasjer og kompresser · Elastisk bandasje · Desinfeksjonsmiddel (klorheksidin eller jod) · Saks og pinsett · Engangshansker · Termometer · Aluminiumsredningsduk · Øyeskyll · Sikkerhetsnåler · Trekantbandasje til armbind","Should include: Plasters in various sizes · Sterile bandages and dressings · Elastic bandage · Disinfectant (chlorhexidine or iodine) · Scissors and tweezers · Disposable gloves · Thermometer · Emergency foil blanket · Eye wash · Safety pins · Triangular bandage for sling"),qty:()=>n>=4?T("2 stk","2 pcs"):T("1 stk","1 pc"),emoji:"🩹"},
@@ -2335,8 +2456,11 @@ function getCats(n, needs, lang) {
     {name:T("🏠 Varme & Hygiene","🏠 Warmth & Hygiene"), items:[
       {name:T("Varme tepper / sovepose","Warm blankets / sleeping bag"),desc:()=>T("Viktig ved strømbrudd om vinteren","Essential during winter power outages"),qty:()=>n+T(' stk',' pcs'),emoji:"🛏️"},
       {name:T("Varme klær og regnjakke","Warm clothes and rain jacket"),desc:()=>T("Ekstraklær i beredskapsbag","Extra clothes in emergency bag"),qty:()=>n+T(' sett',' sets'),emoji:"🧥"},
+      {name:T("Ved / alternativ varme","Firewood / alternative heating"),desc:()=>T("Hvis du har vedovn eller peis: sørg for nok ved. Alternativt: gassovn godkjent for innendørs bruk. Husk at tepper mellom rom og foran vinduer reduserer varmetap.","If you have a wood stove or fireplace: ensure enough firewood. Alternative: gas heater approved for indoor use. Remember that blankets between rooms and over windows reduce heat loss."),qty:()=>T("Tilstrekkelig lager","Sufficient supply"),emoji:"🪵"},
+      {name:T("Avtale om overnatting","Overnight arrangement"),desc:()=>T("Avtal med naboer, familie eller venner at du kan overnatte hos dem ved langvarig strømbrudd uten alternativ oppvarming – eller tilby ditt hjem hvis du har det.","Arrange with neighbours, family or friends to stay with them during prolonged power outages without alternative heating – or offer your home if you have it."),qty:()=>T("1 avtale","1 arrangement"),emoji:"🤝"},
       {name:T("Toalettpapir","Toilet paper"),desc:()=>T("Grunnleggende hygienebehov","Basic hygiene necessity"),qty:()=>n*2+T(' ruller',' rolls'),emoji:"🧻"},
       {name:T("Håndsprit / desinfeksjon","Hand sanitiser / disinfectant"),desc:()=>T("Viktig ved begrensede vannressurser","Important when water supply is limited"),qty:()=>Math.ceil(n*0.5)+'L',emoji:"🧴"},
+      {name:T("Bind / tamponger","Pads / tampons"),desc:()=>T("DSB anbefaler ekstra lager av menstruasjonsprodukter. Kan ikke kjøpes under langvarig krise.","Authorities recommend extra supply of menstrual products. Cannot be purchased during prolonged crisis."),qty:()=>T("1 måneds forsyning","1 month supply"),emoji:"🩹"},
     ]},
     {name:T("🎒 Grab-bag","🎒 Grab-bag"), items:[
       {name:T("Ryggsekk klar ved døren","Backpack ready at the door"),desc:()=>T("Klar til å ta med på 2 minutter","Ready to grab in 2 minutes"),qty:()=>n>=3?T("2 sekker","2 bags"):T("1 sekk","1 bag"),emoji:"🎒"},
@@ -2348,7 +2472,9 @@ function getCats(n, needs, lang) {
     ]},
     {name:T("📄 Dokumenter & Annet","📄 Documents & Other"), items:[
       {name:T("Kopier av viktige dokumenter","Copies of important documents"),desc:()=>T("Pass, forsikring, ID – i vanntett pose","Passport, insurance, ID – in waterproof bag"),qty:()=>n+' '+P,emoji:"📄"},
-      {name:T("Kontanter (noe)","Cash (some)"),desc:()=>T("Kortautomater fungerer ikke alltid","Card terminals don't always work"),qty:()=>T('ca. '+n*500+' kr','approx. '+n*500+' NOK'),emoji:"💵"},
+      {name:T("Kontanter (noe)","Cash (some)"),desc:()=>T("Kortautomater fungerer ikke alltid. Ha ulike og mindre valører.","Card terminals don't always work. Keep different smaller denominations."),qty:()=>T('ca. '+n*500+' kr','approx. '+n*500+' NOK'),emoji:"💵"},
+      {name:T("Flere betalingskort","Multiple payment cards"),desc:()=>T("Ha debet- og kredittkort fra ulike banker. Hvis én bank har tekniske problemer, fungerer den andre.","Have debit and credit cards from different banks. If one bank has issues, the other still works."),qty:()=>T("minst 2 kort","at least 2 cards"),emoji:"💳"},
+      {name:T("Telefonliste på papir","Phone list on paper"),desc:()=>T("Skriv ned viktige nummer: nødetater, legevakt, familie, naboer, veterinær. Du trenger den hvis du må låne andres telefon.","Write down important numbers: emergency services, GP, family, neighbours, vet. You need it if you have to borrow someone's phone."),qty:()=>T("1 liste (laminert)","1 list (laminated)"),emoji:"📝"},
       {name:T("Kart over lokalmiljøet","Map of local area"),desc:()=>T("Fysisk kart, GPS virker ikke alltid","Physical map, GPS doesn't always work"),qty:()=>T("1 stk","1 pc"),emoji:"🗺️"},
     ]},
   ];
@@ -2700,6 +2826,12 @@ var PURCHASE_INFO = {
   'Kopier':           {price:'0',store:{no:'Hjemme (skriver/foto)',en:'Home (printer/photo)'},tip:{no:'Fotografer pass, forsikring, ID. Lagre i nettsky + utskrift i pose.',en:'Photograph passport, insurance, ID. Save in cloud + printout in bag.'}},
   'Kontanter':        {price:'500–1000',store:{no:'Minibank',en:'ATM'},tip:{no:'Ta ut nå. Småsedler (50, 100, 200). Legg i en konvolutt hjemme.',en:'Withdraw now. Small bills. Put in an envelope at home.'}},
   'Kart':             {price:'0–100',store:{no:'Nett / kartbutikk',en:'Online / map shop'},tip:{no:'Last ned Maps.me eller skriv ut Google Maps over nærområdet.',en:'Download Maps.me or print Google Maps of your local area.'}},
+  'Kokeapparat':      {price:'200–800',store:{no:'Sport / nettbutikk',en:'Sports / online store'},tip:{no:'Enklest: Trangia stormkjøkken (ca. 400 kr). Husk brennstoff (rødsprit). Gassbrenner med butan er alternativ.',en:'Easiest: Trangia cookstove (~400 NOK). Remember fuel (methylated spirits). Butane gas burner is an alternative.'}},
+  'Ved':              {price:'500–1500',store:{no:'Vedleverandør / Finn.no',en:'Firewood supplier / Finn.no'},tip:{no:'60L-sekk holder ca. 3–5 dager ved moderat fyring. Lagre tørt. Sørg for at pipe og ildsted er godkjent.',en:'60L bag lasts ~3–5 days with moderate use. Store dry. Ensure chimney and fireplace are approved.'}},
+  'Avtale':           {price:'0',store:{no:'Nabo / familie / venner',en:'Neighbour / family / friends'},tip:{no:'Ring i dag og avtal: «Hvis strømmen går lenge, kan jeg komme til deg?» Enkleste beredskapstiltaket som finnes.',en:'Call today and arrange: "If the power goes out for long, can I come to you?" The easiest preparedness measure there is.'}},
+  'Bind':             {price:'30–80',store:{no:'Dagligvare / apotek',en:'Grocery / pharmacy'},tip:{no:'Kjøp én ekstra pakke neste gang du handler. Oppbevar med resten av beredskapslageret.',en:'Buy one extra pack next time you shop. Store with the rest of your emergency supplies.'}},
+  'Telefonliste':     {price:'0',store:{no:'Hjemme (papir + penn)',en:'At home (paper + pen)'},tip:{no:'Skriv ned: 110, 113, 112, legevakt, familie, naboer, forsikring. Laminer eller legg i plastlomme. Fest på kjøleskapet.',en:'Write down: 110, 113, 112, GP, family, neighbours, insurance. Laminate or put in a plastic sleeve. Attach to fridge.'}},
+  'betalingskort':    {price:'0',store:{no:'Din bank',en:'Your bank'},tip:{no:'Bestill kredittkort eller ekstrakort fra en annen bank enn hovedbanken din. Koster ofte ingenting.',en:'Order a credit card or extra card from a different bank than your main one. Often costs nothing.'}},
   'Ryggsekk':         {price:'—',store:{no:'Allerede hjemme?',en:'Already at home?'},tip:{no:'Hvilken som helst 30-40L sekk. Plasser den ved utgangsdøren.',en:'Any 30-40L backpack. Place it by the front door.'}},
   'Bleier':           {price:'80–150',store:{no:'Dagligvare',en:'Grocery'},tip:{no:'Én stor pakke holder 3+ dager. Roter som vanlig.',en:'One large pack lasts 3+ days. Rotate as usual.'}},
   'Barnemat':         {price:'100–200',store:{no:'Dagligvare',en:'Grocery'},tip:{no:'Glass/poser med lang holdbarhet. Kjøp det barnet faktisk spiser.',en:'Jars/pouches with long shelf life. Buy what the child actually eats.'}},
@@ -3605,7 +3737,7 @@ function closeItemModal(){
 
 // ── HOLDBARHETSDATO: identifiser varer som bør ha utløpsdato ──
 var _PERISHABLE_CATS = ['Vann & Drikke', 'Mat', 'Helse', 'Baby', 'Eldre', 'Kjæledyr'];
-var _PERISHABLE_EXCLUDE = ['boksåpner', 'can opener', 'nødliste', 'health info', 'bur', 'cage', 'bleier', 'nappies', 'våtservietter', 'wet wipes', 'babyklær', 'baby clothes', 'tepper', 'blankets'];
+var _PERISHABLE_EXCLUDE = ['boksåpner', 'can opener', 'kokeapparat', 'camping stove', 'cookstove', 'nødliste', 'health info', 'bur', 'cage', 'bleier', 'nappies', 'våtservietter', 'wet wipes', 'babyklær', 'baby clothes', 'tepper', 'blankets'];
 function _isPerishable(id){
   // id format: "💧 Vann & Drikke::Drikkevann"
   var catPart = id.split('::')[0] || '';
@@ -4068,8 +4200,8 @@ const TRANSLATIONS = {
   shareSub: { no: 'Hjelp venner, familie og naboer å bli bedre forberedt!', en: 'Help friends, family and neighbours get prepared!' },
   // Info accordion titles
   infoTitles: {
-    no: ['Trygghetspunkter & tilfluktsrom','Vann','Mat','Strømbrudd','Evakuering & grab-bag','Kart & navigasjon uten nett','Kommunikasjon uten internett','Offisielle informasjonskilder'],
-    en: ['Safe points & shelters','Water','Food','Power outage','Evacuation & grab-bag','Maps & navigation offline','Communication without internet','Official information sources'],
+    no: ['Trygghetspunkter & tilfluktsrom','Vann','Mat','Strømbrudd','Evakuering & grab-bag','Kart & navigasjon uten nett','Kommunikasjon uten internett','Offisielle informasjonskilder','Sirener og nødvarsel','Nødtoalett og alternative vannkilder','Reduser varmetap uten strøm','Kildekritikk i kriser','Nødnummer og nød-SMS','Finn din beredskapsvenn'],
+    en: ['Safe points & shelters','Water','Food','Power outage','Evacuation & grab-bag','Maps & navigation offline','Communication without internet','Official information sources','Sirens and emergency alerts','Emergency toilet and water sources','Reduce heat loss without power','Source criticism in crises','Emergency numbers and SMS','Find your preparedness buddy'],
   },
   // Onboarding
   ob: {
