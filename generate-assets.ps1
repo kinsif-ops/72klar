@@ -40,14 +40,14 @@ function Save-Icon {
   $sf.LineAlignment = [System.Drawing.StringAlignment]::Center
   $white = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::White)
 
-  # "72" – primary number
+  # "72" – primary number (senter i øvre 65% av ikonet)
   $font72   = New-Object System.Drawing.Font("Arial", [int]($size * 0.50), [System.Drawing.FontStyle]::Bold)
-  $rect72   = New-Object System.Drawing.RectangleF(0, [int](-$size * 0.07), $size, $size)
+  $rect72   = New-Object System.Drawing.RectangleF(0, 0, $size, [int]($size * 0.65))
   $g.DrawString("72", $font72, $white, $rect72, $sf)
 
-  # "klar!" – sub-label
+  # "klar!" – sub-label i nederste 28% av ikonet, tydelig atskilt fra "72"
   $fontKlar = New-Object System.Drawing.Font("Arial", [int]($size * 0.155), [System.Drawing.FontStyle]::Bold)
-  $rectKlar = New-Object System.Drawing.RectangleF(0, [int]($size * 0.46), $size, [int]($size * 0.3))
+  $rectKlar = New-Object System.Drawing.RectangleF(0, [int]($size * 0.68), $size, [int]($size * 0.28))
   $g.DrawString("klar!", $fontKlar, $white, $rectKlar, $sf)
 
   $g.Dispose()
