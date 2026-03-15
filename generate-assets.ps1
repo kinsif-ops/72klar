@@ -47,7 +47,7 @@ function Save-Icon {
 
   # "klar!" – sub-label i nederste 28% av ikonet, tydelig atskilt fra "72"
   $fontKlar = New-Object System.Drawing.Font("Arial", [int]($size * 0.155), [System.Drawing.FontStyle]::Bold)
-  $rectKlar = New-Object System.Drawing.RectangleF(0, [int]($size * 0.68), $size, [int]($size * 0.28))
+  $rectKlar = New-Object System.Drawing.RectangleF(0, [int]($size * 0.62), $size, [int]($size * 0.32))
   $g.DrawString("klar!", $fontKlar, $white, $rectKlar, $sf)
 
   $g.Dispose()
