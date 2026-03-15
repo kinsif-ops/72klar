@@ -1029,12 +1029,13 @@
     </div>
     <button id="crisisManualBtn" onclick="activateCrisisMode()" style="display:none;width:100%;padding:12px;border-radius:12px;border:1px solid rgba(214,40,40,0.3);background:rgba(214,40,40,0.06);color:var(--red-text);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;margin-bottom:14px;transition:all 0.15s;">🔴 <span id="crisisManualLabel">Aktiver krisemodus</span></button>
 
-    <!-- SOCIAL SHARE SCORE -->
+    <!-- BEREDSKAPSPROFIL – DELBART BILDEKORT -->
     <div id="socialShareCard" style="display:none;background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:14px;text-align:center;">
-      <div id="shareStatusLabel" style="font-size:13px;color:var(--muted);margin-bottom:8px;">Del din beredskapsstatus</div>
-      <div id="socialShareText" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:12px;line-height:1.4;"></div>
-      <div style="display:flex;gap:8px;justify-content:center;">
-        <button onclick="shareScore()" style="background:linear-gradient(135deg,var(--red),var(--orange));border:none;color:white;border-radius:8px;padding:8px 16px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;" id="shareProgressBtn">↗️ Del fremgangen din</button>
+      <div id="shareStatusLabel" style="font-size:13px;color:var(--muted);margin-bottom:10px;">Del din beredskapsprofil</div>
+      <canvas id="profileCanvas" width="540" height="540" style="width:100%;max-width:270px;border-radius:12px;"></canvas>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;">
+        <button onclick="shareProfileCard()" style="background:linear-gradient(135deg,var(--red),var(--orange));border:none;color:white;border-radius:8px;padding:10px 18px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;" id="shareProgressBtn">↗️ Del profilen din</button>
+        <button onclick="downloadProfileCard()" style="background:rgba(255,255,255,0.08);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 14px;font-size:13px;cursor:pointer;">💾</button>
       </div>
     </div>
 
@@ -5688,28 +5689,246 @@ function fetchCommunityStats(kommuneName){
     });
 }
 
-// ── SOCIAL SHARE SCORE ──
+// ── BEREDSKAPSPROFIL – DELBART BILDEKORT ──
 function updateSocialShare(pct){
-  const card=document.getElementById('socialShareCard');
-  const txt=document.getElementById('socialShareText');
-  if(!card||!txt) return;
-  if(pct>=20){
-    card.style.display='block';
-    const emoji = pct>=100?'🥇':pct>=75?'🏅':pct>=50?'⭐':'🚀';
-    const en = currentLang==='en';
-    txt.textContent = en ? emoji+' I am '+pct+'% ready for 72 hours! Are you? 🛡️' : emoji+' Jeg er '+pct+'% klar for 72 timer! Er du? 🛡️';
+  var card = document.getElementById('socialShareCard');
+  if(!card) return;
+  if(pct >= 15){
+    card.style.display = 'block';
+    renderProfileCard();
+    var en = currentLang === 'en';
+    var lbl = document.getElementById('shareStatusLabel');
+    if(lbl) lbl.textContent = en ? 'Share your preparedness profile' : 'Del din beredskapsprofil';
+    var btn = document.getElementById('shareProgressBtn');
+    if(btn) btn.innerHTML = '↗️ ' + (en ? 'Share' : 'Del');
   } else {
-    card.style.display='none';
+    card.style.display = 'none';
   }
 }
-function shareScore(){
-  const txt=document.getElementById('socialShareText');
-  const shareText=(txt?txt.textContent+' ':'')+APP_URL;
-  if(navigator.share){
-    navigator.share({title:'72klar!',text:shareText,url:APP_URL}).catch(function(){});
-  } else if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(shareText).then(()=>showToastMsg(currentLang==='en'?'✓ Text copied – paste in social media!':'✓ Tekst kopiert – lim inn i sosiale medier!')).catch(function(){});
+
+function renderProfileCard(){
+  var canvas = document.getElementById('profileCanvas');
+  if(!canvas || !profile) return;
+  var ctx = canvas.getContext('2d');
+  var W = 540, H = 540;
+  canvas.width = W; canvas.height = H;
+  var en = currentLang === 'en';
+  var pct = getPctSafe();
+  var hours = quickSimHours(checkedItems);
+  var name = profile.name || (en ? 'Me' : 'Meg');
+  var kommune = getKommune(profile.postnr);
+  var kommuneName = kommune ? kommune.name : '';
+
+  // ── Background gradient ──
+  var bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, '#0A0A1A');
+  bg.addColorStop(0.5, '#111128');
+  bg.addColorStop(1, '#0A0F1E');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Subtle grid pattern
+  ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+  ctx.lineWidth = 1;
+  for(var gx = 0; gx < W; gx += 30){ ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke(); }
+  for(var gy = 0; gy < H; gy += 30){ ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke(); }
+
+  // Accent glow
+  var glow = ctx.createRadialGradient(W/2, 180, 0, W/2, 180, 200);
+  glow.addColorStop(0, hours >= 72 ? 'rgba(46,204,113,0.08)' : (hours >= 48 ? 'rgba(247,127,0,0.08)' : 'rgba(214,40,40,0.08)'));
+  glow.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
+
+  // ── Top: 72klar! logo ──
+  ctx.fillStyle = '#D62828';
+  ctx.font = 'bold 18px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('72klar!', 32, 42);
+
+  // Shield emoji approximation
+  ctx.font = '16px sans-serif';
+  ctx.fillText('🛡️', 108, 42);
+
+  // ── Name as challenge ──
+  ctx.fillStyle = '#F5F5FA';
+  ctx.font = 'bold 26px sans-serif';
+  ctx.textAlign = 'center';
+  var headline = hours >= 72
+    ? name + (en ? ' is 72klar! Are you?' : ' er 72klar! Er du?')
+    : hours >= 48
+      ? name + (en ? ' is almost 72klar! Are you?' : ' er straks 72klar! Er du?')
+      : name + (en ? ' is preparing. Are you?' : ' forbereder seg. Gjør du?');
+  ctx.fillText(headline, W/2, 95);
+
+  if(kommuneName){
+    ctx.fillStyle = '#A0A0B8';
+    ctx.font = '14px sans-serif';
+    ctx.fillText(kommuneName, W/2, 118);
   }
+
+  // ── Big hours circle ──
+  var cx = W/2, cy = 215, r = 72;
+  // Background ring
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.lineWidth = 8;
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  ctx.stroke();
+  // Progress ring
+  var progress = Math.min(hours / 72, 1);
+  var startAngle = -Math.PI / 2;
+  var endAngle = startAngle + progress * Math.PI * 2;
+  var ringGrad = ctx.createLinearGradient(cx - r, cy, cx + r, cy);
+  if(hours >= 72){ ringGrad.addColorStop(0, '#2ECC71'); ringGrad.addColorStop(1, '#27AE60'); }
+  else if(hours >= 48){ ringGrad.addColorStop(0, '#F77F00'); ringGrad.addColorStop(1, '#F59E0B'); }
+  else { ringGrad.addColorStop(0, '#D62828'); ringGrad.addColorStop(1, '#F77F00'); }
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, startAngle, endAngle);
+  ctx.lineWidth = 8;
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = ringGrad;
+  ctx.stroke();
+  // Hours number
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = 'bold 42px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(hours + 't', cx, cy + 12);
+  ctx.fillStyle = '#A0A0B8';
+  ctx.font = '13px sans-serif';
+  ctx.fillText(en ? 'of 72 hours' : 'av 72 timer', cx, cy + 34);
+
+  // ── Category bars ──
+  var cats = getCats(profile.persons, new Set(profile.needs), 'no');
+  var displayCats = getCats(profile.persons, new Set(profile.needs), currentLang);
+  var catData = [];
+  cats.forEach(function(cat, ci){
+    var total = cat.items.length;
+    var done = 0;
+    cat.items.forEach(function(item){
+      var key = cat.name + '::' + item.name;
+      if(checkedItems.includes(key)) done++;
+    });
+    var catPct = total > 0 ? Math.round(done / total * 100) : 0;
+    var dCat = displayCats[ci];
+    // Extract emoji from category name
+    var emoji = dCat.name.match(/^(\S+)/);
+    catData.push({ name: dCat.name.replace(/^(\S+)\s*/, ''), emoji: emoji ? emoji[1] : '', pct: catPct });
+  });
+
+  // Find strongest and weakest
+  var strongest = catData.reduce(function(a, b){ return a.pct >= b.pct ? a : b; });
+  var weakest = catData.reduce(function(a, b){ return a.pct <= b.pct ? a : b; });
+
+  // Draw top 6 category bars
+  var barY = 310;
+  var barH = 20;
+  var barGap = 28;
+  var maxBars = Math.min(catData.length, 6);
+  var barLeft = 40, barRight = W - 40;
+  var barWidth = barRight - barLeft;
+
+  for(var bi = 0; bi < maxBars; bi++){
+    var cd = catData[bi];
+    var by = barY + bi * barGap;
+    // Label
+    ctx.fillStyle = '#A0A0B8';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(cd.emoji + ' ' + cd.name, barLeft, by - 4);
+    // Pct
+    ctx.textAlign = 'right';
+    ctx.fillStyle = cd.pct >= 100 ? '#2ECC71' : (cd.pct >= 50 ? '#F77F00' : '#E84444');
+    ctx.font = 'bold 12px sans-serif';
+    ctx.fillText(cd.pct + '%', barRight, by - 4);
+    // Bar bg
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    roundRect(ctx, barLeft, by, barWidth, 6, 3);
+    ctx.fill();
+    // Bar fill
+    var fillW = Math.max(3, barWidth * cd.pct / 100);
+    var barGr = ctx.createLinearGradient(barLeft, 0, barLeft + fillW, 0);
+    if(cd.pct >= 100){ barGr.addColorStop(0, '#2ECC71'); barGr.addColorStop(1, '#27AE60'); }
+    else if(cd.pct >= 50){ barGr.addColorStop(0, '#F77F00'); barGr.addColorStop(1, '#F59E0B'); }
+    else { barGr.addColorStop(0, '#D62828'); barGr.addColorStop(1, '#F77F00'); }
+    ctx.fillStyle = barGr;
+    roundRect(ctx, barLeft, by, fillW, 6, 3);
+    ctx.fill();
+  }
+
+  // ── Bottom stats ──
+  var bottomY = barY + maxBars * barGap + 16;
+
+  // Strongest / weakest
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#2ECC71';
+  ctx.font = 'bold 13px sans-serif';
+  ctx.fillText((en ? '💪 Strongest: ' : '💪 Sterkest: ') + strongest.emoji + ' ' + strongest.name, W/2, bottomY);
+
+  ctx.fillStyle = '#E84444';
+  ctx.font = 'bold 13px sans-serif';
+  ctx.fillText((en ? '⚠️ Weakest: ' : '⚠️ Svakest: ') + weakest.emoji + ' ' + weakest.name, W/2, bottomY + 22);
+
+  // ── Footer ──
+  ctx.fillStyle = 'rgba(255,255,255,0.03)';
+  ctx.fillRect(0, H - 50, W, 50);
+
+  ctx.fillStyle = '#A0A0B8';
+  ctx.font = '12px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(en ? 'How many hours would you manage? → 72klar.no' : 'Hvor mange timer klarer du deg? → 72klar.no', W/2, H - 22);
+}
+
+// Canvas rounded rect helper
+function roundRect(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function shareProfileCard(){
+  var canvas = document.getElementById('profileCanvas');
+  if(!canvas) return;
+  var en = currentLang === 'en';
+  canvas.toBlob(function(blob){
+    if(!blob) return;
+    var file = new File([blob], '72klar-profil.png', {type:'image/png'});
+    if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+      navigator.share({
+        title: '72klar!',
+        text: en ? 'My preparedness profile – how many hours would you manage?' : 'Min beredskapsprofil – hvor mange timer klarer du deg?',
+        files: [file],
+        url: APP_URL
+      }).catch(function(){});
+    } else {
+      // Fallback: download + copy text
+      downloadProfileCard();
+      var text = en
+        ? 'My preparedness: ' + quickSimHours(checkedItems) + ' of 72 hours ⚡ How long would you last? 72klar.no'
+        : 'Min beredskap: ' + quickSimHours(checkedItems) + ' av 72 timer ⚡ Hvor lenge klarer du deg? 72klar.no';
+      if(navigator.clipboard) navigator.clipboard.writeText(text).then(function(){
+        showToastMsg(en ? '✓ Image saved + text copied!' : '✓ Bilde lagret + tekst kopiert!');
+      });
+    }
+  }, 'image/png');
+  localStorage.setItem('72t_shared','1'); checkBadges();
+}
+
+function downloadProfileCard(){
+  var canvas = document.getElementById('profileCanvas');
+  if(!canvas) return;
+  var link = document.createElement('a');
+  link.download = '72klar-profil.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
 }
 
 // ── FØRSTEHJELP ACCORDION ──
