@@ -10,14 +10,18 @@
 <meta name="apple-mobile-web-app-title" content="72klar!">
 <meta name="description" content="Bli klar til å klare deg selv i 72 timer ved strømstans, krise eller katastrofe. Gratis norsk beredskapsapp for hele familien.">
 <link rel="canonical" href="https://72klar.no/">
+<link rel="apple-touch-icon" href="./icon-192.png">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://72klar.no/">
 <meta property="og:title" content="72klar! – Norsk beredskapsapp">
 <meta property="og:description" content="Bli klar til å klare deg selv i 72 timer. Personlig sjekkliste, grab-bag guide og trygghetspunkter for din kommune.">
 <meta property="og:image" content="https://72klar.no/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="72klar! – Norsk beredskapsapp">
 <meta name="twitter:description" content="Bli klar til å klare deg selv i 72 timer. Gratis og uten reklame.">
+<meta name="twitter:image" content="https://72klar.no/og-image.png">
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -360,6 +364,18 @@
   .qr-copy-btn { width:100%; padding:12px; border-radius:10px; border:none; background:linear-gradient(135deg,var(--red),var(--orange)); color:white; font-family:'Syne',sans-serif; font-size: 15px; font-weight:700; cursor:pointer; }
 
   .copy-toast { position:fixed; bottom:100px; left:50%; transform:translateX(-50%) translateY(10px); background:var(--green); color:var(--dark); border-radius:10px; padding:10px 20px; font-family:'Syne',sans-serif; font-size: 15px; font-weight:700; z-index:600; opacity:0; transition:all 0.3s; pointer-events:none; white-space:nowrap; }
+
+  /* SW UPDATE BANNER */
+  #swUpdateBanner { display:none; position:fixed; top:0; left:0; right:0; z-index:9500; background:linear-gradient(135deg,#1C2033,#12121F); border-bottom:2px solid var(--orange); padding:10px 14px; align-items:center; gap:10px; max-width:480px; margin:0 auto; box-shadow:0 4px 24px rgba(0,0,0,0.5); }
+  #swUpdateBanner.show { display:flex; animation:swBannerIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both; }
+  @keyframes swBannerIn { from{transform:translateY(-100%);opacity:0} to{transform:translateY(0);opacity:1} }
+  .swub-msg { flex:1; font-size:14px; line-height:1.35; }
+  .swub-msg strong { display:block; font-family:'Syne',sans-serif; font-size:14px; font-weight:800; color:var(--text); }
+  .swub-msg span { font-size:12px; color:var(--muted); }
+  .swub-btn { padding:8px 14px; border-radius:8px; border:none; background:linear-gradient(135deg,var(--red),var(--orange)); color:#fff; font-family:'Syne',sans-serif; font-size:13px; font-weight:800; cursor:pointer; white-space:nowrap; flex-shrink:0; transition:opacity 0.15s; }
+  .swub-btn:hover { opacity:0.88; }
+  .swub-close { background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer; padding:4px 6px; flex-shrink:0; line-height:1; border-radius:6px; transition:color 0.15s; }
+  .swub-close:hover { color:var(--text); }
   #milestoneToast { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(0.7); background:linear-gradient(135deg,#1C1C28,#2A1F3D); border:1px solid rgba(247,127,0,0.4); border-radius:20px; padding:20px 28px; text-align:center; z-index:9999; opacity:0; pointer-events:none; transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1); }
   #milestoneToast.show { opacity:1; transform:translate(-50%,-50%) scale(1); }
   #milestoneToast .mt-emoji { font-size:48px; display:block; margin-bottom:8px; }
@@ -883,7 +899,7 @@
       </div>
       <div class="custom-number" id="customNumberRow" style="display:none">
         <label id="obPersonLabel">Antall personer</label>
-        <div class="num-controls"><button class="num-btn" onclick="changeNum(-1)">−</button><div class="num-val" id="numVal">6</div><button class="num-btn" onclick="changeNum(1)">+</button></div>
+        <div class="num-controls"><button class="num-btn" onclick="changeNum(-1)" aria-label="Reduser antall personer">−</button><div class="num-val" id="numVal" aria-live="polite" aria-atomic="true">6</div><button class="num-btn" onclick="changeNum(1)" aria-label="Øk antall personer">+</button></div>
       </div>
       <button class="ob-btn" id="obNext1" onclick="obNext(1)">Fortsett →</button>
     </div>
@@ -1789,6 +1805,17 @@
 
 <!-- COPY TOAST -->
 <div class="copy-toast" id="copyToast">✓ Lenke kopiert!</div>
+
+<!-- SW UPDATE BANNER -->
+<div id="swUpdateBanner" role="alert" aria-live="assertive" aria-atomic="true">
+  <span style="font-size:20px;flex-shrink:0;" aria-hidden="true">🔄</span>
+  <div class="swub-msg">
+    <strong id="swub-title">Ny versjon klar!</strong>
+    <span id="swub-sub">Oppdater for nye funksjoner og forbedringer</span>
+  </div>
+  <button class="swub-btn" id="swub-reload" onclick="window.location.reload(true)">Oppdater nå</button>
+  <button class="swub-close" id="swub-close" onclick="document.getElementById('swUpdateBanner').classList.remove('show')" aria-label="Lukk oppdateringsvarsel">✕</button>
+</div>
 
 <!-- QR MODAL -->
 <div class="qr-modal-overlay" id="qrModalOverlay">
@@ -4335,6 +4362,7 @@ function applyLang(skipRender){
     if(icon && label && parts.length >= 2){
       icon.textContent = parts[0];
       label.textContent = parts.slice(1).join(' ');
+      b.setAttribute('aria-label', parts.slice(1).join(' '));
     }
   });
 
@@ -7590,10 +7618,20 @@ if('serviceWorker' in navigator){
           const newWorker = reg.installing;
           newWorker.addEventListener('statechange', () => {
             if(newWorker.state === 'installed' && navigator.serviceWorker.controller){
-              // Ny versjon klar – vis melding
-              const t = document.getElementById('copyToast');
-              const swMsg = (localStorage.getItem('72t_lang')==='en') ? '🔄 New version available – reload!' : '🔄 Ny versjon tilgjengelig – last inn på nytt!';
-              if(t){ t.textContent = swMsg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 5000); }
+              // Ny versjon klar – vis persistent banner med oppdater-knapp
+              const en     = localStorage.getItem('72t_lang') === 'en';
+              const banner = document.getElementById('swUpdateBanner');
+              const title  = document.getElementById('swub-title');
+              const sub    = document.getElementById('swub-sub');
+              const reload = document.getElementById('swub-reload');
+              const close  = document.getElementById('swub-close');
+              if(banner){
+                if(title)  title.textContent  = en ? 'New version ready!'                      : 'Ny versjon klar!';
+                if(sub)    sub.textContent    = en ? 'Update for new features and improvements' : 'Oppdater for nye funksjoner og forbedringer';
+                if(reload) reload.textContent = en ? 'Update now'                               : 'Oppdater nå';
+                if(close)  close.setAttribute('aria-label', en ? 'Dismiss update notice' : 'Lukk oppdateringsvarsel');
+                banner.classList.add('show');
+              }
             }
           });
         });

@@ -1,9 +1,12 @@
 // 72timer – Service Worker
 // Oppdater CACHE_NAME når du publiserer ny versjon (f.eks. v2.1, v2.2...)
-const CACHE_NAME = '72timer-v4.7';
+const CACHE_NAME = '72timer-v4.9';
 const FILES_TO_CACHE = [
   './',
-  './index.html'
+  './index.html',
+  './icon-192.png',
+  './icon-512.png',
+  './og-image.png'
 ];
 
 // Fonts to cache for offline use
