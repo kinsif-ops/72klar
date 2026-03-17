@@ -1003,7 +1003,7 @@
 </button>
 
   <!-- MOTIVASJON -->
-  <div id="motivasjon" role="tabpanel" class="tab active">
+  <div id="motivasjon" role="tabpanel" class="tab">
     <div id="motivationContainer"><div class="mot-hero">
       <div class="mot-readiness-ring">
         <svg class="ring-svg" width="110" height="110" viewBox="0 0 110 110">
@@ -1134,13 +1134,23 @@
   </div></div>
 
   <!-- SJEKKLISTE -->
-  <div id="sjekkliste" role="tabpanel" class="tab">
+  <div id="sjekkliste" role="tabpanel" class="tab active">
     <div class="progress-card">
       <div class="progress-top"><div id="progressTitle" class="progress-title">Beredskapsstatus</div><div class="progress-pct" id="progressPct">0%</div></div>
       <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
       <div class="progress-label"><span id="progressSummary">0 av 0 punkter fullført</span></div>
       <div class="household-summary" id="householdSummary"></div>
       <div id="checklistLastUpdated" style="font-size:11px;color:var(--muted);margin-top:6px;text-align:right;"></div>
+    </div>
+    <div id="familySyncBanner" style="display:none;background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(59,130,246,0.1));border:1px solid rgba(139,92,246,0.4);border-radius:14px;padding:16px;margin-bottom:14px;cursor:pointer;transition:transform 0.15s;" onclick="openSyncModal('export')" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.98)'" ontouchend="this.style.transform=''">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:28px;">👨‍👩‍👧</span>
+        <div style="flex:1;">
+          <div id="familySyncBannerTitle" style="font-family:Syne,sans-serif;font-size:15px;font-weight:800;color:#8B5CF6;">Del med familien</div>
+          <div id="familySyncBannerSub" style="font-size:13px;color:var(--muted);margin-top:2px;">La familien se hvor langt dere har kommet sammen</div>
+        </div>
+        <div style="color:var(--muted);font-size:14px;flex-shrink:0;">▸</div>
+      </div>
     </div>
     <div id="expiryWarnings" style="display:none;margin-bottom:14px;"></div>
     <div id="notifNudge" style="display:none;"></div>
@@ -2044,12 +2054,12 @@ const BADGES = [
 // MOTIVATION MESSAGES
 function getMotMsg(p) {
   const en = currentLang === 'en';
-  if(p===0)  return en?{l:'Get started! 🚀',m:"You haven't started yet. The first step is the most important – just one item makes a difference!"}:{l:'Kom i gang! 🚀',m:'Du har ikke startet ennå. Første steg er det viktigste – bare ett punkt gjør en forskjell!'};
-  if(p<10)   return en?{l:'Good start! 💪',m:'You have taken the first steps. That is more than most people do. Keep going!'}:{l:'Godt begynt! 💪',m:'Du har tatt de første skrittene. Det er mer enn de fleste gjør. Fortsett!'};
-  if(p<25)   return en?{l:'On the right track! 🌱',m:p+'% is a solid foundation. A little more and you are better prepared than most.'}:{l:'På rett vei! 🌱',m:p+'% er et godt fundament. Litt mer, og du er bedre forberedt enn de fleste nordmenn.'};
-  if(p<50)   return en?{l:'Getting there! ⚡',m:"You are making progress! Halfway means you can manage through a crisis."}:{l:'Du nærmer deg! ⚡',m:'Du er i gang og det merkes! Halvveis betyr at du kan klare deg gjennom en krise.'};
-  if(p<75)   return en?{l:'Impressive! 🔥',m:'Over halfway done – you are among the best prepared. Do not stop now!'}:{l:'Imponerende! 🔥',m:'Over halvparten er klart – du er blant de best forberedte i landet. Ikke stopp nå!'};
-  if(p<90)   return en?{l:'Almost there! 🦾',m:'The last items are often the easiest. Finish the list!'}:{l:'Nesten i mål! 🦾',m:'De siste punktene er ofte de enkleste. Fullfør lista!'};
+  if(p===0)  return en?{l:'Get started! 🚀',m:"Start with ONE task – takes 5 minutes. You'll jump from 0% to 2% ready immediately!"}:{l:'Kom i gang! 🚀',m:'Start med ÉN oppgave – tar 5 minutter. Du hopper fra 0% til 2% klar med en gang!'};
+  if(p<10)   return en?{l:'Good start! 💪',m:'You have taken the first steps. That is more than 90% of people. Keep going!'}:{l:'Godt begynt! 💪',m:'Du har tatt de første skrittene. Du er allerede bedre enn 9 av 10 nordmenn. Fortsett!'};
+  if(p<25)   return en?{l:'On the right track! 🌱',m:p+'% done – every item gets you closer. You are building momentum!'}:{l:'På rett vei! 🌱',m:p+'% ferdig – hvert punkt bringer deg nærmere. Du bygger momentum!'};
+  if(p<50)   return en?{l:'Getting there! ⚡',m:"You are making real progress! At 50% you can actually survive a crisis."}:{l:'Du nærmer deg! ⚡',m:'Du gjør ekte fremgang! Ved 50% kan du faktisk klare deg i en krise.'};
+  if(p<75)   return en?{l:'Impressive! 🔥',m:'Over 50% done – you are in the top 15% of all Norwegians. Almost there!'}:{l:'Imponerende! 🔥',m:'Over 50% ferdig – du er blant topp 15% av alle nordmenn. Nesten i mål!'};
+  if(p<90)   return en?{l:'Almost there! 🦾',m:'The last items are the easiest. Finish strong!'}:{l:'Nesten i mål! 🦾',m:'De siste punktene er de enkleste. Fullfør sterkt!'};
   if(p<100)  return en?{l:'Final push! 🏁',m:'Incredible work! Just a few items left. You are almost 100% ready!'}:{l:'Siste innspurt! 🏁',m:'Utrolig jobba! Bare noen få punkter gjenstår. Du er snart 100% klar!'};
   return en?{l:'🛡️ Fully prepared!',m:'You are among the best prepared in Norway. Share the app with friends and family – they need it too!'}:{l:'🛡️ Fullt beredt!',m:'Du er blant de best forberedte i Norge. Del appen med venner og familie – de trenger den også!'};
 }
@@ -3711,6 +3721,19 @@ function renderChecklist(){
   if(fill) fill.style.width = pct+'%';
   if(pctEl) pctEl.textContent = pct+'%';
   if(summary) summary.textContent = currentLang==='en' ? done+' of '+total+' items completed' : done+' av '+total+' punkter fullført';
+
+  // Show Family Sync banner if household has ≥2 people and ≥25% done
+  var syncBanner = document.getElementById('familySyncBanner');
+  if(syncBanner && profile && profile.persons >= 2 && pct >= 25){
+    syncBanner.style.display = 'block';
+    // Update text based on language
+    var en = currentLang === 'en';
+    document.getElementById('familySyncBannerTitle').textContent = en ? 'Share with family' : 'Del med familien';
+    document.getElementById('familySyncBannerSub').textContent = en ? 'Let your family see your progress together' : 'La familien se hvor langt dere har kommet sammen';
+  } else if(syncBanner){
+    syncBanner.style.display = 'none';
+  }
+
   updateChecklistDate();
   // App icon badge (PWA – viser % på ikonet)
   if('setAppBadge' in navigator){
