@@ -4597,8 +4597,6 @@ function setRating(n){
     if(s) s.classList.toggle('active', i<=n);
   }
 }
-// Configure this URL to receive feedback (e.g. Google Forms, Cloudflare Worker, etc.)
-var FEEDBACK_WEBHOOK_URL = ''; // Set to your webhook endpoint, e.g. 'https://your-worker.workers.dev/feedback'
 
 function submitFeedback(){
   const txt = document.getElementById('fbText').value.trim();
