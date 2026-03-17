@@ -2045,7 +2045,6 @@ const BADGES = [
   {id:'warmth',  e:'🏠',n:'Varme & Hygiene klar',d:'Alle varme- og hygiene-punkter på plass',pct:25,chk:(_,_2,items)=>{var cats=getCats(profile.persons, new Set(profile.needs), 'no');var wc=cats.find(c=>c.name.includes('Varme'));return wc?wc.items.every(it=>items.includes(wc.name+'::'+it.name)):false;}},
   {id:'docs',    e:'📄',n:'Dokumenter klar',d:'Alle dokumenter og ID på plass',    pct:22,chk:(_,_2,items)=>{var cats=getCats(profile.persons, new Set(profile.needs), 'no');var dc=cats.find(c=>c.name.includes('Dokumenter'));return dc?dc.items.every(it=>items.includes(dc.name+'::'+it.name)):false;}},
   {id:'contacts',e:'📞',n:'Kontaktliste',   d:'La til en nødkontakt',              pct:44,chk:(_,c)=>c>=1},
-  {id:'weekly',  e:'📅',n:'Ukessjekk',      d:'Fullførte ukentlig sjekk',          pct:27,chk:()=>!!localStorage.getItem('72t_weekly_done')},
   {id:'ambassador',e:'📣',n:'Ambassadør',   d:'Delte appen med andre',             pct:31,chk:()=>!!localStorage.getItem('72t_shared')},
   {id:'week7',     e:'🗓️',n:'7-dagershelten',d:'Aksepterte 7-dagers utfordringen',  pct:8, chk:()=>!!localStorage.getItem('72t_7day')&&JSON.parse(localStorage.getItem('72t_7day')||'{}').accepted},
   {id:'expiry',    e:'🔔',n:'Holdbarhetsvokter',d:'Registrerte utløpsdato på 3+ produkter', pct:15, chk:()=>Object.keys(JSON.parse(localStorage.getItem('72t_expiry')||'{}')).length>=3},
@@ -2586,7 +2585,7 @@ function startApp(){
   document.getElementById('headerSub').textContent=_saEn?'Hi, '+p.name+'! Ready for 72 hours.':'Hei, '+p.name+'! Klar for 72 timer.';
   const nl=[];if(needs.has('baby'))nl.push(_saEn?'baby':'baby');if(needs.has('eldre'))nl.push(_saEn?'elderly':'eldre');if(needs.has('hund'))nl.push(_saEn?'pet':'kjæledyr');if(needs.has('medisin'))nl.push(_saEn?'medication':'medisiner');
   document.getElementById('householdSummary').textContent='📊 '+n+(_saEn?' person'+( n>1?'s':''):' person'+(n>1?'er':''))+' · '+Math.round(n*9)+(_saEn?' L water':' L vann')+' · '+n*3+(_saEn?' portions/day':' porsjoner/dag')+(nl.length?' · '+nl.join(', '):'');
-  renderDailyTip(); renderChecklist(); fetchFarevarsel(); showNewFeaturesBanner(); recordActivity(); renderContacts(); renderMotivation(); renderWeeklyFocus(); renderExpiryWarnings(); renderNotifNudge(); updateSimCard(); updateCrisisUI(); renderCommunityCard(); checkExpiryNotifications(); checkInactivityReminder(); show7DayBanner(); renderTrygghetspunkter(); showWelcomeBack(); initMilestoneTracker(); initBatteryMonitor();
+  renderDailyTip(); renderChecklist(); fetchFarevarsel(); showNewFeaturesBanner(); recordActivity(); renderContacts(); renderMotivation(); renderExpiryWarnings(); renderNotifNudge(); updateSimCard(); updateCrisisUI(); renderCommunityCard(); checkExpiryNotifications(); checkInactivityReminder(); show7DayBanner(); renderTrygghetspunkter(); showWelcomeBack(); initMilestoneTracker(); initBatteryMonitor();
 }
 function _goToOnboarding(){
   document.getElementById('app').style.display='none';
@@ -2615,7 +2614,7 @@ function resetProfile(){
 }
 function resetAll(){
   if(!confirm(currentLang==='en'?'Start completely over?\nThis deletes ALL data:\n• Household profile\n• All checkmarks\n• Expiry dates\n• Contacts\n• Badges\n\nUse this to show the app to someone new.':'Start helt på nytt?\nDette sletter ALLE data:\n• Husstandsprofil\n• Alle avkrysninger\n• Holdbarhetsdatoer\n• Kontakter\n• Merker\n\nBruk dette for å vise appen til noen nye.'))return;
-  ['72t_profile','72t_checked','72t_contacts','72t_badges','72t_weekly_done',
+  ['72t_profile','72t_checked','72t_contacts','72t_badges',
        '72t_7day','72t_7day_shown','72t_shared','72t_last_activity','72t_features_seen',
        '72t_last_visit','72t_last_check','72t_pwa_dismissed','72t_expiry','72t_splash_seen',
        '72t_expiry_tip_shown',
@@ -2648,18 +2647,6 @@ function renderDailyTip(){
 
 // WEEKLY REMINDER
 function renderWeeklyReminder(){
-  const box=document.getElementById('weeklyReminderBox');
-  if(!box) return;
-  const last=localStorage.getItem('72t_weekly_done');
-  const weekAgo=Date.now()-7*24*60*60*1000;
-  const en=currentLang==='en';
-  if(last&&parseInt(last)>weekAgo){
-    box.innerHTML='<div class="wr-icon">✅</div><div class="wr-body"><strong style="color:var(--green)">'+(en?'Weekly check done!':'Ukessjekk fullført!')+'</strong><span>'+(en?'Great job! Come back in a week for the next check.':'Bra jobba! Kom tilbake om en uke for neste sjekk.')+'</span></div>';
-  } else {
-    box.innerHTML='<div class="wr-icon">📅</div><div class="wr-body"><strong>'+(en?'Weekly check':'Ukentlig sjekk')+'</strong><span>'+(en?'Check that food and water are within expiry date, and that your powerbank is charged!':'Sjekk at mat og vann er innen holdbarhetsdato, og at powerbanken er ladet!')+'</span><br><button class="wr-done-btn" onclick="markWeeklyDone()">✓ '+(en?'Done for this week':'Gjort for denne uken')+'</button></div>';
-  }
-}
-function markWeeklyDone(){localStorage.setItem('72t_weekly_done',Date.now().toString());checkBadges();}
 
 // MOTIVATION
 // Safe version that doesn't crash if profile isn't ready yet
@@ -2761,7 +2748,7 @@ function checkBadges(){
   try { pct=getPct(); } catch(e){ return; }
 
   // Badges that are one-time achievements (not revocable)
-  var permanentBadges = {weekly:1, ambassador:1, week7:1};
+  var permanentBadges = {ambassador:1, week7:1};
 
   // Check for newly earned badges
   const newOnes=[];
@@ -3069,89 +3056,6 @@ function getWeeklyFocus(){
   });
   return best;
 }
-function renderWeeklyFocus(){
-  var container=document.getElementById('weeklyFocusCard');
-  if(!container) return;
-  var focus=getWeeklyFocus();
-  var en=currentLang==='en';
-  if(!focus){ container.style.display='none'; return; }
-  container.style.display='block';
-
-  // Finn kjøpsinfo
-  var pInfo = null;
-  var noName = focus.noName || '';
-  Object.keys(PURCHASE_INFO).forEach(function(k){
-    if(!pInfo && noName.toLowerCase().indexOf(k.toLowerCase()) !== -1) pInfo = PURCHASE_INFO[k];
-  });
-
-  // Beregn sim-effekt
-  var simDelta = _calcSimImpact(focus.key);
-
-  var html = '';
-  // Header
-  html += '<div style="display:flex;align-items:center;gap:4px;margin-bottom:12px;">'
-    +'<span style="font-size:14px;">🎯</span>'
-    +'<span style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:1px;">'
-    +(en?'This week\'s task':'Denne ukens oppgave')+'</span></div>';
-
-  // Item name + emoji
-  html += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">'
-    +'<span style="font-size:36px;">'+esc(focus.emoji)+'</span>'
-    +'<div style="flex:1;">'
-    +'<div style="font-family:Syne,sans-serif;font-size:18px;font-weight:800;">'+esc(focus.name)+'</div>'
-    +(focus.qty?'<div style="font-size:13px;color:var(--orange);font-weight:600;margin-top:2px;">'+esc(focus.qty)+'</div>':'')
-    +'</div></div>';
-
-  // Purchase info cards
-  if(pInfo){
-    html += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">';
-
-    // Price + store
-    if(pInfo.price && pInfo.price !== '—' && pInfo.price !== '0'){
-      html += '<div style="display:flex;gap:8px;">';
-      html += '<div style="flex:1;background:rgba(247,127,0,0.08);border:1px solid rgba(247,127,0,0.2);border-radius:10px;padding:10px 12px;text-align:center;">'
-        +'<div style="font-family:Syne,sans-serif;font-size:16px;font-weight:800;color:var(--orange);">'+pInfo.price+' kr</div>'
-        +'<div style="font-size:11px;color:var(--muted);margin-top:2px;">'+(en?'approx. price':'ca. pris')+'</div></div>';
-      html += '<div style="flex:1;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:10px 12px;text-align:center;">'
-        +'<div style="font-family:Syne,sans-serif;font-size:14px;font-weight:700;color:var(--blue);">🏪 '+(en?pInfo.store.en:pInfo.store.no)+'</div>'
-        +'<div style="font-size:11px;color:var(--muted);margin-top:2px;">'+(en?'where to buy':'hvor du får det')+'</div></div>';
-      html += '</div>';
-    } else if(pInfo.price === '0' || pInfo.price === '—'){
-      html += '<div style="background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.2);border-radius:10px;padding:10px 12px;text-align:center;">'
-        +'<div style="font-size:13px;color:var(--green);font-weight:600;">✓ '+(en?pInfo.store.en:pInfo.store.no)
-        +(pInfo.price==='0'?' – '+(en?'free':'gratis'):'')+'</div></div>';
-    }
-
-    // Practical tip
-    var tip = en ? pInfo.tip.en : pInfo.tip.no;
-    if(tip){
-      html += '<div style="font-size:13px;color:var(--muted);line-height:1.5;padding:0 2px;">'
-        +'💡 '+tip+'</div>';
-    }
-
-    html += '</div>';
-  }
-
-  // Sim impact
-  if(simDelta > 0){
-    html += '<div style="background:linear-gradient(135deg,rgba(214,40,40,0.1),rgba(247,127,0,0.06));border:1px solid rgba(214,40,40,0.25);border-radius:10px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">'
-      +'<span style="font-size:20px;">⚡</span>'
-      +'<div style="flex:1;font-size:13px;color:var(--text);line-height:1.4;">'
-      +(en?'Adds <strong style="color:var(--orange);">+'+simDelta+' hours</strong> to your crisis simulation'
-         :'Gir <strong style="color:var(--orange);">+'+simDelta+' timer</strong> i krisesimulatoren')
-      +'</div></div>';
-  }
-
-  // Action button
-  html += '<button onclick="toggleItem(\''+focus.key.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\',true);renderWeeklyFocus();renderMotivation();" '
-    +'style="width:100%;padding:13px;border-radius:12px;border:none;'
-    +'background:linear-gradient(135deg,var(--green),#27AE60);color:white;'
-    +'font-family:Syne,sans-serif;font-size:15px;font-weight:700;cursor:pointer;">'
-    +'✅ '+(en?'Done – I have this!':'Gjort – dette har jeg!')+'</button>';
-
-  container.innerHTML = html;
-}
-
 // ── FUNKSJON 2: FAREVARSEL KOBLET TIL MANGLER ─────────
 function getMissingForWeather(weatherTypes){
   if(!profile||!weatherTypes.length) return [];
@@ -3823,7 +3727,6 @@ function toggleItem(id, _skipAutoOpen){
     renderChecklist();checkBadges();
   }
   // Oppdater motivasjon-kort etter toggle
-  renderWeeklyFocus();
   renderExpiryWarnings();
   renderNotifNudge();
   updateSimCard();
@@ -4238,12 +4141,12 @@ const TRANSLATIONS = {
   },
   // Badges
   badgeNames: {
-    no: ['Første skritt','25% klar','Halvveis!','75% klar','100% klar!','Vanntanken','Matlageret','Helseklar','Strømklar','Grab-bag klar','Varme & Hygiene klar','Dokumenter klar','Kontaktliste','Ukessjekk','Ambassadør','7-dagershelten','Holdbarhetsvokter'],
-    en: ['First step','25% ready','Halfway!','75% ready','100% ready!','Water tank','Food supply','Health ready','Power ready','Grab-bag ready','Warmth & Hygiene ready','Documents ready','Contact list','Weekly check','Ambassador','7-Day Hero','Expiry tracker'],
+    no: ['Første skritt','25% klar','Halvveis!','75% klar','100% klar!','Vanntanken','Matlageret','Helseklar','Strømklar','Grab-bag klar','Varme & Hygiene klar','Dokumenter klar','Kontaktliste','Ambassadør','7-dagershelten','Holdbarhetsvokter'],
+    en: ['First step','25% ready','Halfway!','75% ready','100% ready!','Water tank','Food supply','Health ready','Power ready','Grab-bag ready','Warmth & Hygiene ready','Documents ready','Contact list','Ambassador','7-Day Hero','Expiry tracker'],
   },
   badgeDescs: {
-    no: ['Hukket av første punkt','En kvarting av lista på plass','50% av lista klargjort','Nesten i mål!','Fullt beredt for 72 timer','Alle vann-punkter huket av','Hermetikk og tørrmat klargjort','Alle helse-punkter på plass','Lys og energi-punkter på plass','Beredskapssekken er pakket!','Alle varme- og hygiene-punkter på plass','Alle dokumenter og ID på plass','La til en nødkontakt','Fullførte ukentlig sjekk','Delte appen med andre','Aksepterte 7-dagers utfordringen','Registrerte utløpsdato på 3+ produkter'],
-    en: ['Checked off your first item','A quarter of the list done','50% of the list completed','Almost there!','Fully prepared for 72 hours','All water items checked off','Canned goods and dry food ready','All health items in place','Light and energy items ready','Emergency bag packed!','All warmth and hygiene items in place','All important documents ready','Added an emergency contact','Completed weekly check','Shared the app with others','Accepted the 7-day challenge','Registered expiry date on 3+ products'],
+    no: ['Hukket av første punkt','En kvarting av lista på plass','50% av lista klargjort','Nesten i mål!','Fullt beredt for 72 timer','Alle vann-punkter huket av','Hermetikk og tørrmat klargjort','Alle helse-punkter på plass','Lys og energi-punkter på plass','Beredskapssekken er pakket!','Alle varme- og hygiene-punkter på plass','Alle dokumenter og ID på plass','La til en nødkontakt','Delte appen med andre','Aksepterte 7-dagers utfordringen','Registrerte utløpsdato på 3+ produkter'],
+    en: ['Checked off your first item','A quarter of the list done','50% of the list completed','Almost there!','Fully prepared for 72 hours','All water items checked off','Canned goods and dry food ready','All health items in place','Light and energy items ready','Emergency bag packed!','All warmth and hygiene items in place','All important documents ready','Added an emergency contact','Shared the app with others','Accepted the 7-day challenge','Registered expiry date on 3+ products'],
   },
   // Share card
   shareTitle: { no: 'Del 72klar! med andre', en: 'Share 72klar! with others' },
@@ -4674,7 +4577,6 @@ function applyLang(skipRender){
     renderChecklist();
     renderDailyTip();
     renderMotivation();
-    renderWeeklyFocus();
     renderExpiryWarnings();
     renderNotifNudge();
     updateSimCard();
