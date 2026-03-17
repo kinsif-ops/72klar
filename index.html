@@ -1656,8 +1656,6 @@
         <div class="share-card-sub">Hjelp venner, familie og naboer å bli bedre forberedt!</div>
         <div class="share-btns">
           <button id="shareScoreBtn" class="share-btn" style="background:linear-gradient(135deg,rgba(214,40,40,0.2),rgba(247,127,0,0.2));border:1px solid rgba(247,127,0,0.5);color:var(--orange);font-size:14px;" onclick="openShareScore()">🏆 Del mitt resultat</button>
-          <button id="shareCopyBtn" class="share-btn share-btn-copy" onclick="copyLink()">🔗 Kopier lenke</button>
-          <button class="share-btn share-btn-native" id="nativeShareBtn" onclick="nativeShare()" style="display:none">↗️ Del via telefon</button>
           <button id="shareNeighbourBtn" class="share-btn" style="background:rgba(46,204,113,0.12);border:1px solid rgba(46,204,113,0.35);color:var(--green);" onclick="sendNeighbourAlert()">🏘️ Send nabovarsel</button>
           <button id="shareMuniBtn" class="share-btn" style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.35);color:var(--blue);" onclick="recommendToMunicipality()">🏛️ Anbefal til kommunen</button>
         </div>
@@ -4678,19 +4676,33 @@ var FEEDBACK_WEBHOOK_URL = ''; // Set to your webhook endpoint, e.g. 'https://yo
 function submitFeedback(){
   const txt = document.getElementById('fbText').value.trim();
   if(!fbRating){ alert(currentLang==='en'?'Please select a star rating first':'Velg antall stjerner først'); return; }
-  const fb = { rating: fbRating, comment: txt, date: new Date().toLocaleDateString(currentLang==='en'?'en-GB':'no-NO'), version: 'v2.4', lang: currentLang, persons: profile ? profile.persons : 0, pct: profile ? getPct() : 0 };
+  const en = currentLang === 'en';
+  const fb = { rating: fbRating, comment: txt, date: new Date().toLocaleDateString(en?'en-GB':'no-NO'), version: 'v2.4', lang: currentLang, persons: profile ? profile.persons : 0, pct: profile ? getPct() : 0 };
   const all = JSON.parse(localStorage.getItem('72t_feedback') || '[]');
   all.push(fb);
   localStorage.setItem('72t_feedback', JSON.stringify(all));
-  // Send to webhook if configured
-  if(FEEDBACK_WEBHOOK_URL && navigator.sendBeacon){
-    try { navigator.sendBeacon(FEEDBACK_WEBHOOK_URL, JSON.stringify(fb)); } catch(e){}
-  }
+
+  // Open mailto with feedback
+  const stars = '⭐'.repeat(fbRating);
+  const mailBody = encodeURIComponent(
+    (en ? 'Rating: ' : 'Vurdering: ') + stars + ' (' + fbRating + '/5)\n' +
+    (en ? 'Comment: ' : 'Kommentar: ') + (txt || (en ? '(none)' : '(ingen)')) + '\n\n' +
+    '---\n' +
+    (en ? 'Date: ' : 'Dato: ') + new Date().toLocaleDateString(en?'en-GB':'no-NO') + '\n' +
+    'Version: v2.4\n' +
+    (en ? 'Language: ' : 'Språk: ') + (en ? 'English' : 'Norsk') + '\n' +
+    (en ? 'Household size: ' : 'Husstandsstørrelse: ') + (profile ? profile.persons : '?') + '\n' +
+    (en ? 'Preparedness: ' : 'Beredskapsnivå: ') + (profile ? getPct() : '?') + '%'
+  );
+  const subject = encodeURIComponent(en ? '72klar! Feedback' : '72klar! Tilbakemelding');
+  window.location.href = 'mailto:kontakt@72klar.no?subject=' + subject + '&body=' + mailBody;
+
+  // Reset form
   document.getElementById('fbText').value = '';
   fbRating = 0;
   for(let i=1;i<=5;i++){ const s=document.getElementById('star'+i); if(s) s.classList.remove('active'); }
   const thanks = document.getElementById('fbThanks');
-  if(thanks){ thanks.textContent = currentLang==='en' ? '✓ Thank you! Feedback saved.' : '✓ Takk! Tilbakemeldingen er lagret.'; thanks.style.display='block'; setTimeout(()=>thanks.style.display='none', 3000); }
+  if(thanks){ thanks.textContent = en ? '✓ Thank you! Your email client will open.' : '✓ Takk! E-postklienten åpnes nå.'; thanks.style.display='block'; setTimeout(()=>thanks.style.display='none', 3000); }
 }
 
 
