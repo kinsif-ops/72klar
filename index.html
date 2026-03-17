@@ -6093,17 +6093,11 @@ function generateSyncCode(){
   // Show code
   var display = document.getElementById('syncCodeDisplay');
   if(display) display.textContent = _syncCode;
-  // Draw QR as URL so scanning opens the app directly with import dialog
+  // Draw QR from sync code (short, always fits in low QR version)
   var qrCanvas = document.getElementById('syncQrCanvas');
   if(qrCanvas){
-    var syncB64 = _syncCode.substring(4); // strip '72K-' prefix
-    var syncUrl = APP_URL + '#sync=' + encodeURIComponent(syncB64);
-    if(syncUrl.length < 2000){
-      qrCanvas.style.display = 'block';
-      drawSyncQR(syncUrl);
-    } else {
-      qrCanvas.style.display = 'none';
-    }
+    qrCanvas.style.display = 'block';
+    drawSyncQR(_syncCode);
   }
 }
 function drawSyncQR(text){
