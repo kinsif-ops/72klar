@@ -2032,6 +2032,8 @@ const BADGES = [
   {id:'health',  e:'💊',n:'Helseklar',      d:'Alle helse-punkter på plass',      pct:29,chk:(_,_2,items)=>{var cats=getCats(profile.persons, new Set(profile.needs), 'no');var hc=cats.find(c=>c.name.includes('Helse'));return hc?hc.items.every(it=>items.includes(hc.name+'::'+it.name)):false;}},
   {id:'power',   e:'🔋',n:'Strømklar',      d:'Lys og energi-punkter på plass',   pct:33,chk:(_,_2,items)=>{var cats=getCats(profile.persons, new Set(profile.needs), 'no');var pc=cats.find(c=>c.name.includes('Lys'));return pc?pc.items.every(it=>items.includes(pc.name+'::'+it.name)):false;}},
   {id:'grabBag', e:'🎒',n:'Grab-bag klar',  d:'Beredskapssekken er pakket!',      pct:18,chk:(_,_2,items)=>{var cats=getCats(profile.persons, new Set(profile.needs), 'no');var gc=cats.find(c=>c.name.includes('Grab'));return gc?gc.items.every(it=>items.includes(gc.name+'::'+it.name)):false;}},
+  {id:'warmth',  e:'🏠',n:'Varme & Hygiene klar',d:'Alle varme- og hygiene-punkter på plass',pct:25,chk:(_,_2,items)=>{var cats=getCats(profile.persons, new Set(profile.needs), 'no');var wc=cats.find(c=>c.name.includes('Varme'));return wc?wc.items.every(it=>items.includes(wc.name+'::'+it.name)):false;}},
+  {id:'docs',    e:'📄',n:'Dokumenter klar',d:'Alle dokumenter og ID på plass',    pct:22,chk:(_,_2,items)=>{var cats=getCats(profile.persons, new Set(profile.needs), 'no');var dc=cats.find(c=>c.name.includes('Dokumenter'));return dc?dc.items.every(it=>items.includes(dc.name+'::'+it.name)):false;}},
   {id:'contacts',e:'📞',n:'Kontaktliste',   d:'La til en nødkontakt',              pct:44,chk:(_,c)=>c>=1},
   {id:'weekly',  e:'📅',n:'Ukessjekk',      d:'Fullførte ukentlig sjekk',          pct:27,chk:()=>!!localStorage.getItem('72t_weekly_done')},
   {id:'ambassador',e:'📣',n:'Ambassadør',   d:'Delte appen med andre',             pct:31,chk:()=>!!localStorage.getItem('72t_shared')},
@@ -4213,12 +4215,12 @@ const TRANSLATIONS = {
   },
   // Badges
   badgeNames: {
-    no: ['Første skritt','25% klar','Halvveis!','75% klar','100% klar!','Vanntanken','Matlageret','Helseklar','Strømklar','Grab-bag klar','Kontaktliste','Ukessjekk','Ambassadør','7-dagershelten','Holdbarhetsvokter'],
-    en: ['First step','25% ready','Halfway!','75% ready','100% ready!','Water tank','Food supply','Health ready','Power ready','Grab-bag ready','Contact list','Weekly check','Ambassador','7-Day Hero','Expiry tracker'],
+    no: ['Første skritt','25% klar','Halvveis!','75% klar','100% klar!','Vanntanken','Matlageret','Helseklar','Strømklar','Grab-bag klar','Varme & Hygiene klar','Dokumenter klar','Kontaktliste','Ukessjekk','Ambassadør','7-dagershelten','Holdbarhetsvokter'],
+    en: ['First step','25% ready','Halfway!','75% ready','100% ready!','Water tank','Food supply','Health ready','Power ready','Grab-bag ready','Warmth & Hygiene ready','Documents ready','Contact list','Weekly check','Ambassador','7-Day Hero','Expiry tracker'],
   },
   badgeDescs: {
-    no: ['Hukket av første punkt','En kvarting av lista på plass','50% av lista klargjort','Nesten i mål!','Fullt beredt for 72 timer','Alle vann-punkter huket av','Hermetikk og tørrmat klargjort','Alle helse-punkter på plass','Lys og energi-punkter på plass','Beredskapssekken er pakket!','La til en nødkontakt','Fullførte ukentlig sjekk','Delte appen med andre','Aksepterte 7-dagers utfordringen','Registrerte utløpsdato på 3+ produkter'],
-    en: ['Checked off your first item','A quarter of the list done','50% of the list completed','Almost there!','Fully prepared for 72 hours','All water items checked off','Canned goods and dry food ready','All health items in place','Light and energy items ready','Emergency bag packed!','Added an emergency contact','Completed weekly check','Shared the app with others','Accepted the 7-day challenge','Registered expiry date on 3+ products'],
+    no: ['Hukket av første punkt','En kvarting av lista på plass','50% av lista klargjort','Nesten i mål!','Fullt beredt for 72 timer','Alle vann-punkter huket av','Hermetikk og tørrmat klargjort','Alle helse-punkter på plass','Lys og energi-punkter på plass','Beredskapssekken er pakket!','Alle varme- og hygiene-punkter på plass','Alle dokumenter og ID på plass','La til en nødkontakt','Fullførte ukentlig sjekk','Delte appen med andre','Aksepterte 7-dagers utfordringen','Registrerte utløpsdato på 3+ produkter'],
+    en: ['Checked off your first item','A quarter of the list done','50% of the list completed','Almost there!','Fully prepared for 72 hours','All water items checked off','Canned goods and dry food ready','All health items in place','Light and energy items ready','Emergency bag packed!','All warmth and hygiene items in place','All important documents ready','Added an emergency contact','Completed weekly check','Shared the app with others','Accepted the 7-day challenge','Registered expiry date on 3+ products'],
   },
   // Share card
   shareTitle: { no: 'Del 72klar! med andre', en: 'Share 72klar! with others' },
