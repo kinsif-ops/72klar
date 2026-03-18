@@ -5495,22 +5495,20 @@ function renderTrygghetspunkter(){
     h += '</div>';
   } else if(postnr && postnr.length >= 4){
     const kommuneName = kommuneForPostnr(postnr.trim().padStart(4,'0'));
-    if(!kommuneName){
-      // Unknown municipality – show modal
+    // Show modal for ANY kommune without trygghetspunkter (unknown OR no points registered)
+    if(!kommuneName || !TRYGGHETSPUNKTER[kommuneName] || TRYGGHETSPUNKTER[kommuneName].length === 0){
+      const displayName = kommuneName || 'Unknown';
       h += '<div style="background:rgba(247,127,0,0.08);border:1px solid rgba(247,127,0,0.2);border-radius:12px;padding:14px 16px;margin-bottom:8px;">';
-      h += '<div style="font-size:13px;color:var(--orange);">'+(en?'⚠️ Unknown postal code – please check and try again.':'⚠️ Ukjent postnummer – sjekk at du har tastet riktig (4 siffer).')+'</div>';
+      h += '<div style="font-size:13px;color:var(--orange);">'+(en?'⚠️ No safety points registered for this municipality yet.':'⚠️ Ingen trygghetspunkter registrert for denne kommunen ennå.')+'</div>';
       h += '</div>';
       // Queue modal to show after render completes
-      setTimeout(()=>showMissingKommuneModal('Unknown', postnr), 100);
+      setTimeout(()=>showMissingKommuneModal(displayName, postnr), 100);
     } else {
-      // Known municipality but no safety points registered
+      // This won't happen in current setup, but kept for safety
       h += '<div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:12px;padding:14px 16px;margin-bottom:8px;">';
       h += '<div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--blue);margin-bottom:6px;">📍 '+(en?'Postal code ':'Postnummer ')+esc(postnr)+'</div>';
-      h += '<div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:10px;">'+(en?'We have not added safety points for your municipality yet. Find them via DSB or your municipality\'s website:':'Vi har ikke lagt inn trygghetspunkter for din kommune ennå. Finn dem via DSB eller kommunens nettside:')+'</div>';
-      h += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
-      h += '<a href="https://www.dsb.no/egenberedskap" target="_blank" rel="noopener noreferrer" style="background:rgba(214,40,40,0.12);border:1px solid rgba(214,40,40,0.3);color:var(--red-text);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;text-decoration:none;">DSB.no ↗</a>';
-      h += '<a href="https://www.kommunekatalogen.no" target="_blank" rel="noopener noreferrer" style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);color:var(--blue);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;text-decoration:none;">'+(en?'Your municipality':'Din kommune')+' ↗</a>';
-      h += '</div></div>';
+      h += '<div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:10px;">'+(en?'Safety points found:':'Trygghetspunkter funnet:')+'</div>';
+      h += '</div>';
     }
   } else {
     h += '<div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:12px;padding:14px 16px;margin-bottom:8px;">';
