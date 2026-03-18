@@ -38,6 +38,9 @@ export default {
       if (request.method === 'GET' && pathname === '/all') {
         return await handleAll(env);
       }
+      if (request.method === 'POST' && pathname === '/missing-kommune-request') {
+        return await handleMissingKommuneRequest(request, env);
+      }
       return jsonResponse({ error: 'Not found' }, 404);
     } catch (err) {
       return jsonResponse({ error: 'Internal server error', detail: err.message }, 500);
@@ -112,6 +115,56 @@ async function handleAll(env) {
 
   result.sort((a, b) => b.count - a.count);
   return jsonResponse(result);
+}
+
+// ── POST /missing-kommune-request ─────────────────────────────────────
+async function handleMissingKommuneRequest(request, env) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonResponse({ error: 'Invalid JSON' }, 400);
+  }
+
+  const { kommune, postnr, navn, email } = body;
+
+  if (typeof kommune !== 'string' || kommune.trim().length === 0) {
+    return jsonResponse({ error: 'Missing or invalid "kommune"' }, 400);
+  }
+  if (typeof postnr !== 'string' || postnr.trim().length < 4) {
+    return jsonResponse({ error: 'Missing or invalid "postnr"' }, 400);
+  }
+
+  // Validate email if provided
+  if (email && (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) {
+    return jsonResponse({ error: 'Invalid email format' }, 400);
+  }
+
+  const timestamp = new Date().toISOString();
+  const requestId = `${kommune.toLowerCase()}_${Date.now()}`;
+  const key = `missing-kommune:${requestId}`;
+
+  const data = {
+    kommune: kommune.trim(),
+    postnr: postnr.trim(),
+    navn: navn && typeof navn === 'string' ? navn.trim() : null,
+    email: email && typeof email === 'string' ? email.trim() : null,
+    timestamp,
+    userAgent: request.headers.get('User-Agent') || 'Unknown',
+  };
+
+  await env.STATS.put(key, JSON.stringify(data));
+
+  // Also increment counter per kommune
+  const counterKey = `missing-kommune-count:${kommune.toLowerCase()}`;
+  const existing = await env.STATS.get(counterKey, { type: 'json' });
+  const counter = existing || { count: 0, latestRequest: null };
+  counter.count += 1;
+  counter.latestRequest = timestamp;
+  if (email) counter.latestEmail = email;
+  await env.STATS.put(counterKey, JSON.stringify(counter));
+
+  return jsonResponse({ ok: true, stored: true, requestId });
 }
 
 // ── Helper ────────────────────────────────────────────────────────────────────
