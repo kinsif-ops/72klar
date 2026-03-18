@@ -41,6 +41,9 @@ export default {
       if (request.method === 'POST' && pathname === '/missing-kommune-request') {
         return await handleMissingKommuneRequest(request, env);
       }
+      if (request.method === 'GET' && pathname === '/missing-kommune/export') {
+        return await handleMissingKommuneExport(env);
+      }
       return jsonResponse({ error: 'Not found' }, 404);
     } catch (err) {
       return jsonResponse({ error: 'Internal server error', detail: err.message }, 500);
@@ -165,6 +168,101 @@ async function handleMissingKommuneRequest(request, env) {
   await env.STATS.put(counterKey, JSON.stringify(counter));
 
   return jsonResponse({ ok: true, stored: true, requestId });
+}
+
+// ── GET /missing-kommune/export ───────────────────────────────────
+async function handleMissingKommuneExport(env) {
+  const list = await env.STATS.list({ prefix: 'missing-kommune:' });
+  const byKommune = {};
+  let totalCount = 0;
+
+  for (const key of list.keys) {
+    const data = await env.STATS.get(key.name, { type: 'json' });
+    if (!data) continue;
+
+    const kommune = (data.kommune || 'Unknown').toLowerCase();
+    if (!byKommune[kommune]) {
+      byKommune[kommune] = {
+        count: 0,
+        emails: [],
+        requests: [],
+      };
+    }
+
+    byKommune[kommune].count += 1;
+    totalCount += 1;
+    if (data.email) {
+      byKommune[kommune].emails.push(data.email);
+    }
+    byKommune[kommune].requests.push({
+      timestamp: data.timestamp,
+      navn: data.navn || '(ikke oppgitt)',
+      email: data.email || '(ikke oppgitt)',
+      postnr: data.postnr,
+    });
+  }
+
+  // Also include counters
+  const counterList = await env.STATS.list({ prefix: 'missing-kommune-count:' });
+  const byKommuneWithCounters = {};
+  for (const key of counterList.keys) {
+    const counter = await env.STATS.get(key.name, { type: 'json' });
+    if (counter) {
+      const kommune = key.name.replace('missing-kommune-count:', '');
+      byKommuneWithCounters[kommune] = counter;
+    }
+  }
+
+  // Sort communes by request count (descending)
+  const sortedKommuner = Object.keys(byKommune).sort(
+    (a, b) => byKommune[b].count - byKommune[a].count
+  );
+
+  const result = {
+    exportedAt: new Date().toISOString(),
+    totalRequests: totalCount,
+    byKommune: {},
+  };
+
+  for (const kommune of sortedKommuner) {
+    result.byKommune[kommune] = byKommune[kommune];
+  }
+
+  // Format as CSV-friendly JSON for Sheets import
+  const exportData = {
+    meta: {
+      exportedAt: result.exportedAt,
+      totalRequests: totalCount,
+      uniqueKommuner: sortedKommuner.length,
+    },
+    summaryPerKommune: sortedKommuner.map(k => ({
+      kommune: k,
+      count: byKommune[k].count,
+      uniqueEmails: new Set(byKommune[k].emails).size,
+      latestEmail: byKommuneWithCounters[k]?.latestEmail || '',
+    })),
+    allRequests: [],
+  };
+
+  // Flatten all requests for CSV
+  for (const kommune of sortedKommuner) {
+    for (const req of byKommune[kommune].requests) {
+      exportData.allRequests.push({
+        kommune,
+        timestamp: req.timestamp,
+        navn: req.navn,
+        email: req.email,
+        postnr: req.postnr,
+      });
+    }
+  }
+
+  // Sort by timestamp descending (newest first)
+  exportData.allRequests.sort((a, b) =>
+    new Date(b.timestamp) - new Date(a.timestamp)
+  );
+
+  return jsonResponse(exportData);
 }
 
 // ── Helper ────────────────────────────────────────────────────────────────────
