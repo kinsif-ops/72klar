@@ -1,6 +1,6 @@
 // 72timer – Service Worker
 // Oppdater CACHE_NAME når du publiserer ny versjon (f.eks. v2.1, v2.2...)
-const CACHE_NAME = '72timer-v4.11';
+const CACHE_NAME = '72timer-v4.12';
 const FILES_TO_CACHE = [
   './',
   './index.html',

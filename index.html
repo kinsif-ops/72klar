@@ -3949,6 +3949,14 @@ function showMissingKommuneModal(kommune, postnr){
   document.getElementById('mkEmail').value = '';
   document.getElementById('missingKommuneModalOverlay').classList.add('open');
 }
+function showMissingKommuneModalFromBtn(){
+  // Helper to extract data from button and show modal
+  const btn = document.getElementById('mkRequestBtn');
+  if(!btn) return;
+  const kommune = btn.dataset.kommune;
+  const postnr = btn.dataset.postnr;
+  showMissingKommuneModal(kommune, postnr);
+}
 function closeMissingKommuneModal(){
   const kommune = document.getElementById('mkKommuneInput').value;
   if(kommune) localStorage.setItem('72t_missing_kommune_dismissed_' + kommune, '1');
@@ -5495,14 +5503,15 @@ function renderTrygghetspunkter(){
     h += '</div>';
   } else if(postnr && postnr.length >= 4){
     const kommuneName = kommuneForPostnr(postnr.trim().padStart(4,'0'));
-    // Show modal for ANY kommune without trygghetspunkter (unknown OR no points registered)
+    // Show message for ANY kommune without trygghetspunkter
     if(!kommuneName || !TRYGGHETSPUNKTER[kommuneName] || TRYGGHETSPUNKTER[kommuneName].length === 0){
       const displayName = kommuneName || 'Unknown';
       h += '<div style="background:rgba(247,127,0,0.08);border:1px solid rgba(247,127,0,0.2);border-radius:12px;padding:14px 16px;margin-bottom:8px;">';
-      h += '<div style="font-size:13px;color:var(--orange);">'+(en?'⚠️ No safety points registered for this municipality yet.':'⚠️ Ingen trygghetspunkter registrert for denne kommunen ennå.')+'</div>';
-      h += '</div>';
-      // Queue modal to show after render completes
-      setTimeout(()=>showMissingKommuneModal(displayName, postnr), 100);
+      h += '<div style="font-size:13px;color:var(--orange);line-height:1.6;margin-bottom:10px;">'+(en?'⚠️ No safety points registered for your municipality yet. Help us by requesting them!':'⚠️ Ingen trygghetspunkter registrert for din kommune ennå. Hjelp oss ved å forespørre dem!')+'</div>';
+      h += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
+      h += '<button id="mkRequestBtn" data-kommune="'+esc(displayName)+'" data-postnr="'+esc(postnr)+'" onclick="showMissingKommuneModalFromBtn()" style="background:linear-gradient(135deg,var(--red),var(--orange));border:none;color:white;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;text-decoration:none;cursor:pointer;">📧 '+(en?'Request for my municipality':'Be om din kommune')+'</button>';
+      h += '<a href="https://www.dsb.no/egenberedskap" target="_blank" rel="noopener noreferrer" style="background:rgba(214,40,40,0.12);border:1px solid rgba(214,40,40,0.3);color:var(--red-text);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;text-decoration:none;">DSB.no ↗</a>';
+      h += '</div></div>';
     } else {
       // This won't happen in current setup, but kept for safety
       h += '<div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:12px;padding:14px 16px;margin-bottom:8px;">';
