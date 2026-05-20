@@ -616,7 +616,7 @@
 
     <div class="weekly-reminder" id="weeklyReminderBox"></div>
 
-    <div class="badges-section-title">🏅 Dine merker</div>
+    <div class="badges-section-title" id="badgesSectionTitle">🏅 Dine merker</div>
     <div class="badges-grid" id="badgesGrid"></div>
   </div></div>
 
@@ -1153,7 +1153,7 @@
       <button id="resetProfileBtn" class="reset-btn-soft" onclick="resetProfile()">👤 Endre husstandsprofil</button>
       <button id="resetAllBtn" class="reset-btn" onclick="resetAll()">🔄 Start appen helt på nytt</button>
     </div>
-    <div class="app-version" style="cursor:pointer;" onclick="toggleChangelog()"><span id="appVersionLine">72klar! · v2.1 · Laget for folk flest i Norge</span> · <span id="changelogToggle" style="color:var(--orange);">Hva er nytt? ▾</span></div>
+    <div class="app-version" style="cursor:pointer;" onclick="toggleChangelog()"><span id="appVersionLine">72klar! · v2.2 · Laget for folk flest i Norge</span> · <span id="changelogToggle" style="color:var(--orange);">Hva er nytt? ▾</span></div>
     <div id="changelogBox" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:8px 0 16px;text-align:left;">
       <div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;color:var(--orange);margin-bottom:8px;">v2.0 – Mars 2026</div>
       <ul style="font-size:12px;color:var(--muted);line-height:1.8;padding-left:16px;">
@@ -1328,28 +1328,28 @@ let selectedPersons = 1, customNum = 6, selectedNeeds = new Set();
 
 // DAILY TIPS
 const TIPS = [
-  { t:"Vann er det viktigste du kan lagre. En voksen trenger minimum 2–3 liter per dag – mer ved sykdom eller varme. Fyll flasker i dag!", s:"DSB – Direktoratet for samfunnssikkerhet og beredskap" },
-  { t:"En batteriradio er din livline under strømbrudd. NRK sender alltid offisiell kriseinformasjon på radio, selv når nettet er nede.", s:"NRK / DSB" },
-  { t:"Sjekk holdbarhetsdatoen på hermetikken din jevnlig. Mat kan holde seg lenge, men kvaliteten synker gradvis over tid.", s:"Mattilsynet" },
-  { t:"Ha alltid en fulladet powerbank. I en krise er mobilen din viktigste verktøy for informasjon og kontakt med nære og kjære.", s:"Nasjonal sikkerhetsmyndighet" },
-  { t:"Kontanter kan redde deg. Kortterminaler og minibanker fungerer ikke uten strøm. Ha et lite kontantbeløp hjemme til nødsituasjoner.", s:"DSB" },
-  { t:"Lær deg å stenge av vann og strøm i boligen din. Ved rørbrudd eller brann kan det stoppe store skader og redde liv.", s:"DSB" },
-  { t:"Et møtepunkt er viktig. Avtal med familien et sted dere møtes om mobilnettet er nede og dere ikke kan nå hverandre.", s:"DSB" },
-  { t:"Stearinlys gir varme og lys, men vær alltid oppmerksom på brannfare. Sett dem aldri i nærheten av gardiner eller tekstiler.", s:"Direktoratet for samfunnssikkerhet" },
-  { t:"Kjenn fluktveiene fra hjemmet ditt. Ha to alternative ruter ut – en primær og en reserve. Øv gjerne med familien.", s:"DSB" },
-  { t:"Frysmat holder seg i opptil 48 timer etter strømbrudd hvis du ikke åpner fryseren. Plan for hva du skal spise først.", s:"Mattilsynet" },
-  { t:"Vannrensingstabletter er billige og kompakte. Med disse kan du rense vann fra bekk, innsjø eller regnvann til drikkevann.", s:"Røde Kors" },
-  { t:"Førstehjelp-kunnskap kan redde liv. Meld deg på et gratis kurs hos Røde Kors eller St. John – det tar bare noen timer.", s:"Røde Kors Norge" },
-  { t:"Nøtter og tørket frukt er perfekt nødmat. Høy kaloritetthet, lang holdbarhet og trenger ingen tilberedning.", s:"DSB" },
-  { t:"Ha en liten nødsekk klar ved døren: pass, medisiner, varme klær, litt mat og vann. Kan brukes til evakuering på kort varsel.", s:"DSB" },
-  { t:"Sjekk ut varsom.no regelmessig. Siden viser alle aktive naturfarer i Norge: skred, flom, storm og ekstremvær.", s:"NVE / Varsom.no" },
-  { t:"Sørg for at CO-alarmen din fungerer. Karbonmonoksid er luktfri og dødelig – viktig ved bruk av parafinvarmere.", s:"DSB" },
-  { t:"Lagre kopier av viktige dokumenter digitalt. Ta bilder av pass, forsikringsbevis og ID og lagre i nettskyen.", s:"Datatilsynet" },
-  { t:"Nabohjelp er undervurdert. Bli kjent med naboene dine – i en krise er lokalsamfunnet den første og viktigste ressursen.", s:"Sivilforsvaret" },
-  { t:"Ha minst to lyskilder. Én for hånden og én i reserve. Lommelykt pluss hodelykt er en god kombinasjon.", s:"DSB" },
-  { t:"Kontroller røykvarslerne dine månedlig og skift batteriene minst en gang i året.", s:"DSB" },
-  { t:"Vet du hvor nærmeste tilfluktsrom er? Sivilforsvaret har kart over tilfluktsrom på sivilforsvaret.no.", s:"Sivilforsvaret" },
-  { t:"Last ned offline-kart til mobilen din eller skriv ut et fysisk kart av nærområdet. GPS og navigasjonsapper fungerer ikke uten nett.", s:"Kartverket" },
+  { t:"Vann er det viktigste du kan lagre. En voksen trenger minimum 2–3 liter per dag – mer ved sykdom eller varme. Fyll flasker i dag!", te:"Water is the most important thing to store. An adult needs at least 2–3 litres per day – more in heat or illness. Fill bottles today!", s:"DSB – Direktoratet for samfunnssikkerhet og beredskap" },
+  { t:"En batteriradio er din livline under strømbrudd. NRK sender alltid offisiell kriseinformasjon på radio, selv når nettet er nede.", te:"A battery radio is your lifeline during power outages. NRK always broadcasts official crisis information on radio, even when the internet is down.", s:"NRK / DSB" },
+  { t:"Sjekk holdbarhetsdatoen på hermetikken din jevnlig. Mat kan holde seg lenge, men kvaliteten synker gradvis over tid.", te:"Check the expiry dates on your canned food regularly. Food can last a long time, but quality gradually declines.", s:"Mattilsynet" },
+  { t:"Ha alltid en fulladet powerbank. I en krise er mobilen din viktigste verktøy for informasjon og kontakt med nære og kjære.", te:"Always keep a fully charged power bank. In a crisis, your phone is your most important tool for information and staying in touch.", s:"Nasjonal sikkerhetsmyndighet" },
+  { t:"Kontanter kan redde deg. Kortterminaler og minibanker fungerer ikke uten strøm. Ha et lite kontantbeløp hjemme til nødsituasjoner.", te:"Cash can save you. Card terminals and ATMs don't work without power. Keep a small amount of cash at home for emergencies.", s:"DSB" },
+  { t:"Lær deg å stenge av vann og strøm i boligen din. Ved rørbrudd eller brann kan det stoppe store skader og redde liv.", te:"Learn how to shut off water and electricity in your home. In case of a burst pipe or fire, this can prevent major damage and save lives.", s:"DSB" },
+  { t:"Et møtepunkt er viktig. Avtal med familien et sted dere møtes om mobilnettet er nede og dere ikke kan nå hverandre.", te:"Agree on a meeting point with your family for when the mobile network is down and you can't reach each other.", s:"DSB" },
+  { t:"Stearinlys gir varme og lys, men vær alltid oppmerksom på brannfare. Sett dem aldri i nærheten av gardiner eller tekstiler.", te:"Candles provide warmth and light, but always be aware of fire hazards. Never place them near curtains or textiles.", s:"Direktoratet for samfunnssikkerhet" },
+  { t:"Kjenn fluktveiene fra hjemmet ditt. Ha to alternative ruter ut – en primær og en reserve. Øv gjerne med familien.", te:"Know the escape routes from your home. Have two alternative routes out – a primary and a backup. Practise with your family.", s:"DSB" },
+  { t:"Frysmat holder seg i opptil 48 timer etter strømbrudd hvis du ikke åpner fryseren. Plan for hva du skal spise først.", te:"Frozen food stays safe for up to 48 hours after a power outage if you keep the freezer closed. Plan what to eat first.", s:"Mattilsynet" },
+  { t:"Vannrensingstabletter er billige og kompakte. Med disse kan du rense vann fra bekk, innsjø eller regnvann til drikkevann.", te:"Water purification tablets are cheap and compact. Use them to purify water from streams, lakes or rainwater for drinking.", s:"Røde Kors" },
+  { t:"Førstehjelp-kunnskap kan redde liv. Meld deg på et gratis kurs hos Røde Kors eller St. John – det tar bare noen timer.", te:"First aid knowledge can save lives. Sign up for a free course with the Red Cross or St. John – it only takes a few hours.", s:"Røde Kors Norge" },
+  { t:"Nøtter og tørket frukt er perfekt nødmat. Høy kaloritetthet, lang holdbarhet og trenger ingen tilberedning.", te:"Nuts and dried fruit are perfect emergency food. High calorie density, long shelf life and no preparation needed.", s:"DSB" },
+  { t:"Ha en liten nødsekk klar ved døren: pass, medisiner, varme klær, litt mat og vann. Kan brukes til evakuering på kort varsel.", te:"Keep a small emergency bag by the door: passport, medications, warm clothing, some food and water. Ready for quick evacuation.", s:"DSB" },
+  { t:"Sjekk ut varsom.no regelmessig. Siden viser alle aktive naturfarer i Norge: skred, flom, storm og ekstremvær.", te:"Check varsom.no regularly. The site shows all active natural hazards in Norway: avalanches, floods, storms and extreme weather.", s:"NVE / Varsom.no" },
+  { t:"Sørg for at CO-alarmen din fungerer. Karbonmonoksid er luktfri og dødelig – viktig ved bruk av parafinvarmere.", te:"Make sure your CO alarm works. Carbon monoxide is odourless and deadly – especially important when using paraffin heaters.", s:"DSB" },
+  { t:"Lagre kopier av viktige dokumenter digitalt. Ta bilder av pass, forsikringsbevis og ID og lagre i nettskyen.", te:"Store digital copies of important documents. Take photos of your passport, insurance certificates and ID and save them to the cloud.", s:"Datatilsynet" },
+  { t:"Nabohjelp er undervurdert. Bli kjent med naboene dine – i en krise er lokalsamfunnet den første og viktigste ressursen.", te:"Neighbour support is underrated. Get to know your neighbours – in a crisis, the local community is the first and most important resource.", s:"Sivilforsvaret" },
+  { t:"Ha minst to lyskilder. Én for hånden og én i reserve. Lommelykt pluss hodelykt er en god kombinasjon.", te:"Have at least two light sources. One at hand and one in reserve. A torch plus a headlamp is a good combination.", s:"DSB" },
+  { t:"Kontroller røykvarslerne dine månedlig og skift batteriene minst en gang i året.", te:"Test your smoke alarms monthly and replace the batteries at least once a year.", s:"DSB" },
+  { t:"Vet du hvor nærmeste tilfluktsrom er? Sivilforsvaret har kart over tilfluktsrom på sivilforsvaret.no.", te:"Do you know where your nearest shelter is? The Civil Defence has a map of shelters at sivilforsvaret.no.", s:"Sivilforsvaret" },
+  { t:"Last ned offline-kart til mobilen din eller skriv ut et fysisk kart av nærområdet. GPS og navigasjonsapper fungerer ikke uten nett.", te:"Download offline maps to your phone or print a physical map of your local area. GPS and navigation apps don't work without internet.", s:"Kartverket" },
 ];
 
 // BADGES
@@ -1651,7 +1651,7 @@ function openStatusDetail(){
   if(!d) return;
   statusDetailOpen=!statusDetailOpen;
   d.style.display=statusDetailOpen?'block':'none';
-  if(arrow) arrow.textContent=statusDetailOpen?'▾ lukk':'▸ se mer';
+  if(arrow) arrow.textContent=statusDetailOpen?(currentLang==='en'?'▾ close':'▾ lukk'):(currentLang==='en'?'▸ details':'▸ detaljer');
 }
 async function fetchFarevarsel(){
   var dot=document.getElementById('statusDot');
@@ -1842,7 +1842,7 @@ function renderDailyTip(){
   if(!tip) return;
   const tEl=document.getElementById('dailyTipText');
   const sEl=document.getElementById('dailyTipSource');
-  if(tEl) tEl.textContent=tip.t;
+  if(tEl) tEl.textContent=(currentLang==='en' && tip.te) ? tip.te : tip.t;
   if(sEl) sEl.textContent='— '+(currentLang==='en'?'Source: ':'Kilde: ')+tip.s;
 }
 
@@ -2007,7 +2007,7 @@ function showNewFeaturesBanner(){
   btn.style.cssText = 'background:linear-gradient(135deg,var(--red),var(--orange));border:none;color:white;border-radius:8px;padding:8px 16px;font-family:Syne,sans-serif;font-size:13px;font-weight:700;cursor:pointer;';
   btn.onclick = function(){ banner.remove(); localStorage.setItem('72t_features_seen','1'); };
   banner.innerHTML = '<div style="font-family:Syne,sans-serif;font-weight:800;font-size:15px;margin-bottom:6px;">👋 '
-    + (_sfbEn ? 'Welcome to 72klar! v2.1' : 'Velkommen til 72klar! v2.1') + '</div>'
+    + (_sfbEn ? 'Welcome to 72klar! v2.2' : 'Velkommen til 72klar! v2.2') + '</div>'
     + '<div style="font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:12px;">'
     + (_sfbEn ? 'Here is what you can do:' : 'Her er hva du kan gjøre:') + '<br>'
     + '🎒 <strong style="color:var(--text);">' + (_sfbEn ? 'Checklist' : 'Sjekkliste') + '</strong> – '
@@ -2535,6 +2535,12 @@ function applyLang(skipRender){
   const pTitle = document.querySelector('.progress-title');
   if(pTitle) pTitle.textContent = en ? 'Preparedness status' : 'Beredskapsstatus';
 
+  // Status bar arrow (only update when panel is closed)
+  if(!statusDetailOpen){ const sArr=document.getElementById('statusArrow'); if(sArr) sArr.textContent=en?'▸ details':'▸ detaljer'; }
+
+  // Badges section title
+  const bst=document.getElementById('badgesSectionTitle'); if(bst) bst.textContent=en?'🏅 Your badges':'🏅 Dine merker';
+
   // Share card
   const sTitle = document.querySelector('.share-card-title');
   const sSub = document.querySelector('.share-card-sub');
@@ -2698,7 +2704,7 @@ function applyLang(skipRender){
   const setLbl=document.getElementById('settingsLabel'); if(setLbl) setLbl.textContent=en?'⚙️ Settings':'⚙️ Innstillinger';
   const rpBtn=document.getElementById('resetProfileBtn'); if(rpBtn) rpBtn.textContent=en?'👤 Change household profile':'👤 Endre husstandsprofil';
   const raBtn=document.getElementById('resetAllBtn'); if(raBtn) raBtn.textContent=en?'🔄 Reset app completely':'🔄 Start appen helt på nytt';
-  const avl=document.getElementById('appVersionLine'); if(avl) avl.textContent=en?'72klar! · v2.1 · Made for everyone in Norway':'72klar! · v2.1 · Laget for folk flest i Norge';
+  const avl=document.getElementById('appVersionLine'); if(avl) avl.textContent=en?'72klar! · v2.2 · Made for everyone in Norway':'72klar! · v2.2 · Laget for folk flest i Norge';
   const ctgl=document.getElementById('changelogToggle'); if(ctgl) ctgl.textContent=en?'What\'s new? ▾':'Hva er nytt? ▾';
   // Info tab
   const aw=document.getElementById('authorityWarning'); if(aw) aw.innerHTML=en?'⚠️ Authorities recommend that all households are prepared to take care of themselves for at least <strong>72 hours</strong> in a crisis situation.':'⚠️ Myndighetene anbefaler at alle husstander er forberedt på å klare seg selv i minst <strong>72 timer</strong> ved en krisesituasjon.';
@@ -2761,7 +2767,7 @@ function setRating(n){
 function submitFeedback(){
   const txt = document.getElementById('fbText').value.trim();
   if(!fbRating){ alert(currentLang==='en'?'Please select a star rating first':'Velg antall stjerner først'); return; }
-  const fb = { rating: fbRating, comment: txt, date: new Date().toLocaleDateString(currentLang==='en'?'en-GB':'no-NO'), version: 'v2.1' };
+  const fb = { rating: fbRating, comment: txt, date: new Date().toLocaleDateString(currentLang==='en'?'en-GB':'no-NO'), version: 'v2.2' };
   const all = JSON.parse(localStorage.getItem('72t_feedback') || '[]');
   all.push(fb);
   localStorage.setItem('72t_feedback', JSON.stringify(all));
