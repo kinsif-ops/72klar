@@ -1,18 +1,9 @@
 // 72timer – Service Worker
-// Oppdater CACHE_NAME når du publiserer ny versjon (f.eks. v2.1, v2.2...)
-const CACHE_NAME = '72timer-v4.12';
+// Oppdater CACHE_NAME når du publiserer ny versjon (f.eks. v1.4, v1.5...)
+const CACHE_NAME = '72timer-v2.1';
 const FILES_TO_CACHE = [
   './',
-  './index.html',
-  './icon-192.png',
-  './icon-512.png',
-  './og-image.png'
-];
-
-// Fonts to cache for offline use
-const FONT_ORIGINS = [
-  'https://fonts.googleapis.com',
-  'https://fonts.gstatic.com'
+  './index.html'
 ];
 
 // INSTALL – cache filer første gang
@@ -41,12 +32,10 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// FETCH – network-first for HTML, cache-first for fonts & assets
+// FETCH – network-first for HTML (alltid fersk app), cache-first for resten (offline-støtte)
 self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
   const isHTML = event.request.mode === 'navigate' ||
     (event.request.headers.get('accept') || '').includes('text/html');
-  const isFont = FONT_ORIGINS.some(origin => event.request.url.startsWith(origin));
 
   if (isHTML) {
     // HTML: prøv nett først, fall tilbake på cache om offline
@@ -62,23 +51,8 @@ self.addEventListener('fetch', (event) => {
         return caches.match(event.request).then(r => r || caches.match('./index.html'));
       })
     );
-  } else if (isFont) {
-    // Fonter: cache-first med stale-while-revalidate (kritisk for offline)
-    event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        const fetchPromise = fetch(event.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, networkResponse.clone());
-            });
-          }
-          return networkResponse;
-        }).catch(() => {});
-        return cachedResponse || fetchPromise;
-      })
-    );
   } else {
-    // Alt annet: cache-first (bilder, API-svar, etc.)
+    // Alt annet: cache-first (bilder, fonter, etc.)
     event.respondWith(
       caches.match(event.request).then((cachedResponse) => {
         return cachedResponse || fetch(event.request).catch(() => {});
